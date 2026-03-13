@@ -17,4 +17,4 @@
 
 （5）配送：主要包括买家和卖家对订单的一系列操作：用户下订单后。卖家在发现后修改订单状态为出货，买家收到物品后能将订单状态修改为已收货，交易成功结束。
 
-Contributors: dudujerry452(周致远) Junhan327(刘俊含)
+Contributors: dudujerry452(周致远) Junhan327(刘俊含) morose098(李子豪) HKJay(黄坤) 
