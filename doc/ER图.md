@@ -1,0 +1,92 @@
+erDiagram
+    %% ------------------------------ 实体间关系定义 ------------------------------
+    USER ||--o{ PRODUCT : "发布"
+    USER ||--|| REGISTER_REVIEW : "接受注册审查"
+    USER ||--o{ REGISTER_REVIEW : "执行注册审查"
+    PRODUCT ||--|| PRODUCT_REVIEW : "接受商品审查"
+    USER ||--o{ PRODUCT_REVIEW : "执行商品审查"
+    USER ||--o{ ORDER : "下单"
+    USER ||--o{ ORDER : "接单出货"
+    ORDER ||--o{ ORDER_DETAIL : "包含"
+    PRODUCT ||--o{ ORDER_DETAIL : "对应"
+    USER ||--o{ MESSAGE : "发布留言"
+    PRODUCT ||--o{ MESSAGE : "关联留言"
+
+    %% ------------------------------ 实体与属性定义 ------------------------------
+    USER {
+        string user_id PK "用户ID（主键）"
+        string username "用户名"
+        string encrypted_password "加密登录密码"
+        string real_name "真实姓名"
+        string id_card "身份证号"
+        string phone "联系电话"
+        string address "收货地址"
+        string role "用户角色（枚举：普通用户/系统管理员）"
+        string register_status "注册状态（枚举：待审核/审核通过/审核驳回）"
+        datetime register_time "注册时间"
+        datetime last_login_time "最后登录时间"
+    }
+
+    PRODUCT {
+        string product_id PK "商品ID（主键）"
+        string product_name "商品名称"
+        string category "商品分类"
+        string description "详情描述"
+        string image_url "商品图片地址（必填）"
+        decimal price "单价"
+        int stock "库存数量"
+        string publisher_id FK "发布者用户ID（外键，关联USER.user_id）"
+        string product_status "商品状态（枚举：待审核/审核通过/已下架/审核驳回）"
+        datetime publish_time "发布时间"
+        datetime review_time "审核时间"
+    }
+
+    REGISTER_REVIEW {
+        string review_id PK "审查记录ID（主键）"
+        string pending_user_id FK "待审核用户ID（外键，关联USER.user_id）"
+        string admin_id FK "审查管理员ID（外键，关联USER.user_id）"
+        string result "审查结果（枚举：审核通过/审核驳回）"
+        string opinion "审查意见"
+        datetime review_time "审查时间"
+    }
+
+    PRODUCT_REVIEW {
+        string review_id PK "审查记录ID（主键）"
+        string pending_product_id FK "待审核商品ID（外键，关联PRODUCT.product_id）"
+        string admin_id FK "审查管理员ID（外键，关联USER.user_id）"
+        string result "审查结果（枚举：审核通过/审核驳回）"
+        string opinion "审查意见"
+        datetime review_time "审查时间"
+    }
+
+    ORDER {
+        string order_id PK "订单ID（主键）"
+        string buyer_id FK "买家用户ID（外键，关联USER.user_id）"
+        string seller_id FK "卖家用户ID（外键，关联USER.user_id）"
+        decimal total_amount "订单总金额"
+        string address_snapshot "收货地址快照"
+        string phone_snapshot "联系电话快照"
+        string order_status "订单状态（枚举：待付款/已付款待出货/已出货待收货/已收货交易完成/已取消）"
+        datetime order_time "下单时间"
+        datetime ship_time "出货时间"
+        datetime receive_time "收货时间"
+    }
+
+    ORDER_DETAIL {
+        string detail_id PK "订单明细ID（主键）"
+        string order_id FK "订单ID（外键，关联ORDER.order_id）"
+        string product_id FK "商品ID（外键，关联PRODUCT.product_id）"
+        int quantity "购买数量"
+        decimal price_snapshot "下单单价快照"
+        decimal subtotal "小计金额"
+    }
+
+    MESSAGE {
+        string message_id PK "留言ID（主键）"
+        string user_id FK "留言用户ID（外键，关联USER.user_id）"
+        string product_id FK "关联商品ID（外键，关联PRODUCT.product_id）"
+        string content "留言内容"
+        datetime message_time "留言时间"
+        string reply_content "回复内容"
+        datetime reply_time "回复时间"
+    }
