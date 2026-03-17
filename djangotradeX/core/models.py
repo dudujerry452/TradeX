@@ -1,6 +1,6 @@
 from django.db import models
 
-class User(models.User):
+class User(models.Model):
     """
     之后用户加密用 django.contrib.auth.models.AbstractUser 替代
     """
