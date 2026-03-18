@@ -15,10 +15,12 @@ class User(models.Model):
 
     user_id = models.CharField(max_length=50, primary_key=True, verbose_name="用户ID")
     username = models.CharField(max_length=100, unique=True, verbose_name="用户名")
+    email = models.EmailField(max_length=254, unique=True, verbose_name="电子邮箱") 
+    phone = models.EmailField(max_length=254, unique=True, verbose_name="电话号码") 
     encrypted_password = models.CharField(max_length=255, verbose_name="加密登录密码")
     real_name = models.CharField(max_length=100, verbose_name="真实姓名")
     id_card = models.CharField(max_length=18, unique=True, verbose_name="身份证号")
-    phone = models.CharField(max_length=20, verbose_name="联系电话")
+    phone_display = models.CharField(max_length=20, null=True, verbose_name="联系电话")
     address = models.CharField(max_length=255, verbose_name="收货地址")
     
     role = models.CharField(

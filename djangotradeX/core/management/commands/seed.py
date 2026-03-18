@@ -22,6 +22,8 @@ USERS = [
     dict(
         user_id="seed_admin001",
         username="admin_root",
+        email="a@a.com",
+        phone_display=None, 
         encrypted_password="hashed_admin_pw",
         real_name="系统管理员",
         id_card="110101198001010001",
@@ -33,6 +35,8 @@ USERS = [
     dict(
         user_id="seed_buyer001",
         username="buyer_alice",
+        email="b@a.com",
+        phone_display="123333", 
         encrypted_password="hashed_pw",
         real_name="爱丽丝",
         id_card="110101199501010002",
@@ -43,6 +47,8 @@ USERS = [
     dict(
         user_id="seed_buyer002",
         username="buyer_bob",
+        email="c@a.com",
+        phone_display="12331441", 
         encrypted_password="hashed_pw",
         real_name="鲍勃",
         id_card="110101199301010003",
@@ -53,6 +59,8 @@ USERS = [
     dict(
         user_id="seed_seller001",
         username="seller_techshop",
+        email="d@a.com",
+        phone_display=None, 
         encrypted_password="hashed_pw",
         real_name="科技数码店",
         id_card="110101198801010004",
@@ -63,6 +71,8 @@ USERS = [
     dict(
         user_id="seed_seller002",
         username="seller_newbie",
+        email="e@a.com",
+        phone_display=None, 
         encrypted_password="hashed_pw",
         real_name="新手卖家",
         id_card="110101200001010005",

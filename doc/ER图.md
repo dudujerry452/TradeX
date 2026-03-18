@@ -16,10 +16,12 @@ erDiagram
     USER {
         string user_id PK "用户ID（主键）"
         string username "用户名"
+        string email "电子邮箱"
+        string phone "电话号码"
         string encrypted_password "加密登录密码"
         string real_name "真实姓名"
         string id_card "身份证号"
-        string phone "联系电话"
+        string phone_display "联系电话"
         string address "收货地址"
         string role "用户角色（枚举：普通用户/系统管理员）"
         string register_status "注册状态（枚举：待审核/审核通过/审核驳回）"

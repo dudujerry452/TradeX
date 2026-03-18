@@ -18,14 +18,13 @@ router = Router()
 # ── Schemas ───────────────────────────────────────────────────────────────────
 
 class LoginIn(Schema):
-    username: str
+    email: str
     password: str
 
 
 class LoginOut(Schema):
     user_id: str
     username: str
-    real_name: str
     role: str
 
 
@@ -39,13 +38,14 @@ class UserOut(Schema):
     address: str
 
 
-class UserIn(Schema):
-    user_id: Optional[str] = None   # 可选
+class RegisterIn(Schema):
+    email: str
     username: str
     encrypted_password: str
     real_name: str
     id_card: str
     phone: str
+    phone_display: Optional[str] = None
     address: str
 
 
@@ -126,7 +126,7 @@ def list_users(request):
     tags=["用户"],
     summary="注册新用户",
 )
-def create_user(request, data: UserIn):
+def create_user(request, data: RegisterIn):
     """创建新用户。
 
     - 字段缺失/类型错误 > 422
@@ -140,6 +140,7 @@ def create_user(request, data: UserIn):
             real_name=data.real_name,
             id_card=data.id_card,
             phone=data.phone,
+            phone_display=data.phone_display or None, 
             address=data.address,
         )
     except IntegrityError as e:

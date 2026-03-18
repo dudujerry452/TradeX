@@ -12,10 +12,12 @@ def make_user(**kwargs):
     defaults = dict(
         user_id="u001",
         username="testuser",
+        email = "a@a.com",
         encrypted_password="hashed_pw",
         real_name="张三",
         id_card="110101199001011234",
         phone="13800000000",
+        phone_display=None, 
         address="北京市朝阳区",
     )
     defaults.update(kwargs)
