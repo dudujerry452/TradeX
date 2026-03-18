@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'core',
+    'ninja',  # django-ninja: Swagger UI 模板与静态文件
 ]
 
 MIDDLEWARE = [

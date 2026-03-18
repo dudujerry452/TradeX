@@ -92,7 +92,7 @@ class UserListCreateTests(TestCase):
         )
         # view now catches IntegrityError and returns 400
         self.assertEqual(response.status_code, 400)
-        self.assertIn("error", response.json())
+        self.assertIn("detail", response.json())
 
 
 class UserDetailTests(TestCase):
@@ -113,7 +113,7 @@ class UserDetailTests(TestCase):
     def test_get_nonexistent_user_returns_404(self):
         response = self.client.get("/api/users/does_not_exist/")
         self.assertEqual(response.status_code, 404)
-        self.assertIn("error", response.json())
+        self.assertIn("detail", response.json())
 
 
 # ── Product API tests ──────────────────────────────────────────────────────────
@@ -166,7 +166,7 @@ class ProductListCreateTests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 404)
-        self.assertIn("error", response.json())
+        self.assertIn("detail", response.json())
 
     def test_get_product_list_after_create(self):
         make_product(self.publisher)
@@ -195,4 +195,4 @@ class ProductDetailTests(TestCase):
     def test_get_nonexistent_product_returns_404(self):
         response = self.client.get("/api/products/no_such_product/")
         self.assertEqual(response.status_code, 404)
-        self.assertIn("error", response.json())
+        self.assertIn("detail", response.json())
