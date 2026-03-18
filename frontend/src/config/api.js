@@ -1,6 +1,5 @@
-export const BACKEND_IP = '127.0.0.1'
-export const BACKEND_PORT = 8000
-export const BACKEND_PROTOCOL = 'http'
+// 开发时：Vite 代理将 /api/* 转发到 127.0.0.1:8000，浏览器只看到同源请求，无 CORS 问题
+// 生产时：前端由 Django 静态文件服务，前后端同域，相对路径同样有效
+export const API_BASE_URL = ''
 
-export const API_BASE_URL = `${BACKEND_PROTOCOL}://${BACKEND_IP}:${BACKEND_PORT}`
 export const LOGIN_API_URL = `${API_BASE_URL}/api/login`
