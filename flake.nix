@@ -36,6 +36,25 @@
           doCheck = false;
           pythonImportsCheck = [ "django" ];
         };
+
+        djangoNinja = pythonPackages.buildPythonPackage rec {
+          pname = "django-ninja";
+          version = "1.6.0";
+          format = "wheel";
+
+          src = pkgs.fetchurl {
+            url = "https://files.pythonhosted.org/packages/fc/ff/51e518a434f1af18932d4fe52a4c46985b7c15a75e394aeed5ed87ff6f98/django_ninja-1.6.0-py3-none-any.whl";
+            hash = "sha256-RMbj9fG5Kc9R9kUARxWzYybqMv3fGpQCbEkX3o0jATU=";
+          };
+
+          nativeBuildInputs = with pythonPackages; [ wheel ];
+          propagatedBuildInputs = [
+            django603
+            pythonPackages.pydantic
+          ];
+
+          doCheck = false;
+        };
       in
       {
         devShells.default = pkgs.mkShell {
@@ -44,6 +63,7 @@
             pythonPackages.pip
             pythonPackages.virtualenv
             django603
+            djangoNinja
             pythonPackages.pytest
             nodejs_22
             pnpm
