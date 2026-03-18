@@ -1,7 +1,7 @@
 <script setup>
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { LOGIN_API_URL } from '../config/api'
+import { REGISTER_API_URL } from '../config/api'
 import { floatingIcons } from '../config/loginFloatingIcons'
 import bagIcon from '../assets/login/bag.svg'
 import mailIcon from '../assets/login/mail.svg'
@@ -9,10 +9,13 @@ import lockIcon from '../assets/login/lock.svg'
 import eyeIcon from '../assets/login/eye.svg'
 
 const form = reactive({
-  loginMode: 'username',
-  identifier: '',
+  username: '',
+  realName: '',
+  idCard: '',
+  phone: '',
+  address: '',
   password: '',
-  remember: false,
+  confirmPassword: '',
   loading: false,
   error: '',
   success: '',
@@ -23,44 +26,43 @@ const router = useRouter()
 const onSubmit = async () => {
   if (form.loading) return
 
-  form.loading = true
   form.error = ''
   form.success = ''
 
-  try {
-    const loginPayload = {
-      password: form.password,
-      //remember: form.remember,
-    }
-    if (form.loginMode === 'email') {
-      loginPayload.email = form.identifier
-    } else {
-      loginPayload.username = form.identifier
-    }
+  if (form.password !== form.confirmPassword) {
+    form.error = '两次密码不一致'
+    return
+  }
 
-    const response = await fetch(LOGIN_API_URL, {
+
+  form.loading = true
+
+  try {
+    const response = await fetch(REGISTER_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(loginPayload),
+      body: JSON.stringify({
+        username: form.username,
+        encrypted_password: form.password, //这里暂时没有加密
+        real_name: form.realName,
+        id_card: form.idCard,
+        phone: form.phone,
+        address: form.address,
+      }),
     })
 
     if (!response.ok) {
-      let message = `Login failed: ${response.status}`
-      try {
-        const err = await response.json()
-        message = err?.detail || message
-      } catch (_) {
-        // Keep fallback message when response body is not JSON.
-      }
-      throw new Error(message)
+      form.error = response.status === 400 ? '用户名或身份证已存在，或字段不合法' : '注册失败'
+      return
     }
 
-    form.success = '登录成功'
-    await router.push('/home')
+    form.success = '注册成功，请登录'
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await router.push('/login')
   } catch (error) {
-    form.error = error instanceof Error ? error.message : '登录请求失败'
+    form.error = error instanceof Error ? error.message : '注册请求失败'
   } finally {
     form.loading = false
   }
@@ -92,59 +94,101 @@ const onSubmit = async () => {
           <img :src="bagIcon" alt="" />
         </div>
         <h1>
-          Welcome to
+          Create
           <span>tradeX</span>
         </h1>
-        <p class="subtitle">Sign in to continue shopping</p>
+        <p class="subtitle">Join and start your shopping journey</p>
       </header>
 
       <form class="login-form" @submit.prevent="onSubmit">
-        <div class="mode-switch" role="tablist" aria-label="登录方式切换">
-          <button
-            type="button"
-            class="mode-btn"
-            :class="{ active: form.loginMode === 'username' }"
-            @click="form.loginMode = 'username'"
-          >
-            用户名登录
-          </button>
-          <button
-            type="button"
-            class="mode-btn"
-            :class="{ active: form.loginMode === 'email' }"
-            @click="form.loginMode = 'email'"
-          >
-            邮箱登录
-          </button>
-        </div>
-
-        <label class="field" :for="form.loginMode === 'email' ? 'login-email' : 'login-username'">
-          <span>{{ form.loginMode === 'email' ? 'Email Address' : 'Username' }}</span>
+        <label class="field" for="register-username">
+          <span>Username</span>
           <div class="input-wrap">
             <img :src="mailIcon" alt="" />
             <input
-              :id="form.loginMode === 'email' ? 'login-email' : 'login-username'"
-              v-model="form.identifier"
-              :type="form.loginMode === 'email' ? 'email' : 'text'"
-              :name="form.loginMode === 'email' ? 'email' : 'username'"
-              :autocomplete="form.loginMode === 'email' ? 'email' : 'username'"
-              :placeholder="form.loginMode === 'email' ? 'you@example.com' : 'Enter username'"
+              id="register-username"
+              v-model="form.username"
+              type="text"
+              name="username"
+              autocomplete="username"
+              placeholder="Enter username"
               required
             />
           </div>
         </label>
 
-        <label class="field" for="login-password">
+        <label class="field" for="register-real-name">
+          <span>Real Name</span>
+          <div class="input-wrap">
+            <img :src="mailIcon" alt="" />
+            <input
+              id="register-real-name"
+              v-model="form.realName"
+              type="text"
+              name="real-name"
+              placeholder="Enter real name"
+              required
+            />
+          </div>
+        </label>
+
+        <label class="field" for="register-id-card">
+          <span>ID Card</span>
+          <div class="input-wrap">
+            <img :src="mailIcon" alt="" />
+            <input
+              id="register-id-card"
+              v-model="form.idCard"
+              type="text"
+              name="id-card"
+              maxlength="18"
+              placeholder="18-digit id card"
+              required
+            />
+          </div>
+        </label>
+
+        <label class="field" for="register-phone">
+          <span>Phone</span>
+          <div class="input-wrap">
+            <img :src="mailIcon" alt="" />
+            <input
+              id="register-phone"
+              v-model="form.phone"
+              type="tel"
+              name="phone"
+              placeholder="Enter phone number"
+              required
+            />
+          </div>
+        </label>
+
+        <label class="field" for="register-address">
+          <span>Address</span>
+          <div class="input-wrap">
+            <img :src="mailIcon" alt="" />
+            <input
+              id="register-address"
+              v-model="form.address"
+              type="text"
+              name="address"
+              placeholder="Enter shipping address"
+              required
+            />
+          </div>
+        </label>
+
+        <label class="field" for="register-password">
           <span>Password</span>
           <div class="input-wrap">
             <img :src="lockIcon" alt="" />
             <input
-              id="login-password"
+              id="register-password"
               v-model="form.password"
               type="password"
               name="password"
-              autocomplete="current-password"
-              placeholder="Enter your password"
+              autocomplete="new-password"
+              placeholder="Create a password"
               required
             />
             <button type="button" class="eye-btn" aria-label="toggle password visibility">
@@ -153,16 +197,27 @@ const onSubmit = async () => {
           </div>
         </label>
 
-        <div class="row">
-          <label class="remember">
-            <input v-model="form.remember" type="checkbox" />
-            <span>Remember me</span>
-          </label>
-          <a href="#" class="link">Forgot password?</a>
-        </div>
+        <label class="field" for="register-confirm-password">
+          <span>Confirm Password</span>
+          <div class="input-wrap">
+            <img :src="lockIcon" alt="" />
+            <input
+              id="register-confirm-password"
+              v-model="form.confirmPassword"
+              type="password"
+              name="confirm-password"
+              autocomplete="new-password"
+              placeholder="Confirm your password"
+              required
+            />
+            <button type="button" class="eye-btn" aria-label="toggle password visibility">
+              <img :src="eyeIcon" alt="" />
+            </button>
+          </div>
+        </label>
 
         <button type="submit" class="submit-btn" :disabled="form.loading">
-          {{ form.loading ? 'Signing In...' : 'Sign In' }}
+          {{ form.loading ? 'Creating Account...' : 'Create Account' }}
         </button>
 
         <p v-if="form.error" class="status error">{{ form.error }}</p>
@@ -170,8 +225,8 @@ const onSubmit = async () => {
       </form>
 
       <footer class="login-footer">
-        <span>Don't have an account?</span>
-        <RouterLink to="/register" class="link">Sign up for free</RouterLink>
+        <span>Already have an account?</span>
+        <RouterLink to="/login" class="link">Back to sign in</RouterLink>
       </footer>
     </section>
   </div>
@@ -289,31 +344,6 @@ const onSubmit = async () => {
 .login-form {
   display: grid;
   gap: 16px;
-}
-
-.mode-switch {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  background: #ececf0;
-  border-radius: 12px;
-  padding: 4px;
-}
-
-.mode-btn {
-  border: 0;
-  background: transparent;
-  height: 38px;
-  border-radius: 9px;
-  cursor: pointer;
-  font-weight: 700;
-  color: #4a4f63;
-}
-
-.mode-btn.active {
-  background: #fff;
-  color: #11131f;
-  box-shadow: 0 3px 8px rgba(30, 38, 66, 0.12);
 }
 
 .field {

@@ -3,3 +3,6 @@
 export const API_BASE_URL = ''
 
 export const LOGIN_API_URL = `${API_BASE_URL}/api/login`
+export const REGISTER_API_URL = `${API_BASE_URL}/api/users/`
+export const PRODUCTS_API_URL = `${API_BASE_URL}/api/products/`
+export const getProductDetailApiUrl = (productId) => `${API_BASE_URL}/api/products/${encodeURIComponent(productId)}/`
