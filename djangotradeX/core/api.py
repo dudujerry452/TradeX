@@ -32,10 +32,12 @@ class LoginOut(Schema):
 class UserOut(Schema):
     user_id: str
     username: str
+    email: str
     real_name: str
     role: str
     register_status: str
     phone: str
+    phone_display: Optional[str] = None
     address: str
 
 
@@ -142,6 +144,7 @@ def create_user(request, data: RegisterIn):
         user = User.objects.create(
             user_id=uuid.uuid4().hex[:20],
             username=data.username,
+            email=data.email, 
             encrypted_password=data.encrypted_password,
             real_name=data.real_name,
             id_card=data.id_card,
