@@ -18,7 +18,8 @@ router = Router()
 # ── Schemas ───────────────────────────────────────────────────────────────────
 
 class LoginIn(Schema):
-    email: str
+    email: Optional[str] = None 
+    username: Optional[str] = None
     password: str
 
 
@@ -86,8 +87,13 @@ def login(request, data: LoginIn):
     注意：当前直接比对 encrypted_password 字段。
     待 User 模型切换到 AbstractUser 后改用 check_password()。
     """
+    if (not data.username) and (not data.email): 
+        raise HttpError(401, "未提供用户名或邮箱")
     try:
-        user = User.objects.get(username=data.username)
+        if data.username:
+            user = User.objects.get(username=data.username)
+        else:
+            user = User.objects.get(email=data.email)
     except User.DoesNotExist:
         raise HttpError(401, "用户名或密码错误")
 
