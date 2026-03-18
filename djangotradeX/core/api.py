@@ -6,6 +6,7 @@ import uuid
 from typing import Optional
 
 from django.db import IntegrityError
+from django.utils import timezone
 from ninja import Router, Schema
 from ninja.errors import HttpError
 
@@ -15,6 +16,18 @@ router = Router()
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
+
+class LoginIn(Schema):
+    username: str
+    password: str
+
+
+class LoginOut(Schema):
+    user_id: str
+    username: str
+    real_name: str
+    role: str
+
 
 class UserOut(Schema):
     user_id: str
@@ -59,7 +72,40 @@ class ProductIn(Schema):
     publisher_id: str
 
 
-# ── 用户接口────
+# ── 认证接口 ──────────────────────────────────────────────────────────────────
+
+@router.post("/login", response=LoginOut, tags=["认证"], summary="用户登录",
+             auth=None)  # auth=None 明确标记无需鉴权
+def login(request, data: LoginIn):
+    """验证用户名和密码，返回基本用户信息。
+
+    错误码：
+    - 401 用户名不存在或密码错误
+    - 403 账号待审核或已被拒绝
+
+    注意：当前直接比对 encrypted_password 字段。
+    待 User 模型切换到 AbstractUser 后改用 check_password()。
+    """
+    try:
+        user = User.objects.get(username=data.username)
+    except User.DoesNotExist:
+        raise HttpError(401, "用户名或密码错误")
+
+    if user.encrypted_password != data.password:
+        raise HttpError(401, "用户名或密码错误")
+
+    if user.register_status == User.RegisterStatusChoices.PENDING:
+        raise HttpError(403, "账号正在审核中，请耐心等待")
+    if user.register_status == User.RegisterStatusChoices.REJECTED:
+        raise HttpError(403, "账号审核未通过")
+
+    user.last_login_time = timezone.now()
+    user.save(update_fields=["last_login_time"])
+
+    return user
+
+
+# ── 用户接口 ──────────────────────────────────────────────────────────────────
 
 @router.get(
     "/users/",
