@@ -9,6 +9,7 @@ import lockIcon from '../assets/login/lock.svg'
 import eyeIcon from '../assets/login/eye.svg'
 
 const form = reactive({
+  email: '',
   username: '',
   realName: '',
   idCard: '',
@@ -44,6 +45,7 @@ const onSubmit = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        email: form.email,
         username: form.username,
         encrypted_password: form.password, //这里暂时没有加密
         real_name: form.realName,
@@ -54,7 +56,7 @@ const onSubmit = async () => {
     })
 
     if (!response.ok) {
-      form.error = response.status === 400 ? '用户名或身份证已存在，或字段不合法' : '注册失败'
+      form.error = response.status === 400 ? '邮箱/用户名/身份证可能已存在，或字段不合法' : '注册失败'
       return
     }
 
@@ -101,6 +103,22 @@ const onSubmit = async () => {
       </header>
 
       <form class="login-form" @submit.prevent="onSubmit">
+        <label class="field" for="register-email">
+          <span>Email Address</span>
+          <div class="input-wrap">
+            <img :src="mailIcon" alt="" />
+            <input
+              id="register-email"
+              v-model="form.email"
+              type="email"
+              name="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+        </label>
+
         <label class="field" for="register-username">
           <span>Username</span>
           <div class="input-wrap">

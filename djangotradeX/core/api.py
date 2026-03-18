@@ -140,7 +140,7 @@ def create_user(request, data: RegisterIn):
     """
     try:
         user = User.objects.create(
-            user_id=data.user_id or uuid.uuid4().hex[:20],
+            user_id=uuid.uuid4().hex[:20],
             username=data.username,
             encrypted_password=data.encrypted_password,
             real_name=data.real_name,
