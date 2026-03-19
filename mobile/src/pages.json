@@ -1,0 +1,26 @@
+{
+  "pages": [
+    {
+      "path": "pages/login/UserLogin",
+      "style": { "navigationBarTitleText": "登录" }
+    },
+    {
+      "path": "pages/register/RegisterPage",
+      "style": { "navigationBarTitleText": "注册" }
+    },
+    {
+      "path": "pages/home/HomePage",
+      "style": { "navigationBarTitleText": "商品广场" }
+    },
+    {
+      "path": "pages/product/ProductPage",
+      "style": { "navigationBarTitleText": "商品详情" }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "tradeX",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  }
+}
