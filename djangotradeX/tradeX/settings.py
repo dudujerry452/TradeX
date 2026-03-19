@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-4@3!$=cgd60j(-t8=r%zcn5*^ng*z6ncdfm*3j6fiz)-5(d5bj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Vite dev server 的 Origin 头需要显式信任 部署时记得改
 CSRF_TRUSTED_ORIGINS = [
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'tradeX.cors_middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
