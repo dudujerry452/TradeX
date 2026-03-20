@@ -65,6 +65,7 @@
             django603
             djangoNinja
             pythonPackages.pytest
+            pythonPackages.django-cors-headers
             nodejs_22
             pnpm
             sqlite

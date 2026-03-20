@@ -32,12 +32,34 @@ ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost', 
+    'http://127.0.0.1', 
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True  
+CORS_ALLOW_CREDENTIALS = True  # 开发时允许全局信任
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",      # Vue Web Dev
+    "http://127.0.0.1:5173",
+    "http://localhost",  # Flutter
+    "http://127.0.0.1", 
+
+]
+CORS_ALLOW_CREDENTIALS = True     # 允许跨域发送 Cookie
+
+
+
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = False  # 本地 http 开发时设为 False，生产 https 设为 True
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = False     # 同上
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,7 +72,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'tradeX.cors_middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
