@@ -50,8 +50,8 @@ class UserListCreateTests(TestCase):
 
     def test_create_user(self):
         payload = {
-            "user_id": "u001",
             "username": "alice",
+            "email": "alice@gmail.com", 
             "encrypted_password": "pw123",
             "real_name": "爱丽丝",
             "id_card": "110101199001010001",
@@ -65,9 +65,7 @@ class UserListCreateTests(TestCase):
         )
         self.assertEqual(response.status_code, 201)
         body = response.json()
-        self.assertEqual(body["user_id"], "u001")
         self.assertEqual(body["username"], "alice")
-        self.assertTrue(User.objects.filter(user_id="u001").exists())
 
     def test_get_user_list_after_create(self):
         make_user()
@@ -81,6 +79,7 @@ class UserListCreateTests(TestCase):
         make_user()
         payload = {
             "username": "testuser",   # duplicate
+            "email": "lisi@qq.com", 
             "encrypted_password": "pw",
             "real_name": "李四",
             "id_card": "110101199001019999",
