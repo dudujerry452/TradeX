@@ -3,14 +3,22 @@ core/api.py  —  core app 's django-ninja Router
 """
 
 import uuid
-from typing import Optional
+import json
+from typing import Any, Optional
 
+from openai import OpenAI
+from django.http import StreamingHttpResponse
 from django.db import IntegrityError
+from django.conf import settings
 from django.utils import timezone
 from ninja import Router, Schema
 from ninja.errors import HttpError
 
 from .models import Product, User
+from .rag_vector_service import (
+    build_product_document,
+    get_rag_collection,
+)
 
 router = Router()
 
@@ -73,6 +81,34 @@ class ProductIn(Schema):
     price: float
     stock: int
     publisher_id: str
+
+
+class RagAddProductIn(Schema):
+    id: str
+    name: str
+    price: float
+    desc: str
+    category: str
+
+
+class RagAddProductOut(Schema):
+    status: str
+    msg: str
+
+
+class RagChatIn(Schema):
+    question: str
+    n_results: int = 3
+
+
+class RagChatOut(Schema):
+    answer: str
+    products: list[dict[str, Any]]
+
+
+class RagChatStreamOut(Schema):
+    stream: bool
+    message: str
 
 
 # ── 认证接口 ──────────────────────────────────────────────────────────────────
@@ -199,3 +235,109 @@ def get_product(request, product_id: str):
         return Product.objects.get(product_id=product_id)
     except Product.DoesNotExist:
         raise HttpError(404, "Product not found")
+
+
+# ── RAG 接口 ──────────────────────────────────────────────────────────────────
+
+@router.post(
+    "/rag/add-product",
+    response=RagAddProductOut,
+    tags=["RAG"],
+    summary="向 RAG 知识库添加商品",
+)
+def rag_add_product(request, data: RagAddProductIn):
+    try:
+        collection = get_rag_collection(settings.BASE_DIR)
+    except Exception as exc:
+        raise HttpError(500, f"初始化向量库失败: {exc}")
+    text = build_product_document(
+        name=data.name,
+        category=data.category,
+        price=data.price,
+        desc=data.desc,
+    )
+
+    try:
+        collection.upsert(
+            documents=[text],
+            metadatas=[
+                {
+                    "id": data.id,
+                    "name": data.name,
+                    "price": data.price,
+                    "desc": data.desc,
+                    "category": data.category,
+                }
+            ],
+            ids=[data.id],
+        )
+    except Exception as exc:
+        raise HttpError(400, f"写入向量库失败: {exc}")
+
+    return {"status": "ok", "msg": "商品已加入AI知识库"}
+
+
+@router.post(
+    "/rag/chat/stream",
+    response={200: None},
+    tags=["RAG"],
+    summary="基于商品知识库的 AI 流式问答（SSE）",
+)
+def rag_chat_stream(request, data: RagChatIn):
+    try:
+        collection = get_rag_collection(settings.BASE_DIR)
+    except Exception as exc:
+        raise HttpError(500, f"初始化向量库失败: {exc}")
+    top_k = max(1, min(data.n_results, 10))
+    res = collection.query(query_texts=[data.question], n_results=top_k)
+    products = (res.get("metadatas") or [[]])[0]
+
+    if not products:
+        raise HttpError(404, "未检索到匹配商品，请先添加商品到知识库")
+
+    api_key = settings.OPENROUTER_API_KEY.strip()
+    if not api_key:
+        raise HttpError(500, "未配置 OPENROUTER_API_KEY，请在环境变量中设置")
+
+    prompt = (
+        "你是电商智能导购，只根据以下商品回答，不许编造。\n"
+        f"商品信息：{products}\n"
+        f"用户问题：{data.question}\n"
+        "请自然语言回答，并推荐商品。"
+    )
+
+    client = OpenAI(api_key=api_key, base_url=settings.OPENROUTER_BASE_URL)
+
+    def event_stream():
+        yield "event: meta\n"
+        yield f"data: {json.dumps({'products': products}, ensure_ascii=False)}\n\n"
+        try:
+            stream = client.chat.completions.create(
+                model="deepseek/deepseek-chat",
+                messages=[
+                    {"role": "system", "content": "你是一个电商导购助手，只能基于给出的商品信息回答，不许编造。"},
+                    {"role": "user", "content": prompt},
+                ],
+                stream=True,
+            )
+
+            for chunk in stream:
+                if not chunk.choices:
+                    continue
+                delta = chunk.choices[0].delta
+                token = delta.content if delta else None
+                if token:
+                    yield f"event: token\n"
+                    yield f"data: {json.dumps({'token': token}, ensure_ascii=False)}\n\n"
+
+            yield "event: done\n"
+            yield "data: {\"done\": true}\n\n"
+        except Exception as exc:
+            msg = str(exc).replace("\n", " ")
+            yield "event: error\n"
+            yield f"data: {json.dumps({'error': msg}, ensure_ascii=False)}\n\n"
+
+    response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
+    response["Cache-Control"] = "no-cache"
+    response["X-Accel-Buffering"] = "no"
+    return response

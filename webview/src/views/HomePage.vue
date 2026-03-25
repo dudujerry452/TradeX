@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive } from 'vue'
 import { PRODUCTS_API_URL } from '../config/api'
 import { floatingIcons } from '../config/loginFloatingIcons'
+import RagChatPanel from '../components/RagChatPanel.vue'
 
 const state = reactive({
   products: [],
@@ -121,7 +122,9 @@ onMounted(() => {
         当前暂无商品数据
       </article>
 
-      <section v-else class="products-section">
+      <RagChatPanel />
+
+      <section v-if="!state.loading && !state.error && state.products.length" class="products-section">
         <h2 class="section-title">最新商品</h2>
         <div class="product-grid">
           <article v-for="item in state.products" :key="item.product_id" class="product-card">

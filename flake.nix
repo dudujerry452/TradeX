@@ -66,6 +66,8 @@
             djangoNinja
             pythonPackages.pytest
             pythonPackages.django-cors-headers
+            pythonPackages.requests
+            pythonPackages.chromadb
             nodejs_22
             pnpm
             sqlite
