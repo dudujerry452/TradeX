@@ -67,6 +67,7 @@
             pythonPackages.pytest
             pythonPackages.django-cors-headers
             pythonPackages.requests
+            pythonPackages.openai
             pythonPackages.chromadb
             nodejs_22
             pnpm

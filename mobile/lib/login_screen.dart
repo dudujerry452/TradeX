@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'api.dart';
+import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -53,8 +54,11 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('欢迎回来, ${userData['username']}!')),
       );
-      // TODO: 跳转到主页
-      // Navigator.pushReplacementNamed(context, '/home');
+      // 跳转到主页
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
     } else {
       // 登录失败，显示后端返回的错误信息 (401, 403等)
       ScaffoldMessenger.of(context).showSnackBar(
