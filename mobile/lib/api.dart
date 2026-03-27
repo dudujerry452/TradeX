@@ -215,26 +215,9 @@ class ApiService {
     }
   }
 
-  /// 取消收藏
+  /// 取消收藏（通过 user_id 和 product_id）
   static Future<Map<String, dynamic>> removeFavorite(String userId, String productId) async {
-    // 首先获取收藏记录ID
-    final getResult = await getUserFavorites(userId);
-    if (!getResult['success']) {
-      return getResult;
-    }
-
-    final favorites = getResult['data'] as List<dynamic>;
-    final favorite = favorites.firstWhere(
-      (f) => f['product_id'] == productId,
-      orElse: () => null,
-    );
-
-    if (favorite == null) {
-      return {'success': false, 'message': '未找到收藏记录'};
-    }
-
-    final favoriteId = favorite['id'];
-    final url = Uri.parse('$baseUrl/product-favorites/$favoriteId/');
+    final url = Uri.parse('$baseUrl/product-favorites/delete/?user_id=$userId&product_id=$productId');
 
     try {
       final response = await http.delete(url, headers: await getHeaders());
@@ -243,10 +226,11 @@ class ApiService {
         return {'success': false, 'message': '登录已过期，请重新登录'};
       }
 
-      if (response.statusCode == 204) {
+      if (response.statusCode == 200) {
         return {'success': true, 'message': '已取消收藏'};
       } else {
-        return {'success': false, 'message': '取消收藏失败'};
+        final responseData = jsonDecode(response.body);
+        return {'success': false, 'message': responseData['detail'] ?? '取消收藏失败'};
       }
     } catch (e) {
       return {'success': false, 'message': '网络连接错误: $e'};

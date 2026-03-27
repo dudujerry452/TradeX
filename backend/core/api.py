@@ -600,6 +600,28 @@ def check_product_favorite(request, user_id: str, product_id: str):
     return {"is_favorited": is_favorited}
 
 
+@router.delete("/product-favorites/delete/", tags=["商品收藏"], summary="取消收藏（通过user_id和product_id）")
+def delete_product_favorite_by_ids(request, user_id: str, product_id: str):
+    """通过 user_id 和 product_id 删除收藏记录"""
+    try:
+        pf = ProductFavorite.objects.get(
+            user__user_id=user_id,
+            product__product_id=product_id
+        )
+        pf.delete()
+
+        # 更新商品收藏数
+        product = Product.objects.get(product_id=product_id)
+        product.favorite_count = ProductFavorite.objects.filter(product=product).count()
+        product.save()
+
+        return {"success": True, "message": "已取消收藏"}
+    except ProductFavorite.DoesNotExist:
+        raise HttpError(404, "收藏记录不存在")
+    except Exception as e:
+        raise HttpError(500, str(e))
+
+
 # ── RAG 接口 ──────────────────────────────────────────────────────────────────
 
 @router.post(
