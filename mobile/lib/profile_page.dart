@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'icons.dart';
 import 'login_screen.dart';
 
 /// 我的页面 - 展示用户账户信息
@@ -29,14 +29,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // 功能菜单列表
   final List<Map<String, dynamic>> _menuItems = [
-    {'icon': CupertinoIcons.heart, 'title': '我的收藏', 'color': Colors.red},
-    {'icon': CupertinoIcons.clock, 'title': '浏览历史', 'color': Colors.blue},
-    {'icon': CupertinoIcons.location, 'title': '收货地址', 'color': Colors.green},
-    {'icon': CupertinoIcons.bell, 'title': '消息通知', 'color': Colors.orange},
-    {'icon': CupertinoIcons.gift, 'title': '优惠券', 'color': Colors.purple},
-    {'icon': CupertinoIcons.money_yen_circle, 'title': '我的钱包', 'color': Colors.amber},
-    {'icon': CupertinoIcons.settings, 'title': '设置', 'color': Colors.grey},
-    {'icon': CupertinoIcons.question_circle, 'title': '帮助与反馈', 'color': Colors.teal},
+    {'icon': 'heart', 'title': '我的收藏', 'color': Colors.red},
+    {'icon': 'clock', 'title': '浏览历史', 'color': Colors.blue},
+    {'icon': 'map-pin', 'title': '收货地址', 'color': Colors.green},
+    {'icon': 'bell', 'title': '消息通知', 'color': Colors.orange},
+    {'icon': 'gift', 'title': '优惠券', 'color': Colors.purple},
+    {'icon': 'currency-dollar', 'title': '我的钱包', 'color': Colors.amber},
+    {'icon': 'cog', 'title': '设置', 'color': Colors.grey},
+    {'icon': 'question', 'title': '帮助与反馈', 'color': Colors.teal},
   ];
 
   @override
@@ -108,8 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           fit: BoxFit.cover,
                         ),
                       )
-                    : Icon(
-                        CupertinoIcons.person_fill,
+                    : HeroIcons.user(
                         size: 35,
                         color: const Color(0xFFCE965B),
                       ),
@@ -150,8 +149,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            CupertinoIcons.star_fill,
+                          HeroIcons.star(
                             size: 12,
                             color: Colors.white.withOpacity(0.9),
                           ),
@@ -181,8 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    CupertinoIcons.pencil,
+                  child: HeroIcons.pencil(
                     color: Colors.white,
                     size: 20,
                   ),
@@ -283,8 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: Colors.grey.shade500,
                       ),
                     ),
-                    Icon(
-                      CupertinoIcons.chevron_right,
+                    HeroIcons.chevronRight(
                       size: 14,
                       color: Colors.grey.shade500,
                     ),
@@ -299,7 +295,7 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: _orderStats.entries.map((entry) {
               return _buildOrderStatusItem(
-                _getOrderIcon(entry.key),
+                _getOrderIconName(entry.key),
                 entry.key,
                 entry.value > 0 ? entry.value.toString() : null,
               );
@@ -310,22 +306,22 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  IconData _getOrderIcon(String status) {
+  String _getOrderIconName(String status) {
     switch (status) {
       case '待付款':
-        return CupertinoIcons.creditcard;
+        return 'credit-card';
       case '待发货':
-        return CupertinoIcons.cube_box;
+        return 'cube';
       case '待收货':
-        return CupertinoIcons.cube;
+        return 'shopping-bag';
       case '待评价':
-        return CupertinoIcons.chat_bubble_text;
+        return 'chat-bubble-left-ellipsis';
       default:
-        return CupertinoIcons.bag;
+        return 'shopping-bag';
     }
   }
 
-  Widget _buildOrderStatusItem(IconData icon, String label, String? badge) {
+  Widget _buildOrderStatusItem(String iconName, String label, String? badge) {
     return GestureDetector(
       onTap: () {
         // TODO: 跳转到对应订单列表
@@ -341,10 +337,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: const Color(0xFFF5F6FA),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  color: const Color(0xFFCE965B),
-                  size: 24,
+                child: Center(
+                  child: HeroIcons.icon(
+                    iconName,
+                    size: 24,
+                    color: const Color(0xFFCE965B),
+                  ),
                 ),
               ),
               if (badge != null)
@@ -429,7 +427,7 @@ class _ProfilePageState extends State<ProfilePage> {
             itemBuilder: (context, index) {
               final item = _menuItems[index];
               return _buildMenuItem(
-                item['icon'] as IconData,
+                item['icon'] as String,
                 item['title'] as String,
                 item['color'] as Color,
               );
@@ -440,7 +438,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, Color color) {
+  Widget _buildMenuItem(String iconName, String title, Color color) {
     return GestureDetector(
       onTap: () {
         // TODO: 跳转到对应功能页面
@@ -458,10 +456,12 @@ class _ProfilePageState extends State<ProfilePage> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 24,
+            child: Center(
+              child: HeroIcons.icon(
+                iconName,
+                size: 24,
+                color: color,
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -509,17 +509,17 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showLogoutDialog() {
-    showCupertinoDialog(
+    showDialog(
       context: context,
-      builder: (context) => CupertinoAlertDialog(
+      builder: (context) => AlertDialog(
         title: const Text('退出登录'),
         content: const Text('确定要退出登录吗？'),
         actions: [
-          CupertinoDialogAction(
+          TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('取消'),
           ),
-          CupertinoDialogAction(
+          TextButton(
             onPressed: () {
               Navigator.pop(context);
               // 跳转到登录页面
@@ -531,8 +531,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 (route) => false,
               );
             },
-            isDestructiveAction: true,
-            child: const Text('确定'),
+            child: const Text('确定', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

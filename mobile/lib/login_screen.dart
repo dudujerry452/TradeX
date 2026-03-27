@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'icons.dart';
 import 'api.dart';
 import 'main_screen.dart';
 
@@ -12,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   // 0 表示 "用户名登录", 1 表示 "邮箱登录"
-  int _selectedTabIndex = 0; 
+  int _selectedTabIndex = 0;
   bool _isLoading = false;
 
   final TextEditingController _identifierController = TextEditingController();
@@ -145,11 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.more_horiz, size: 18),
+                Icon(Icons.more_horiz, size: 18, color: Colors.grey.shade600),
                 const SizedBox(width: 8),
                 Container(width: 1, height: 12, color: Colors.grey.shade300),
                 const SizedBox(width: 8),
-                const Icon(CupertinoIcons.circle, size: 18),
+                HeroIcons.globeAlt(size: 18, color: Colors.grey.shade600),
               ],
             ),
           )
@@ -186,11 +186,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: const Color(0xFFD67F1F), // 接近图中的橙色
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(CupertinoIcons.bag, color: Colors.white, size: 30),
+              child: HeroIcons.shoppingBag(size: 30, color: Colors.white),
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // 欢迎语
           Center(
             child: Column(
@@ -226,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _buildTextField(
             controller: _identifierController,
             hintText: _selectedTabIndex == 0 ? 'Enter username' : 'Enter email',
-            icon: CupertinoIcons.mail,
+            icon: HeroIcons.envelope(size: 20, color: Colors.blueGrey.shade300),
           ),
           const SizedBox(height: 20),
 
@@ -238,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _buildTextField(
             controller: _passwordController,
             hintText: 'Enter your password',
-            icon: CupertinoIcons.lock,
+            icon: HeroIcons.lockClosed(size: 20, color: Colors.blueGrey.shade300),
             isPassword: true,
           ),
           const SizedBox(height: 30),
@@ -273,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
             height: 45,
             child: ElevatedButton.icon(
               onPressed: _isLoading ? null : _debugLogin,
-              icon: const Icon(Icons.bug_report, size: 18),
+              icon: HeroIcons.bugAnt(size: 18, color: Colors.white),
               label: const Text(
                 '调试登录 (admin)',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -363,7 +363,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
-    required IconData icon,
+    required Widget icon,
     bool isPassword = false,
   }) {
     return TextField(
@@ -373,7 +373,10 @@ class _LoginScreenState extends State<LoginScreen> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.blueGrey.shade300, fontSize: 14),
-        prefixIcon: Icon(icon, color: Colors.blueGrey.shade300, size: 20),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(12),
+          child: icon,
+        ),
         filled: true,
         fillColor: inputBgColor,
         contentPadding: const EdgeInsets.symmetric(vertical: 16),

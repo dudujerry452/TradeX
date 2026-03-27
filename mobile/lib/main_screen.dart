@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'icons.dart';
 import 'discover_page.dart';
 import 'message_page.dart';
 import 'profile_page.dart';
@@ -30,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -42,9 +42,9 @@ class _MainScreenState extends State<MainScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(CupertinoIcons.compass, '发现', 0),
-                _buildNavItem(CupertinoIcons.chat_bubble, '消息', 1),
-                _buildNavItem(CupertinoIcons.person, '我的', 2),
+                _buildNavItem(_getIconWidget(0), '发现', 0),
+                _buildNavItem(_getIconWidget(1), '消息', 1),
+                _buildNavItem(_getIconWidget(2), '我的', 2),
               ],
             ),
           ),
@@ -53,7 +53,20 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _getIconWidget(int index) {
+    switch (index) {
+      case 0:
+        return HeroIcons.globeAlt();
+      case 1:
+        return HeroIcons.chatBubble();
+      case 2:
+        return HeroIcons.user();
+      default:
+        return HeroIcons.globeAlt();
+    }
+  }
+
+  Widget _buildNavItem(Widget iconWidget, String label, int index) {
     final isSelected = _currentIndex == index;
 
     return GestureDetector(
@@ -68,17 +81,17 @@ class _MainScreenState extends State<MainScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFFCE965B).withOpacity(0.1)
+              ? const Color(0xFFCE965B).withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: isSelected ? const Color(0xFFCE965B) : Colors.grey,
+            HeroIcons.icon(
+              _getIconName(index),
               size: 24,
+              color: isSelected ? const Color(0xFFCE965B) : Colors.grey,
             ),
             const SizedBox(height: 4),
             Text(
@@ -93,5 +106,18 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+
+  String _getIconName(int index) {
+    switch (index) {
+      case 0:
+        return 'globe-alt';
+      case 1:
+        return 'chat-bubble-left-ellipsis';
+      case 2:
+        return 'user';
+      default:
+        return 'globe-alt';
+    }
   }
 }

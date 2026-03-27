@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'icons.dart';
 import 'api.dart';
 
 /// 发现页面 - 包含关注、推荐、最新、讨论四个Tab
@@ -218,10 +218,9 @@ class _DiscoverPageState extends State<DiscoverPage>
               child: Row(
                 children: [
                   const SizedBox(width: 12),
-                  Icon(
-                    CupertinoIcons.search,
-                    color: Colors.grey.shade400,
+                  HeroIcons.magnifyingGlass(
                     size: 20,
+                    color: Colors.grey.shade400,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -262,16 +261,15 @@ class _DiscoverPageState extends State<DiscoverPage>
                 ),
               ],
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  CupertinoIcons.bolt_fill,
-                  color: Colors.white,
+                HeroIcons.bolt(
                   size: 18,
+                  color: Colors.white,
                 ),
-                SizedBox(width: 4),
-                Text(
+                const SizedBox(width: 4),
+                const Text(
                   'AI',
                   style: TextStyle(
                     color: Colors.white,
@@ -364,8 +362,7 @@ class _DiscoverPageState extends State<DiscoverPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              CupertinoIcons.bag,
+            HeroIcons.shoppingBag(
               size: 60,
               color: Colors.grey.shade300,
             ),
@@ -444,8 +441,7 @@ class _DiscoverPageState extends State<DiscoverPage>
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Center(
-                              child: Icon(
-                                CupertinoIcons.photo,
+                              child: HeroIcons.photo(
                                 size: 40,
                                 color: Colors.grey.shade400,
                               ),
@@ -453,8 +449,7 @@ class _DiscoverPageState extends State<DiscoverPage>
                           },
                         )
                       : Center(
-                          child: Icon(
-                            CupertinoIcons.bag,
+                          child: HeroIcons.shoppingBag(
                             size: 40,
                             color: Colors.grey.shade400,
                           ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'icons.dart';
 
 /// 消息页面 - 暂时为占位符
 class MessagePage extends StatelessWidget {
@@ -25,8 +25,8 @@ class MessagePage extends StatelessWidget {
             onPressed: () {
               // TODO: 清空消息
             },
-            icon: Icon(
-              CupertinoIcons.delete,
+            icon: HeroIcons.trash(
+              size: 24,
               color: Colors.grey.shade600,
             ),
           ),
@@ -43,8 +43,7 @@ class MessagePage extends StatelessWidget {
                 color: Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(60),
               ),
-              child: Icon(
-                CupertinoIcons.chat_bubble_text,
+              child: HeroIcons.chatBubbleAlt(
                 size: 50,
                 color: Colors.grey.shade400,
               ),
@@ -91,9 +90,9 @@ class MessagePage extends StatelessWidget {
                       color: const Color(0xFFCE965B).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    child: const Icon(
-                      CupertinoIcons.bell_fill,
-                      color: Color(0xFFCE965B),
+                    child: HeroIcons.bell(
+                      size: 24,
+                      color: const Color(0xFFCE965B),
                     ),
                   ),
                   const SizedBox(width: 16),
