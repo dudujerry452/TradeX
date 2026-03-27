@@ -7,5 +7,6 @@ from .api import api
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
-    re_path(r'^.*$', TemplateView.as_view(template_name="index.html")),
+    # 前端路由 catch-all，必须放在最后
+    re_path(r'^(?!api/).*$', TemplateView.as_view(template_name="index.html")),
 ]

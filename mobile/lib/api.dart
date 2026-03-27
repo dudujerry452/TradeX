@@ -253,17 +253,26 @@ class ApiService {
     }
   }
 
-  /// 检查是否已收藏
+  /// 检查是否已收藏（使用轻量接口）
   static Future<Map<String, dynamic>> checkFavorite(String userId, String productId) async {
-    final result = await getUserFavorites(userId);
-    if (!result['success']) {
-      return result;
+    final url = Uri.parse('$baseUrl/product-favorites/check/?user_id=$userId&product_id=$productId');
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 401) {
+        return {'success': false, 'message': '登录已过期，请重新登录'};
+      }
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'isFavorited': responseData['is_favorited'] ?? false};
+      } else {
+        return {'success': false, 'message': '检查收藏状态失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
     }
-
-    final favorites = result['data'] as List<dynamic>;
-    final isFavorited = favorites.any((f) => f['product_id'] == productId);
-
-    return {'success': true, 'isFavorited': isFavorited};
   }
 
   /// 获取商品分类列表

@@ -182,6 +182,8 @@ class ProductFavoriteOut(Schema):
     user_id: str
     product_id: str
     product_name: str
+    price: float
+    image_url: str
     favorited_time: Any
 
 
@@ -501,6 +503,8 @@ def list_product_favorites(request):
             "user_id": pf.user.user_id,
             "product_id": pf.product.product_id,
             "product_name": pf.product.product_name,
+            "price": pf.product.price,
+            "image_url": pf.product.image_url,
             "favorited_time": pf.favorited_time,
         }
         for pf in pfs
@@ -530,6 +534,8 @@ def create_product_favorite(request, data: ProductFavoriteIn):
         "user_id": user.user_id,
         "product_id": product.product_id,
         "product_name": product.product_name,
+        "price": product.price,
+        "image_url": product.image_url,
         "favorited_time": pf.favorited_time,
     }
 
@@ -547,6 +553,8 @@ def get_user_favorites(request, user_id: str):
             "user_id": pf.user.user_id,
             "product_id": pf.product.product_id,
             "product_name": pf.product.product_name,
+            "price": pf.product.price,
+            "image_url": pf.product.image_url,
             "favorited_time": pf.favorited_time,
         }
         for pf in pfs
@@ -566,10 +574,30 @@ def get_product_favorites(request, product_id: str):
             "user_id": pf.user.user_id,
             "product_id": pf.product.product_id,
             "product_name": pf.product.product_name,
+            "price": pf.product.price,
+            "image_url": pf.product.image_url,
             "favorited_time": pf.favorited_time,
         }
         for pf in pfs
     ]
+
+
+@router.get("/product-favorites/check/", tags=["商品收藏"], summary="检查当前用户是否收藏了指定商品")
+def check_product_favorite(request, user_id: str, product_id: str):
+    """轻量接口：检查用户是否收藏了指定商品
+
+    返回: {"is_favorited": true/false}
+    """
+    try:
+        user = User.objects.get(user_id=user_id)
+        product = Product.objects.get(product_id=product_id)
+    except User.DoesNotExist:
+        raise HttpError(404, "User not found")
+    except Product.DoesNotExist:
+        raise HttpError(404, "Product not found")
+
+    is_favorited = ProductFavorite.objects.filter(user=user, product=product).exists()
+    return {"is_favorited": is_favorited}
 
 
 # ── RAG 接口 ──────────────────────────────────────────────────────────────────

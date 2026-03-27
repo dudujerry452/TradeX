@@ -159,24 +159,18 @@ class _FavoritesPageState extends State<FavoritesPage> {
     return RefreshIndicator(
       onRefresh: _loadFavorites,
       color: const Color(0xFFCE965B),
-      child: GridView.builder(
+      child: ListView.builder(
         padding: const EdgeInsets.all(12),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.7,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
         itemCount: _favorites.length,
         itemBuilder: (context, index) {
           final favorite = _favorites[index];
-          return _buildFavoriteCard(favorite);
+          return _buildFavoriteListItem(favorite);
         },
       ),
     );
   }
 
-  Widget _buildFavoriteCard(dynamic favorite) {
+  Widget _buildFavoriteListItem(dynamic favorite) {
     final productName = favorite['product_name'] ?? '未知商品';
     final price = favorite['price'] ?? 0.0;
     final imageUrl = favorite['image_url'] ?? '';
@@ -192,9 +186,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
         );
       },
       child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -203,73 +198,44 @@ class _FavoritesPageState extends State<FavoritesPage> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 商品图片
-            Expanded(
-              flex: 3,
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      color: Colors.grey.shade100,
-                      child: imageUrl.isNotEmpty
-                          ? Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Center(
-                                  child: HeroIcons.photo(
-                                    size: 40,
-                                    color: Colors.grey.shade400,
-                                  ),
-                                );
-                              },
-                            )
-                          : Center(
-                              child: HeroIcons.shoppingBag(
-                                size: 40,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // 左侧商品图片 (80x80)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  color: Colors.grey.shade100,
+                  child: imageUrl.isNotEmpty
+                      ? Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: HeroIcons.photo(
+                                size: 32,
                                 color: Colors.grey.shade400,
                               ),
-                            ),
-                    ),
-                  ),
-                  // 取消收藏按钮
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: () => _removeFavorite(productId),
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(16),
+                            );
+                          },
+                        )
+                      : Center(
+                          child: HeroIcons.shoppingBag(
+                            size: 32,
+                            color: Colors.grey.shade400,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.close,
-                          size: 18,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-            // 商品信息
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
+              const SizedBox(width: 12),
+              // 中间商品名和价格
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // 商品名称
                     Text(
@@ -277,12 +243,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF1A1A2C),
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 8),
                     // 价格
                     Text(
                       '¥${price.toStringAsFixed(2)}',
@@ -295,8 +261,25 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   ],
                 ),
               ),
-            ),
-          ],
+              // 右侧删除按钮 (X按钮)
+              GestureDetector(
+                onTap: () => _removeFavorite(productId),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    size: 20,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
