@@ -108,6 +108,132 @@ class ApiService {
     }
   }
 
+  /// 获取商品标签列表
+  static Future<Map<String, dynamic>> getProductTags(String productId) async {
+    final url = Uri.parse('$baseUrl/products/$productId/tags/');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取商品标签失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 获取用户标签偏好
+  static Future<Map<String, dynamic>> getUserTagPreferences(String userId) async {
+    final url = Uri.parse('$baseUrl/users/$userId/tag-preferences/');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取用户标签偏好失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 获取用户收藏列表
+  static Future<Map<String, dynamic>> getUserFavorites(String userId) async {
+    final url = Uri.parse('$baseUrl/users/$userId/favorites/');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取收藏列表失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 收藏商品
+  static Future<Map<String, dynamic>> addFavorite(String userId, String productId) async {
+    final url = Uri.parse('$baseUrl/product-favorites/');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'user_id': userId,
+          'product_id': productId,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        return {'success': true, 'message': '收藏成功'};
+      } else {
+        final responseData = jsonDecode(response.body);
+        return {'success': false, 'message': responseData['detail'] ?? '收藏失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 取消收藏
+  static Future<Map<String, dynamic>> removeFavorite(String userId, String productId) async {
+    // 首先获取收藏记录ID
+    final getResult = await getUserFavorites(userId);
+    if (!getResult['success']) {
+      return getResult;
+    }
+
+    final favorites = getResult['data'] as List<dynamic>;
+    final favorite = favorites.firstWhere(
+      (f) => f['product_id'] == productId,
+      orElse: () => null,
+    );
+
+    if (favorite == null) {
+      return {'success': false, 'message': '未找到收藏记录'};
+    }
+
+    final favoriteId = favorite['id'];
+    final url = Uri.parse('$baseUrl/product-favorites/$favoriteId/');
+
+    try {
+      final response = await http.delete(url);
+
+      if (response.statusCode == 204) {
+        return {'success': true, 'message': '已取消收藏'};
+      } else {
+        return {'success': false, 'message': '取消收藏失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 检查是否已收藏
+  static Future<Map<String, dynamic>> checkFavorite(String userId, String productId) async {
+    final result = await getUserFavorites(userId);
+    if (!result['success']) {
+      return result;
+    }
+
+    final favorites = result['data'] as List<dynamic>;
+    final isFavorited = favorites.any((f) => f['product_id'] == productId);
+
+    return {'success': true, 'isFavorited': isFavorited};
+  }
+
   /// 获取商品分类列表
   static Future<Map<String, dynamic>> getCategories() async {
     // 目前后端没有专门的分类接口，返回一些预设分类

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'api.dart';
+import 'product_detail_page.dart';
 
 /// 发现页面 - 包含关注、推荐、最新、讨论四个Tab
 class DiscoverPage extends StatefulWidget {
@@ -403,7 +404,12 @@ class _DiscoverPageState extends State<DiscoverPage>
 
     return GestureDetector(
       onTap: () {
-        // TODO: 跳转到商品详情页
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailPage(productId: product['product_id']),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(

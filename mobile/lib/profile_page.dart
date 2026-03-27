@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'login_screen.dart';
+import 'api.dart';
+import 'favorites_page.dart';
+import 'user_state.dart';
 
 /// 我的页面 - 展示用户账户信息
 class ProfilePage extends StatefulWidget {
@@ -11,10 +14,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // 用户信息（实际项目中应该从登录状态或本地存储获取）
+  // 用户信息（从本地存储加载）
   Map<String, dynamic> _userInfo = {
-    'username': 'tradeX用户',
-    'email': 'user@tradex.com',
+    'user_id': '',
+    'username': '未登录',
+    'email': '',
     'avatar': '',
     'role': 'user',
   };
@@ -26,6 +30,58 @@ class _ProfilePageState extends State<ProfilePage> {
     '待收货': 3,
     '待评价': 0,
   };
+
+  // 用户标签偏好数据
+  List<dynamic> _tagPreferences = [];
+  bool _isDebugExpanded = false;
+  bool _isLoadingDebug = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  /// 加载用户信息
+  Future<void> _loadUserInfo() async {
+    final user = await UserState.getUser();
+    if (user != null && mounted) {
+      setState(() {
+        _userInfo = user;
+      });
+      _loadTagPreferences();
+    }
+  }
+
+  Future<void> _loadTagPreferences() async {
+    setState(() => _isLoadingDebug = true);
+
+    final userId = _userInfo['user_id'];
+    if (userId == null || userId.isEmpty) {
+      setState(() => _isLoadingDebug = false);
+      return;
+    }
+
+    final result = await ApiService.getUserTagPreferences(userId);
+
+    if (mounted) {
+      setState(() {
+        _isLoadingDebug = false;
+        if (result['success']) {
+          _tagPreferences = result['data'] is List ? result['data'] : [];
+        }
+      });
+    }
+  }
+
+  void _navigateToFavorites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const FavoritesPage(),
+      ),
+    );
+  }
 
   // 功能菜单列表
   final List<Map<String, dynamic>> _menuItems = [
@@ -53,6 +109,10 @@ class _ProfilePageState extends State<ProfilePage> {
             // 订单统计区域
             SliverToBoxAdapter(
               child: _buildOrderStats(),
+            ),
+            // Debug 区域
+            SliverToBoxAdapter(
+              child: _buildDebugPanel(),
             ),
             // 功能菜单列表
             SliverToBoxAdapter(
@@ -386,6 +446,209 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  /// Debug 面板 - 展示用户标签偏好数据
+  Widget _buildDebugPanel() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 标题栏（可点击展开/收起）
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isDebugExpanded = !_isDebugExpanded;
+              });
+            },
+            child: Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.purple,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'Debug: 用户标签偏好',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1A2C),
+                    ),
+                  ),
+                ),
+                Icon(
+                  _isDebugExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: Colors.grey.shade500,
+                ),
+                const SizedBox(width: 8),
+                // 刷新按钮
+                GestureDetector(
+                  onTap: _loadTagPreferences,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.purple.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: _isLoadingDebug
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.purple),
+                            ),
+                          )
+                        : const Icon(
+                            Icons.refresh,
+                            size: 16,
+                            color: Colors.purple,
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // 展开的详细内容
+          if (_isDebugExpanded) ...[
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 12),
+            if (_tagPreferences.isEmpty)
+              Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.tag,
+                      size: 40,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '暂无标签偏好数据',
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              Column(
+                children: _tagPreferences.map((tag) {
+                  final tagName = tag['tag_name'] ?? '未知标签';
+                  final score = (tag['score'] ?? 0.0).toDouble();
+                  final category = tag['category'] ?? '';
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    tagName,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF1A1A2C),
+                                    ),
+                                  ),
+                                  if (category.isNotEmpty) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.purple.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        category,
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.purple,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              // 分数进度条
+                              LinearProgressIndicator(
+                                value: score / 10,
+                                backgroundColor: Colors.grey.shade200,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                    Colors.purple),
+                                minHeight: 6,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            score.toStringAsFixed(1),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
   /// 功能菜单网格
   Widget _buildMenuGrid() {
     return Container(
@@ -441,10 +704,13 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildMenuItem(String iconName, String title, Color color) {
     return GestureDetector(
       onTap: () {
-        // TODO: 跳转到对应功能页面
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title 功能开发中')),
-        );
+        if (title == '我的收藏') {
+          _navigateToFavorites();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$title 功能开发中')),
+          );
+        }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -520,8 +786,10 @@ class _ProfilePageState extends State<ProfilePage> {
             child: const Text('取消'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
+              // 清除用户数据
+              await UserState.clearUser();
               // 跳转到登录页面
               Navigator.pushAndRemoveUntil(
                 context,

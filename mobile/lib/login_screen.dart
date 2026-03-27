@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'api.dart';
 import 'main_screen.dart';
+import 'user_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -49,8 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (result['success']) {
-      // 登录成功
+      // 登录成功，保存用户信息
       final userData = result['data'];
+      await UserState.saveUser(userData);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('欢迎回来, ${userData['username']}!')),
       );
@@ -86,6 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result['success']) {
       final userData = result['data'];
+      await UserState.saveUser(userData);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('调试登录成功: ${userData['username']}')),
       );
