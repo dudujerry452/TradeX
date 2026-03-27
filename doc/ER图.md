@@ -15,6 +15,8 @@ erDiagram
     TAG ||--o{ PRODUCT_TAG : "标记"
     USER ||--o{ USER_TAG_PREFERENCE : "偏好"
     TAG ||--o{ USER_TAG_PREFERENCE : "被偏好"
+    USER ||--o{ PRODUCT_FAVORITE : "收藏"
+    PRODUCT ||--o{ PRODUCT_FAVORITE : "被收藏"
 
     %% ------------------------------ 实体与属性定义 ------------------------------
     USER {
@@ -45,6 +47,10 @@ erDiagram
         string product_status "商品状态（枚举：待审核/审核通过/已下架/审核驳回）"
         datetime publish_time "发布时间"
         datetime review_time "审核时间"
+        int view_count "浏览量"
+        int sales_count "销量"
+        int favorite_count "收藏数"
+        float avg_rating "平均评分"
     }
 
     REGISTER_REVIEW {
@@ -117,4 +123,10 @@ erDiagram
         string tag_id FK "标签ID（外键，关联TAG.tag_id）"
         float score "偏好分数(基于点击/购买计算)"
         datetime update_time "更新时间"
+    }
+
+    PRODUCT_FAVORITE {
+        string user_id FK "用户ID（外键，关联USER.user_id）"
+        string product_id FK "商品ID（外键，关联PRODUCT.product_id）"
+        datetime favorited_time "收藏时间"
     }

@@ -60,25 +60,31 @@ class Product(models.Model):
     product_name = models.CharField(max_length=200, verbose_name="商品名称")
     category = models.CharField(max_length=100, verbose_name="商品分类")
     description = models.TextField(verbose_name="详情描述")
-    image_url = models.URLField(max_length=500, verbose_name="商品图片地址")  # URLField更适合存地址
+    image_url = models.URLField(max_length=500, verbose_name="商品图片地址")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="单价")
     stock = models.IntegerField(default=0, verbose_name="库存数量")
-    
+
+    # 推荐系统字段
+    view_count = models.IntegerField(default=0, verbose_name="浏览量")
+    sales_count = models.IntegerField(default=0, verbose_name="销量")
+    favorite_count = models.IntegerField(default=0, verbose_name="收藏数")
+    avg_rating = models.FloatField(default=0.0, verbose_name="平均评分")
+
     # 发布者用户ID：外键，关联USER (USER ||--o{ PRODUCT)
     publisher = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='published_products', 
+        User,
+        on_delete=models.CASCADE,
+        related_name='published_products',
         verbose_name="发布者用户"
     )
-    
+
     product_status = models.CharField(
-        max_length=20, 
-        choices=StatusChoices.choices, 
-        default=StatusChoices.PENDING, 
+        max_length=20,
+        choices=StatusChoices.choices,
+        default=StatusChoices.PENDING,
         verbose_name="商品状态"
     )
-    
+
     publish_time = models.DateTimeField(auto_now_add=True, verbose_name="发布时间")
     review_time = models.DateTimeField(null=True, blank=True, verbose_name="审核时间")
 
@@ -346,3 +352,29 @@ class UserTagPreference(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.tag.tag_name}"
+
+
+class ProductFavorite(models.Model):
+    """商品收藏实体"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorites',
+        verbose_name="用户"
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='favorited_by',
+        verbose_name="商品"
+    )
+    favorited_time = models.DateTimeField(auto_now_add=True, verbose_name="收藏时间")
+
+    class Meta:
+        db_table = 'product_favorite'
+        verbose_name = "商品收藏"
+        verbose_name_plural = verbose_name
+        unique_together = ['user', 'product']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.product_name}"

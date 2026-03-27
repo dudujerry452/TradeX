@@ -3,7 +3,7 @@ import json
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Product, User, Tag, ProductTag, UserTagPreference
+from .models import Product, User, Tag, ProductTag, UserTagPreference, ProductFavorite
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -401,6 +401,68 @@ class UserTagPreferenceListCreateTests(TestCase):
         }
         response = self.client.post(
             "/api/user-tag-preferences/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 404)
+
+
+# ── ProductFavorite API tests
+
+class ProductFavoriteListCreateTests(TestCase):
+
+    def setUp(self):
+        self.publisher = make_user()
+        self.user = make_user(user_id="u002", username="testuser2", id_card="110101199001011235", phone="13900000001", email="b@b.com")
+        self.product = make_product(self.publisher)
+
+    def test_get_empty_product_favorite_list(self):
+        response = self.client.get("/api/product-favorites/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+
+    def test_create_product_favorite(self):
+        payload = {
+            "user_id": "u002",
+            "product_id": "p001",
+        }
+        response = self.client.post(
+            "/api/product-favorites/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        body = response.json()
+        self.assertEqual(body["user_id"], "u002")
+        self.assertEqual(body["product_id"], "p001")
+
+        # 验证商品收藏数已更新
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.favorite_count, 1)
+
+    def test_get_user_favorites(self):
+        ProductFavorite.objects.create(user=self.user, product=self.product)
+        response = self.client.get("/api/users/u002/favorites/")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["product_id"], "p001")
+
+    def test_get_product_favorites(self):
+        ProductFavorite.objects.create(user=self.user, product=self.product)
+        response = self.client.get("/api/products/p001/favorites/")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["user_id"], "u002")
+
+    def test_create_product_favorite_invalid_user(self):
+        payload = {
+            "user_id": "nonexistent_user",
+            "product_id": "p001",
+        }
+        response = self.client.post(
+            "/api/product-favorites/",
             data=json.dumps(payload),
             content_type="application/json",
         )

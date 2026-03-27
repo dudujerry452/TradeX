@@ -11,6 +11,7 @@ from core.models import (
     OrderDetail,
     Product,
     ProductReview,
+    ProductFavorite,
     RegisterReview,
     Tag,
     ProductTag,
@@ -96,6 +97,10 @@ PRODUCTS = [
         stock=30,
         publisher_id="seed_seller001",
         product_status=Product.StatusChoices.APPROVED,
+        view_count=1000,
+        sales_count=50,
+        favorite_count=2,
+        avg_rating=4.8,
     ),
     dict(
         product_id="seed_prod002",
@@ -107,6 +112,10 @@ PRODUCTS = [
         stock=50,
         publisher_id="seed_seller001",
         product_status=Product.StatusChoices.APPROVED,
+        view_count=800,
+        sales_count=30,
+        favorite_count=1,
+        avg_rating=4.5,
     ),
     dict(
         product_id="seed_prod003",
@@ -118,6 +127,10 @@ PRODUCTS = [
         stock=100,
         publisher_id="seed_seller002",
         product_status=Product.StatusChoices.PENDING,
+        view_count=200,
+        sales_count=0,
+        favorite_count=0,
+        avg_rating=0.0,
     ),
     dict(
         product_id="seed_prod004",
@@ -129,6 +142,10 @@ PRODUCTS = [
         stock=0,
         publisher_id="seed_seller001",
         product_status=Product.StatusChoices.OFF_SHELF,
+        view_count=500,
+        sales_count=100,
+        favorite_count=0,
+        avg_rating=4.2,
     ),
 ]
 
@@ -328,6 +345,21 @@ USER_TAG_PREFERENCES = [
     ),
 ]
 
+PRODUCT_FAVORITES = [
+    dict(
+        user_id="seed_buyer001",
+        product_id="seed_prod001",
+    ),
+    dict(
+        user_id="seed_buyer001",
+        product_id="seed_prod002",
+    ),
+    dict(
+        user_id="seed_buyer002",
+        product_id="seed_prod002",
+    ),
+]
+
 
 # ── 主逻辑 ────────────────────────────────────────────────────────────────────
 
@@ -383,6 +415,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("── 用户标签偏好 ──"))
         total += self._upsert_user_tag_preferences()
 
+        self.stdout.write(self.style.MIGRATE_HEADING("── 商品收藏 ──"))
+        total += self._upsert_product_favorites()
+
         self.stdout.write(
             self.style.SUCCESS(f"\n完成. 共新增 {total} 条记录.")
         )
@@ -422,5 +457,23 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(
                     self.style.WARNING(f"  ~ UserTagPreference: {data['user_id']} - {data['tag_id']} (已存在, 跳过)")
+                )
+        return created_count
+
+    def _upsert_product_favorites(self):
+        created_count = 0
+        for data in PRODUCT_FAVORITES:
+            user = User.objects.get(user_id=data["user_id"])
+            product = Product.objects.get(product_id=data["product_id"])
+            _, created = ProductFavorite.objects.get_or_create(
+                user=user,
+                product=product,
+            )
+            if created:
+                created_count += 1
+                self.stdout.write(f"  + ProductFavorite: {data['user_id']} - {data['product_id']}")
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f"  ~ ProductFavorite: {data['user_id']} - {data['product_id']} (已存在, 跳过)")
                 )
         return created_count

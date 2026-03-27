@@ -14,7 +14,7 @@ from django.utils import timezone
 from ninja import Router, Schema
 from ninja.errors import HttpError
 
-from .models import Product, User, Tag, ProductTag, UserTagPreference
+from .models import Product, User, Tag, ProductTag, UserTagPreference, ProductFavorite
 from .rag_vector_service import (
     build_product_document,
     get_rag_collection,
@@ -66,10 +66,14 @@ class ProductOut(Schema):
     category: str
     description: str
     image_url: str
-    price: float       
+    price: float
     stock: int
     product_status: str
-    publisher_id: str   # ForeignKey 的 _id 属性
+    publisher_id: str
+    view_count: int
+    sales_count: int
+    favorite_count: int
+    avg_rating: float
 
 
 class ProductIn(Schema):
@@ -152,6 +156,18 @@ class UserTagPreferenceIn(Schema):
     user_id: str
     tag_id: str
     score: float
+
+
+class ProductFavoriteOut(Schema):
+    user_id: str
+    product_id: str
+    product_name: str
+    favorited_time: Any
+
+
+class ProductFavoriteIn(Schema):
+    user_id: str
+    product_id: str
 
 
 # ── 认证接口 ──────────────────────────────────────────────────────────────────
@@ -439,6 +455,87 @@ def get_user_tag_preferences(request, user_id: str):
             "update_time": utp.update_time,
         }
         for utp in utps
+    ]
+
+
+# ── 商品收藏接口
+
+@router.get("/product-favorites/", response=list[ProductFavoriteOut], tags=["商品收藏"], summary="获取所有商品收藏列表")
+def list_product_favorites(request):
+    pfs = ProductFavorite.objects.select_related('user', 'product').all()
+    return [
+        {
+            "user_id": pf.user.user_id,
+            "product_id": pf.product.product_id,
+            "product_name": pf.product.product_name,
+            "favorited_time": pf.favorited_time,
+        }
+        for pf in pfs
+    ]
+
+
+@router.post("/product-favorites/", response={201: ProductFavoriteOut}, tags=["商品收藏"], summary="收藏商品")
+def create_product_favorite(request, data: ProductFavoriteIn):
+    try:
+        user = User.objects.get(user_id=data.user_id)
+        product = Product.objects.get(product_id=data.product_id)
+    except User.DoesNotExist:
+        raise HttpError(404, "User not found")
+    except Product.DoesNotExist:
+        raise HttpError(404, "Product not found")
+
+    pf, created = ProductFavorite.objects.get_or_create(
+        user=user,
+        product=product,
+    )
+
+    # 更新商品收藏数
+    product.favorite_count = ProductFavorite.objects.filter(product=product).count()
+    product.save()
+
+    return 201, {
+        "user_id": user.user_id,
+        "product_id": product.product_id,
+        "product_name": product.product_name,
+        "favorited_time": pf.favorited_time,
+    }
+
+
+@router.get("/users/{user_id}/favorites/", response=list[ProductFavoriteOut], tags=["商品收藏"], summary="获取用户的收藏列表")
+def get_user_favorites(request, user_id: str):
+    try:
+        user = User.objects.get(user_id=user_id)
+    except User.DoesNotExist:
+        raise HttpError(404, "User not found")
+
+    pfs = ProductFavorite.objects.select_related('product').filter(user=user)
+    return [
+        {
+            "user_id": pf.user.user_id,
+            "product_id": pf.product.product_id,
+            "product_name": pf.product.product_name,
+            "favorited_time": pf.favorited_time,
+        }
+        for pf in pfs
+    ]
+
+
+@router.get("/products/{product_id}/favorites/", response=list[ProductFavoriteOut], tags=["商品收藏"], summary="获取收藏该商品的用户列表")
+def get_product_favorites(request, product_id: str):
+    try:
+        product = Product.objects.get(product_id=product_id)
+    except Product.DoesNotExist:
+        raise HttpError(404, "Product not found")
+
+    pfs = ProductFavorite.objects.select_related('user').filter(product=product)
+    return [
+        {
+            "user_id": pf.user.user_id,
+            "product_id": pf.product.product_id,
+            "product_name": pf.product.product_name,
+            "favorited_time": pf.favorited_time,
+        }
+        for pf in pfs
     ]
 
 
