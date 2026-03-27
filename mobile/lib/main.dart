@@ -36,7 +36,8 @@ class MyApp extends StatelessWidget {
       title: 'tradeX',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // fontFamily: 'Roboto', // 建议在 pubspec 引入更现代的字体如 Poppins
+        // 使用系统默认字体，避免字体加载延迟
+        fontFamily: 'Roboto', // Android 系统默认字体
         useMaterial3: true,
       ),
       home: const LoginScreen(),

@@ -262,7 +262,7 @@ class _DiscoverPageState extends State<DiscoverPage>
                 ),
               ],
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
@@ -270,8 +270,8 @@ class _DiscoverPageState extends State<DiscoverPage>
                   color: Colors.white,
                   size: 18,
                 ),
-                const SizedBox(width: 4),
-                const Text(
+                SizedBox(width: 4),
+                Text(
                   'AI',
                   style: TextStyle(
                     color: Colors.white,

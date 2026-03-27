@@ -70,6 +70,40 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// 调试登录 - 使用管理员账号快速登录
+  void _debugLogin() async {
+    setState(() => _isLoading = true);
+
+    final result = await ApiService.login(
+      identifier: 'admin_root',
+      password: 'hashed_admin_pw',
+      isEmail: false,
+    );
+
+    setState(() => _isLoading = false);
+
+    if (!mounted) return;
+
+    if (result['success']) {
+      final userData = result['data'];
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('调试登录成功: ${userData['username']}')),
+      );
+      // 跳转到主页
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('调试登录失败: ${result['message']}'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -229,6 +263,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Sign In',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 调试登录按钮
+          SizedBox(
+            width: double.infinity,
+            height: 45,
+            child: ElevatedButton.icon(
+              onPressed: _isLoading ? null : _debugLogin,
+              icon: const Icon(Icons.bug_report, size: 18),
+              label: const Text(
+                '调试登录 (admin)',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade400,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
             ),
           ),
           const SizedBox(height: 30),
