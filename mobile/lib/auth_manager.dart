@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 认证管理器 - 简化版单一 Token（30天有效期）
+/// Web 端使用 localStorage，移动端使用加密存储
 class AuthManager {
-  static const _storage = FlutterSecureStorage(
+  // 移动端加密存储
+  static const _secureStorage = FlutterSecureStorage(
     aOptions: AndroidOptions(
       encryptedSharedPreferences: true,
     ),
@@ -16,15 +20,53 @@ class AuthManager {
   static const _keyToken = 'auth_token';
   static const _keyUserData = 'auth_user_data';
 
+  /// 获取存储实例（Web 用 SharedPreferences，移动端用 FlutterSecureStorage）
+  static Future<dynamic> _getStorage() async {
+    if (kIsWeb) {
+      return await SharedPreferences.getInstance();
+    }
+    return _secureStorage;
+  }
+
+  /// 写入数据
+  static Future<void> _write(String key, String value) async {
+    final storage = await _getStorage();
+    if (kIsWeb) {
+      await storage.setString(key, value);
+    } else {
+      await storage.write(key: key, value: value);
+    }
+  }
+
+  /// 读取数据
+  static Future<String?> _read(String key) async {
+    final storage = await _getStorage();
+    if (kIsWeb) {
+      return storage.getString(key);
+    } else {
+      return await storage.read(key: key);
+    }
+  }
+
+  /// 删除数据
+  static Future<void> _delete(String key) async {
+    final storage = await _getStorage();
+    if (kIsWeb) {
+      await storage.remove(key);
+    } else {
+      await storage.delete(key: key);
+    }
+  }
+
   /// 保存登录信息（Token + 用户数据）
   static Future<void> saveLogin(String token, Map<String, dynamic> userData) async {
-    await _storage.write(key: _keyToken, value: token);
-    await _storage.write(key: _keyUserData, value: jsonEncode(userData));
+    await _write(_keyToken, token);
+    await _write(_keyUserData, jsonEncode(userData));
   }
 
   /// 获取 Token（自动检查是否过期）
   static Future<String?> getToken() async {
-    final token = await _storage.read(key: _keyToken);
+    final token = await _read(_keyToken);
     if (token == null) return null;
 
     // 检查是否过期
@@ -51,7 +93,7 @@ class AuthManager {
 
   /// 获取用户信息
   static Future<Map<String, dynamic>?> getUser() async {
-    final userDataStr = await _storage.read(key: _keyUserData);
+    final userDataStr = await _read(_keyUserData);
     if (userDataStr == null) return null;
     try {
       return jsonDecode(userDataStr) as Map<String, dynamic>;
@@ -68,13 +110,13 @@ class AuthManager {
 
   /// 清除登录态（退出登录）
   static Future<void> clearLogin() async {
-    await _storage.delete(key: _keyToken);
-    await _storage.delete(key: _keyUserData);
+    await _delete(_keyToken);
+    await _delete(_keyUserData);
   }
 
   /// 获取 Token 剩余有效天数
   static Future<int> getTokenRemainingDays() async {
-    final token = await _storage.read(key: _keyToken);
+    final token = await _read(_keyToken);
     if (token == null) return 0;
 
     try {
