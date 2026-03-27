@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'api.dart';
 import 'main_screen.dart';
-import 'user_state.dart';
+import 'auth_manager.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -50,12 +50,18 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (result['success']) {
-      // 登录成功，保存用户信息
-      final userData = result['data'];
-      await UserState.saveUser(userData);
+      // 登录成功，保存 Token（30天有效）
+      await AuthManager.saveLogin(
+        result['token'],
+        {
+          'user_id': result['user_id'],
+          'username': result['username'],
+          'role': result['role'],
+        },
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('欢迎回来, ${userData['username']}!')),
+        SnackBar(content: Text('欢迎回来, ${result['username']}!')),
       );
       // 跳转到主页
       Navigator.pushReplacement(
@@ -88,11 +94,18 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (result['success']) {
-      final userData = result['data'];
-      await UserState.saveUser(userData);
+      // 登录成功，保存 Token
+      await AuthManager.saveLogin(
+        result['token'],
+        {
+          'user_id': result['user_id'],
+          'username': result['username'],
+          'role': result['role'],
+        },
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('调试登录成功: ${userData['username']}')),
+        SnackBar(content: Text('调试登录成功: ${result['username']}')),
       );
       // 跳转到主页
       Navigator.pushReplacement(

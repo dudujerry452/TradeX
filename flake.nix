@@ -69,6 +69,7 @@
             pythonPackages.requests
             pythonPackages.openai
             pythonPackages.chromadb
+            pythonPackages.pyjwt
             nodejs_22
             pnpm
             sqlite

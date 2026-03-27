@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'api.dart';
-import 'user_state.dart';
+import 'auth_manager.dart';
 
 /// 商品详情页面
 class ProductDetailPage extends StatefulWidget {
@@ -31,7 +31,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Future<void> _loadUserId() async {
-    final userId = await UserState.getUserId();
+    final userId = await AuthManager.getUserId();
     if (mounted) {
       setState(() {
         _currentUserId = userId ?? '';

@@ -5,7 +5,9 @@ core/api.py  —  core app 's django-ninja Router
 import uuid
 import json
 from typing import Any, Optional
+from datetime import datetime, timedelta
 
+import jwt
 from openai import OpenAI
 from django.http import StreamingHttpResponse
 from django.db import IntegrityError
@@ -13,6 +15,7 @@ from django.conf import settings
 from django.utils import timezone
 from ninja import Router, Schema
 from ninja.errors import HttpError
+from ninja.security import HttpBearer
 
 from .models import Product, User, Tag, ProductTag, UserTagPreference, ProductFavorite
 from .rag_vector_service import (
@@ -21,6 +24,22 @@ from .rag_vector_service import (
 )
 
 router = Router()
+
+# JWT 配置
+JWT_SECRET = getattr(settings, 'SECRET_KEY', 'your-secret-key')
+JWT_EXPIRE_DAYS = 30  # Token 30天有效
+
+# JWT 认证器
+class AuthBearer(HttpBearer):
+    def authenticate(self, request, token):
+        try:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+            user = User.objects.get(user_id=payload["user_id"])
+            return user
+        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, User.DoesNotExist):
+            return None
+
+auth = AuthBearer()
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
@@ -32,6 +51,7 @@ class LoginIn(Schema):
 
 
 class LoginOut(Schema):
+    token: str
     user_id: str
     username: str
     role: str
@@ -205,7 +225,20 @@ def login(request, data: LoginIn):
     user.last_login_time = timezone.now()
     user.save(update_fields=["last_login_time"])
 
-    return user
+    # 生成 30 天有效期的 JWT Token
+    payload = {
+        "user_id": user.user_id,
+        "username": user.username,
+        "exp": datetime.utcnow() + timedelta(days=JWT_EXPIRE_DAYS),
+    }
+    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
+    return {
+        "token": token,
+        "user_id": user.user_id,
+        "username": user.username,
+        "role": user.role,
+    }
 
 
 # ── 用户接口 ──────────────────────────────────────────────────────────────────

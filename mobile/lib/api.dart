@@ -1,11 +1,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'auth_manager.dart';
 
 class ApiService {
-  // 请替换为你实际的 Django 后端地址 
+  // 请替换为你实际的 Django 后端地址
   // 如果在安卓模拟器测试本地服务，请使用 http://10.0.2.2:8000
   // 如果是 iOS 模拟器，请使用 http://127.0.0.1:8000
   static const String baseUrl = 'http://127.0.0.1:8000/api';
+
+  /// 获取带认证的请求头
+  static Future<Map<String, String>> getHeaders() async {
+    final token = await AuthManager.getToken();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
 
   /// 用户登录
   /// [identifier] 可以是 username 或 email
@@ -37,8 +47,14 @@ class ApiService {
       final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        // 成功，返回 LoginOut Schema 数据
-        return {'success': true, 'data': responseData};
+        // 成功，返回包含 token 的数据
+        return {
+          'success': true,
+          'token': responseData['token'],
+          'user_id': responseData['user_id'],
+          'username': responseData['username'],
+          'role': responseData['role'],
+        };
       } else {
         // 处理 401, 403 或其他错误
         String errorMessage = responseData['detail'] ?? '登录失败，请重试';
@@ -131,7 +147,11 @@ class ApiService {
     final url = Uri.parse('$baseUrl/users/$userId/tag-preferences/');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 401) {
+        return {'success': false, 'message': '登录已过期，请重新登录'};
+      }
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -149,7 +169,11 @@ class ApiService {
     final url = Uri.parse('$baseUrl/users/$userId/favorites/');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 401) {
+        return {'success': false, 'message': '登录已过期，请重新登录'};
+      }
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -169,12 +193,16 @@ class ApiService {
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: await getHeaders(),
         body: jsonEncode({
           'user_id': userId,
           'product_id': productId,
         }),
       );
+
+      if (response.statusCode == 401) {
+        return {'success': false, 'message': '登录已过期，请重新登录'};
+      }
 
       if (response.statusCode == 201) {
         return {'success': true, 'message': '收藏成功'};
@@ -209,7 +237,11 @@ class ApiService {
     final url = Uri.parse('$baseUrl/product-favorites/$favoriteId/');
 
     try {
-      final response = await http.delete(url);
+      final response = await http.delete(url, headers: await getHeaders());
+
+      if (response.statusCode == 401) {
+        return {'success': false, 'message': '登录已过期，请重新登录'};
+      }
 
       if (response.statusCode == 204) {
         return {'success': true, 'message': '已取消收藏'};

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'api.dart';
 import 'product_detail_page.dart';
-import 'user_state.dart';
+import 'auth_manager.dart';
 
 /// 收藏列表页面
 class FavoritesPage extends StatefulWidget {
@@ -24,7 +24,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 
   Future<void> _loadUserId() async {
-    final userId = await UserState.getUserId();
+    final userId = await AuthManager.getUserId();
     if (mounted) {
       setState(() {
         _currentUserId = userId ?? '';

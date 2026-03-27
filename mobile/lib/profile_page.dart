@@ -3,7 +3,7 @@ import 'icons.dart';
 import 'login_screen.dart';
 import 'api.dart';
 import 'favorites_page.dart';
-import 'user_state.dart';
+import 'auth_manager.dart';
 
 /// 我的页面 - 展示用户账户信息
 class ProfilePage extends StatefulWidget {
@@ -44,7 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   /// 加载用户信息
   Future<void> _loadUserInfo() async {
-    final user = await UserState.getUser();
+    final user = await AuthManager.getUser();
     if (user != null && mounted) {
       setState(() {
         _userInfo = user;
@@ -788,8 +788,8 @@ class _ProfilePageState extends State<ProfilePage> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              // 清除用户数据
-              await UserState.clearUser();
+              // 清除登录态
+              await AuthManager.clearLogin();
               // 跳转到登录页面
               Navigator.pushAndRemoveUntil(
                 context,
