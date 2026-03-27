@@ -161,33 +161,28 @@ class _DiscoverPageState extends State<DiscoverPage>
   Widget _buildTopTabBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              tabAlignment: TabAlignment.start,
-              indicatorColor: const Color(0xFFCE965B),
-              indicatorWeight: 3,
-              labelColor: const Color(0xFF1A1A2C),
-              unselectedLabelColor: Colors.grey,
-              labelStyle: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-              ),
-              tabs: const [
-                Tab(text: '关注'),
-                Tab(text: '推荐'),
-                Tab(text: '最新'),
-                Tab(text: '讨论'),
-              ],
-            ),
-          ),
+      alignment: Alignment.center,
+      child: TabBar(
+        controller: _tabController,
+        isScrollable: true,
+        tabAlignment: TabAlignment.center,
+        indicatorColor: const Color(0xFFCE965B),
+        indicatorWeight: 3,
+        labelColor: const Color(0xFF1A1A2C),
+        unselectedLabelColor: Colors.grey,
+        labelStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
+        tabs: const [
+          Tab(text: '关注'),
+          Tab(text: '推荐'),
+          Tab(text: '最新'),
+          Tab(text: '讨论'),
         ],
       ),
     );
