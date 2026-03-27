@@ -11,6 +11,10 @@ erDiagram
     PRODUCT ||--o{ ORDER_DETAIL : "对应"
     USER ||--o{ MESSAGE : "发布留言"
     PRODUCT ||--o{ MESSAGE : "关联留言"
+    PRODUCT ||--o{ PRODUCT_TAG : "拥有"
+    TAG ||--o{ PRODUCT_TAG : "标记"
+    USER ||--o{ USER_TAG_PREFERENCE : "偏好"
+    TAG ||--o{ USER_TAG_PREFERENCE : "被偏好"
 
     %% ------------------------------ 实体与属性定义 ------------------------------
     USER {
@@ -91,4 +95,26 @@ erDiagram
         datetime message_time "留言时间"
         string reply_content "回复内容"
         datetime reply_time "回复时间"
+    }
+
+    TAG {
+        string tag_id PK "标签ID（主键）"
+        string tag_name "标签名称（唯一）"
+        string category "标签分类（如:风格/品牌/场景）"
+        int usage_count "使用次数（热度）"
+        datetime create_time "创建时间"
+    }
+
+    PRODUCT_TAG {
+        string product_id FK "商品ID（外键，关联PRODUCT.product_id）"
+        string tag_id FK "标签ID（外键，关联TAG.tag_id）"
+        float weight "标签权重(0-1,用于推荐排序)"
+        datetime tagged_time "打标时间"
+    }
+
+    USER_TAG_PREFERENCE {
+        string user_id FK "用户ID（外键，关联USER.user_id）"
+        string tag_id FK "标签ID（外键，关联TAG.tag_id）"
+        float score "偏好分数(基于点击/购买计算)"
+        datetime update_time "更新时间"
     }

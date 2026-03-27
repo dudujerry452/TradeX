@@ -3,7 +3,7 @@ import json
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Product, User
+from .models import Product, User, Tag, ProductTag, UserTagPreference
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -178,6 +178,42 @@ class ProductListCreateTests(TestCase):
         self.assertEqual(data[0]["product_name"], "测试商品")
         self.assertEqual(data[0]["product_status"], Product.StatusChoices.PENDING)
 
+    def test_create_product_with_tags(self):
+        # 先创建标签
+        tag1 = make_tag(tag_id="t001", tag_name="热销")
+        tag2 = make_tag(tag_id="t002", tag_name="新品")
+        payload = {
+            "product_id": "p002",
+            "product_name": "带标签的商品",
+            "category": "电子产品",
+            "description": "这是一个带标签的测试商品",
+            "image_url": "http://example.com/img2.jpg",
+            "price": "199.00",
+            "stock": 20,
+            "publisher_id": "u001",
+            "tag_ids": ["t001", "t002"],
+        }
+        response = self.client.post(
+            "/api/products/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        body = response.json()
+        self.assertEqual(body["product_id"], "p002")
+
+        # 验证标签已关联
+        product = Product.objects.get(product_id="p002")
+        tags = list(product.product_tags.values_list("tag__tag_name", flat=True))
+        self.assertIn("热销", tags)
+        self.assertIn("新品", tags)
+
+        # 验证标签使用次数已更新
+        tag1.refresh_from_db()
+        tag2.refresh_from_db()
+        self.assertGreater(tag1.usage_count, 0)
+        self.assertGreater(tag2.usage_count, 0)
+
 
 class ProductDetailTests(TestCase):
 
@@ -197,3 +233,175 @@ class ProductDetailTests(TestCase):
         response = self.client.get("/api/products/no_such_product/")
         self.assertEqual(response.status_code, 404)
         self.assertIn("detail", response.json())
+
+
+# ── helpers for tag tests ─────────────────────────────────────────────────────
+
+def make_tag(**kwargs):
+    defaults = dict(
+        tag_id="t001",
+        tag_name="测试标签",
+        category="风格",
+        usage_count=0,
+    )
+    defaults.update(kwargs)
+    return Tag.objects.create(**defaults)
+
+
+# ── Tag API tests ─────────────────────────────────────────────────────────────
+
+class TagListCreateTests(TestCase):
+
+    def test_get_empty_tag_list(self):
+        response = self.client.get("/api/tags/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+
+    def test_create_tag(self):
+        payload = {
+            "tag_id": "t001",
+            "tag_name": "新品上市",
+            "category": "营销",
+        }
+        response = self.client.post(
+            "/api/tags/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        body = response.json()
+        self.assertEqual(body["tag_name"], "新品上市")
+        self.assertEqual(body["category"], "营销")
+        self.assertTrue(Tag.objects.filter(tag_id="t001").exists())
+
+    def test_get_tag_list_after_create(self):
+        make_tag()
+        response = self.client.get("/api/tags/")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["tag_name"], "测试标签")
+
+
+class TagDetailTests(TestCase):
+
+    def setUp(self):
+        self.tag = make_tag()
+
+    def test_get_existing_tag(self):
+        response = self.client.get("/api/tags/t001/")
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["tag_id"], "t001")
+        self.assertEqual(body["tag_name"], "测试标签")
+
+    def test_get_nonexistent_tag_returns_404(self):
+        response = self.client.get("/api/tags/no_such_tag/")
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("detail", response.json())
+
+
+# ── ProductTag API tests ─────────────────────────────────────────────────────
+
+class ProductTagListCreateTests(TestCase):
+
+    def setUp(self):
+        self.publisher = make_user()
+        self.product = make_product(self.publisher)
+        self.tag = make_tag()
+
+    def test_get_empty_product_tag_list(self):
+        response = self.client.get("/api/product-tags/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+
+    def test_create_product_tag(self):
+        payload = {
+            "product_id": "p001",
+            "tag_id": "t001",
+            "weight": 0.8,
+        }
+        response = self.client.post(
+            "/api/product-tags/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        body = response.json()
+        self.assertEqual(body["product_id"], "p001")
+        self.assertEqual(body["tag_id"], "t001")
+        self.assertEqual(body["tag_name"], "测试标签")
+        self.assertEqual(body["weight"], 0.8)
+
+    def test_get_product_tags(self):
+        ProductTag.objects.create(product=self.product, tag=self.tag, weight=1.0)
+        response = self.client.get("/api/products/p001/tags/")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["tag_name"], "测试标签")
+
+    def test_create_product_tag_invalid_product(self):
+        payload = {
+            "product_id": "nonexistent_product",
+            "tag_id": "t001",
+            "weight": 1.0,
+        }
+        response = self.client.post(
+            "/api/product-tags/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 404)
+
+
+# ── UserTagPreference API tests ───────────────────────────────────────────────
+
+class UserTagPreferenceListCreateTests(TestCase):
+
+    def setUp(self):
+        self.user = make_user()
+        self.tag = make_tag()
+
+    def test_get_empty_user_tag_preference_list(self):
+        response = self.client.get("/api/user-tag-preferences/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+
+    def test_create_user_tag_preference(self):
+        payload = {
+            "user_id": "u001",
+            "tag_id": "t001",
+            "score": 5.0,
+        }
+        response = self.client.post(
+            "/api/user-tag-preferences/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        body = response.json()
+        self.assertEqual(body["user_id"], "u001")
+        self.assertEqual(body["tag_id"], "t001")
+        self.assertEqual(body["score"], 5.0)
+
+    def test_get_user_tag_preferences(self):
+        UserTagPreference.objects.create(user=self.user, tag=self.tag, score=3.5)
+        response = self.client.get("/api/users/u001/tag-preferences/")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["score"], 3.5)
+
+    def test_create_user_tag_preference_invalid_user(self):
+        payload = {
+            "user_id": "nonexistent_user",
+            "tag_id": "t001",
+            "score": 5.0,
+        }
+        response = self.client.post(
+            "/api/user-tag-preferences/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 404)

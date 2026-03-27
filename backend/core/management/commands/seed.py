@@ -12,6 +12,9 @@ from core.models import (
     Product,
     ProductReview,
     RegisterReview,
+    Tag,
+    ProductTag,
+    UserTagPreference,
     User,
 )
 
@@ -232,6 +235,99 @@ MESSAGES = [
     ),
 ]
 
+TAGS = [
+    dict(
+        tag_id="seed_tag001",
+        tag_name="新品",
+        category="营销",
+        usage_count=2,
+    ),
+    dict(
+        tag_id="seed_tag002",
+        tag_name="热销",
+        category="营销",
+        usage_count=1,
+    ),
+    dict(
+        tag_id="seed_tag003",
+        tag_name="苹果",
+        category="品牌",
+        usage_count=1,
+    ),
+    dict(
+        tag_id="seed_tag004",
+        tag_name="索尼",
+        category="品牌",
+        usage_count=1,
+    ),
+    dict(
+        tag_id="seed_tag005",
+        tag_name="电子产品",
+        category="品类",
+        usage_count=2,
+    ),
+]
+
+PRODUCT_TAGS = [
+    dict(
+        id=1,
+        product_id="seed_prod001",
+        tag_id="seed_tag001",
+        weight=1.0,
+    ),
+    dict(
+        id=2,
+        product_id="seed_prod001",
+        tag_id="seed_tag003",
+        weight=1.0,
+    ),
+    dict(
+        id=3,
+        product_id="seed_prod001",
+        tag_id="seed_tag005",
+        weight=0.8,
+    ),
+    dict(
+        id=4,
+        product_id="seed_prod002",
+        tag_id="seed_tag002",
+        weight=1.0,
+    ),
+    dict(
+        id=5,
+        product_id="seed_prod002",
+        tag_id="seed_tag004",
+        weight=1.0,
+    ),
+    dict(
+        id=6,
+        product_id="seed_prod002",
+        tag_id="seed_tag005",
+        weight=0.8,
+    ),
+]
+
+USER_TAG_PREFERENCES = [
+    dict(
+        id=1,
+        user_id="seed_buyer001",
+        tag_id="seed_tag001",
+        score=5.0,
+    ),
+    dict(
+        id=2,
+        user_id="seed_buyer001",
+        tag_id="seed_tag003",
+        score=4.5,
+    ),
+    dict(
+        id=3,
+        user_id="seed_buyer002",
+        tag_id="seed_tag002",
+        score=3.0,
+    ),
+]
+
 
 # ── 主逻辑 ────────────────────────────────────────────────────────────────────
 
@@ -278,6 +374,53 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("── 留言 ──"))
         total += self._upsert(Message, "message_id", MESSAGES)
 
+        self.stdout.write(self.style.MIGRATE_HEADING("── 标签 ──"))
+        total += self._upsert(Tag, "tag_id", TAGS)
+
+        self.stdout.write(self.style.MIGRATE_HEADING("── 商品标签关联 ──"))
+        total += self._upsert_product_tags()
+
+        self.stdout.write(self.style.MIGRATE_HEADING("── 用户标签偏好 ──"))
+        total += self._upsert_user_tag_preferences()
+
         self.stdout.write(
             self.style.SUCCESS(f"\n完成. 共新增 {total} 条记录.")
         )
+
+    def _upsert_product_tags(self):
+        created_count = 0
+        for data in PRODUCT_TAGS:
+            product = Product.objects.get(product_id=data["product_id"])
+            tag = Tag.objects.get(tag_id=data["tag_id"])
+            _, created = ProductTag.objects.get_or_create(
+                product=product,
+                tag=tag,
+                defaults={"weight": data["weight"]}
+            )
+            if created:
+                created_count += 1
+                self.stdout.write(f"  + ProductTag: {data['product_id']} - {data['tag_id']}")
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f"  ~ ProductTag: {data['product_id']} - {data['tag_id']} (已存在, 跳过)")
+                )
+        return created_count
+
+    def _upsert_user_tag_preferences(self):
+        created_count = 0
+        for data in USER_TAG_PREFERENCES:
+            user = User.objects.get(user_id=data["user_id"])
+            tag = Tag.objects.get(tag_id=data["tag_id"])
+            _, created = UserTagPreference.objects.get_or_create(
+                user=user,
+                tag=tag,
+                defaults={"score": data["score"]}
+            )
+            if created:
+                created_count += 1
+                self.stdout.write(f"  + UserTagPreference: {data['user_id']} - {data['tag_id']}")
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f"  ~ UserTagPreference: {data['user_id']} - {data['tag_id']} (已存在, 跳过)")
+                )
+        return created_count

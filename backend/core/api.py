@@ -14,7 +14,7 @@ from django.utils import timezone
 from ninja import Router, Schema
 from ninja.errors import HttpError
 
-from .models import Product, User
+from .models import Product, User, Tag, ProductTag, UserTagPreference
 from .rag_vector_service import (
     build_product_document,
     get_rag_collection,
@@ -81,6 +81,7 @@ class ProductIn(Schema):
     price: float
     stock: int
     publisher_id: str
+    tag_ids: list[str] = []  # 可选：标签ID列表
 
 
 class RagAddProductIn(Schema):
@@ -109,6 +110,48 @@ class RagChatOut(Schema):
 class RagChatStreamOut(Schema):
     stream: bool
     message: str
+
+
+class TagOut(Schema):
+    tag_id: str
+    tag_name: str
+    category: str
+    usage_count: int
+    create_time: Any
+
+
+class TagIn(Schema):
+    tag_id: Optional[str] = None
+    tag_name: str
+    category: str
+
+
+class ProductTagOut(Schema):
+    product_id: str
+    tag_id: str
+    tag_name: str
+    weight: float
+    tagged_time: Any
+
+
+class ProductTagIn(Schema):
+    product_id: str
+    tag_id: str
+    weight: float = 1.0
+
+
+class UserTagPreferenceOut(Schema):
+    user_id: str
+    tag_id: str
+    tag_name: str
+    score: float
+    update_time: Any
+
+
+class UserTagPreferenceIn(Schema):
+    user_id: str
+    tag_id: str
+    score: float
 
 
 # ── 认证接口 ──────────────────────────────────────────────────────────────────
@@ -226,6 +269,23 @@ def create_product(request, data: ProductIn):
         stock=data.stock,
         publisher=publisher,
     )
+
+    # 关联标签（如有）
+    if data.tag_ids:
+        for tag_id in data.tag_ids:
+            try:
+                tag = Tag.objects.get(tag_id=tag_id)
+                ProductTag.objects.get_or_create(
+                    product=product,
+                    tag=tag,
+                    defaults={"weight": 1.0}
+                )
+                # 更新标签使用次数
+                tag.usage_count = ProductTag.objects.filter(tag=tag).count()
+                tag.save()
+            except Tag.DoesNotExist:
+                pass  # 忽略不存在的标签
+
     return 201, product
 
 
@@ -235,6 +295,151 @@ def get_product(request, product_id: str):
         return Product.objects.get(product_id=product_id)
     except Product.DoesNotExist:
         raise HttpError(404, "Product not found")
+
+
+# ── 标签接口 ──────────────────────────────────────────────────────────────────
+
+@router.get("/tags/", response=list[TagOut], tags=["标签"], summary="获取标签列表")
+def list_tags(request):
+    return Tag.objects.all()
+
+
+@router.post("/tags/", response={201: TagOut}, tags=["标签"], summary="创建新标签")
+def create_tag(request, data: TagIn):
+    tag = Tag.objects.create(
+        tag_id=data.tag_id or uuid.uuid4().hex[:20],
+        tag_name=data.tag_name,
+        category=data.category,
+    )
+    return 201, tag
+
+
+@router.get("/tags/{tag_id}/", response=TagOut, tags=["标签"], summary="查询标签详情")
+def get_tag(request, tag_id: str):
+    try:
+        return Tag.objects.get(tag_id=tag_id)
+    except Tag.DoesNotExist:
+        raise HttpError(404, "Tag not found")
+
+
+# ── 商品标签关联接口 ───────────────────────────────────────────────────────────
+
+@router.get("/product-tags/", response=list[ProductTagOut], tags=["商品标签"], summary="获取商品标签关联列表")
+def list_product_tags(request):
+    pts = ProductTag.objects.select_related('product', 'tag').all()
+    result = []
+    for pt in pts:
+        result.append({
+            "product_id": pt.product.product_id,
+            "tag_id": pt.tag.tag_id,
+            "tag_name": pt.tag.tag_name,
+            "weight": pt.weight,
+            "tagged_time": pt.tagged_time,
+        })
+    return result
+
+
+@router.post("/product-tags/", response={201: ProductTagOut}, tags=["商品标签"], summary="为商品添加标签")
+def create_product_tag(request, data: ProductTagIn):
+    try:
+        product = Product.objects.get(product_id=data.product_id)
+        tag = Tag.objects.get(tag_id=data.tag_id)
+    except Product.DoesNotExist:
+        raise HttpError(404, "Product not found")
+    except Tag.DoesNotExist:
+        raise HttpError(404, "Tag not found")
+
+    pt, created = ProductTag.objects.get_or_create(
+        product=product,
+        tag=tag,
+        defaults={"weight": data.weight}
+    )
+    if not created:
+        pt.weight = data.weight
+        pt.save()
+
+    # 更新标签使用次数
+    tag.usage_count = ProductTag.objects.filter(tag=tag).count()
+    tag.save()
+
+    return 201, {
+        "product_id": product.product_id,
+        "tag_id": tag.tag_id,
+        "tag_name": tag.tag_name,
+        "weight": pt.weight,
+        "tagged_time": pt.tagged_time,
+    }
+
+
+@router.get("/products/{product_id}/tags/", response=list[TagOut], tags=["商品标签"], summary="获取商品的所有标签")
+def get_product_tags(request, product_id: str):
+    try:
+        product = Product.objects.get(product_id=product_id)
+    except Product.DoesNotExist:
+        raise HttpError(404, "Product not found")
+    return Tag.objects.filter(tagged_products__product=product)
+
+
+# ── 用户标签偏好接口 ───────────────────────────────────────────────────────────
+
+@router.get("/user-tag-preferences/", response=list[UserTagPreferenceOut], tags=["用户标签偏好"], summary="获取用户标签偏好列表")
+def list_user_tag_preferences(request):
+    utps = UserTagPreference.objects.select_related('user', 'tag').all()
+    result = []
+    for utp in utps:
+        result.append({
+            "user_id": utp.user.user_id,
+            "tag_id": utp.tag.tag_id,
+            "tag_name": utp.tag.tag_name,
+            "score": utp.score,
+            "update_time": utp.update_time,
+        })
+    return result
+
+
+@router.post("/user-tag-preferences/", response={201: UserTagPreferenceOut}, tags=["用户标签偏好"], summary="设置用户标签偏好")
+def create_user_tag_preference(request, data: UserTagPreferenceIn):
+    try:
+        user = User.objects.get(user_id=data.user_id)
+        tag = Tag.objects.get(tag_id=data.tag_id)
+    except User.DoesNotExist:
+        raise HttpError(404, "User not found")
+    except Tag.DoesNotExist:
+        raise HttpError(404, "Tag not found")
+
+    utp, created = UserTagPreference.objects.update_or_create(
+        user=user,
+        tag=tag,
+        defaults={"score": data.score}
+    )
+
+    return 201, {
+        "user_id": user.user_id,
+        "tag_id": tag.tag_id,
+        "tag_name": tag.tag_name,
+        "score": utp.score,
+        "update_time": utp.update_time,
+    }
+
+
+@router.get("/users/{user_id}/tag-preferences/", response=list[UserTagPreferenceOut], tags=["用户标签偏好"], summary="获取用户的标签偏好")
+def get_user_tag_preferences(request, user_id: str):
+    try:
+        user = User.objects.get(user_id=user_id)
+    except User.DoesNotExist:
+        raise HttpError(404, "User not found")
+
+    utps = UserTagPreference.objects.select_related('tag').filter(user=user)
+    return [
+        {
+            "user_id": utp.user.user_id,
+            "tag_id": utp.tag.tag_id,
+            "tag_name": utp.tag.tag_name,
+            "score": utp.score,
+            "update_time": utp.update_time,
+        }
+        for utp in utps
+    ]
 
 
 # ── RAG 接口 ──────────────────────────────────────────────────────────────────

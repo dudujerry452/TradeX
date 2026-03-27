@@ -245,26 +245,26 @@ class OrderDetail(models.Model):
 class Message(models.Model):
     """留言实体"""
     message_id = models.CharField(max_length=50, primary_key=True, verbose_name="留言ID")
-    
+
     # 留言用户ID：关联USER (USER ||--o{ MESSAGE)
     user = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='messages', 
+        User,
+        on_delete=models.CASCADE,
+        related_name='messages',
         verbose_name="留言用户"
     )
-    
+
     # 关联商品ID：关联PRODUCT (PRODUCT ||--o{ MESSAGE)
     product = models.ForeignKey(
-        Product, 
-        on_delete=models.CASCADE, 
-        related_name='messages', 
+        Product,
+        on_delete=models.CASCADE,
+        related_name='messages',
         verbose_name="关联商品"
     )
-    
+
     content = models.TextField(verbose_name="留言内容")
     message_time = models.DateTimeField(auto_now_add=True, verbose_name="留言时间")
-    
+
     reply_content = models.TextField(null=True, blank=True, verbose_name="回复内容")
     reply_time = models.DateTimeField(null=True, blank=True, verbose_name="回复时间")
 
@@ -275,3 +275,74 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message {self.message_id} on Product {self.product_id}"
+
+
+class Tag(models.Model):
+    """标签实体"""
+    tag_id = models.CharField(max_length=50, primary_key=True, verbose_name="标签ID")
+    tag_name = models.CharField(max_length=100, unique=True, verbose_name="标签名称")
+    category = models.CharField(max_length=100, verbose_name="标签分类")
+    usage_count = models.IntegerField(default=0, verbose_name="使用次数")
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        db_table = 'tag'
+        verbose_name = "标签"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.tag_name
+
+
+class ProductTag(models.Model):
+    """商品标签关联实体"""
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='product_tags',
+        verbose_name="商品"
+    )
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        related_name='tagged_products',
+        verbose_name="标签"
+    )
+    weight = models.FloatField(default=1.0, verbose_name="标签权重")
+    tagged_time = models.DateTimeField(auto_now_add=True, verbose_name="打标时间")
+
+    class Meta:
+        db_table = 'product_tag'
+        verbose_name = "商品标签关联"
+        verbose_name_plural = verbose_name
+        unique_together = ['product', 'tag']
+
+    def __str__(self):
+        return f"{self.product.product_name} - {self.tag.tag_name}"
+
+
+class UserTagPreference(models.Model):
+    """用户标签偏好实体"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='tag_preferences',
+        verbose_name="用户"
+    )
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        related_name='user_preferences',
+        verbose_name="标签"
+    )
+    score = models.FloatField(default=0.0, verbose_name="偏好分数")
+    update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        db_table = 'user_tag_preference'
+        verbose_name = "用户标签偏好"
+        verbose_name_plural = verbose_name
+        unique_together = ['user', 'tag']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.tag.tag_name}"
