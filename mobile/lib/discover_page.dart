@@ -243,55 +243,79 @@ class _DiscoverPageState extends State<DiscoverPage>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       body: SafeArea(
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              // 顶部Tab栏
-              SliverToBoxAdapter(
-                child: _buildTopTabBar(),
-              ),
-              // 搜索框和AI按钮
-              SliverToBoxAdapter(
-                child: _buildSearchBar(),
-              ),
-              // 分类横向滚动列表
-              SliverToBoxAdapter(
-                child: _buildCategoryList(),
-              ),
-            ];
-          },
-          body: _buildProductGrid(),
+        child: RefreshIndicator(
+          onRefresh: () => _loadProducts(refresh: true),
+          color: const Color(0xFFCE965B),
+          child: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                // 顶部Tab栏
+                SliverToBoxAdapter(
+                  child: _buildTopTabBar(),
+                ),
+                // 搜索框和AI按钮
+                SliverToBoxAdapter(
+                  child: _buildSearchBar(),
+                ),
+                // 分类横向滚动列表
+                SliverToBoxAdapter(
+                  child: _buildCategoryList(),
+                ),
+              ];
+            },
+            body: _buildProductGrid(),
+          ),
         ),
       ),
     );
   }
 
-  /// 顶部Tab栏 (关注/推荐/最新/讨论)
+  /// 顶部Tab栏 (关注/推荐/最新/讨论) + 刷新按钮
   Widget _buildTopTabBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      alignment: Alignment.center,
-      child: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        tabAlignment: TabAlignment.center,
-        indicatorColor: const Color(0xFFCE965B),
-        indicatorWeight: 3,
-        labelColor: const Color(0xFF1A1A2C),
-        unselectedLabelColor: Colors.grey,
-        labelStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-        ),
-        tabs: const [
-          Tab(text: '关注'),
-          Tab(text: '推荐'),
-          Tab(text: '最新'),
-          Tab(text: '讨论'),
+      child: Row(
+        children: [
+          Expanded(
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabAlignment: TabAlignment.center,
+              indicatorColor: const Color(0xFFCE965B),
+              indicatorWeight: 3,
+              labelColor: const Color(0xFF1A1A2C),
+              unselectedLabelColor: Colors.grey,
+              labelStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+              tabs: const [
+                Tab(text: '关注'),
+                Tab(text: '推荐'),
+                Tab(text: '最新'),
+                Tab(text: '讨论'),
+              ],
+            ),
+          ),
+          // 刷新按钮
+          IconButton(
+            onPressed: _isLoading ? null : () => _loadProducts(refresh: true),
+            icon: _isLoading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCE965B)),
+                    ),
+                  )
+                : const Icon(Icons.refresh, color: Color(0xFFCE965B)),
+            tooltip: '刷新',
+          ),
         ],
       ),
     );
@@ -483,37 +507,33 @@ class _DiscoverPageState extends State<DiscoverPage>
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: () => _loadProducts(refresh: true),
-      color: const Color(0xFFCE965B),
-      child: GridView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.all(12),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemCount: _products.length + (_isLoadingMore ? 2 : 0),
-        itemBuilder: (context, index) {
-          // 显示加载指示器
-          if (index >= _products.length) {
-            return const Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCE965B)),
-                ),
-              ),
-            );
-          }
-          final product = _products[index];
-          return _buildProductCard(product);
-        },
+    return GridView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
+      itemCount: _products.length + (_isLoadingMore ? 2 : 0),
+      itemBuilder: (context, index) {
+        // 显示加载指示器
+        if (index >= _products.length) {
+          return const Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCE965B)),
+              ),
+            ),
+          );
+        }
+        final product = _products[index];
+        return _buildProductCard(product);
+      },
     );
   }
 
@@ -523,6 +543,7 @@ class _DiscoverPageState extends State<DiscoverPage>
     final price = product['price'] ?? 0.0;
     final imageUrl = product['image_url'] ?? '';
     final category = product['category'] ?? '其他';
+    final isFavorited = product['is_favorited'] ?? false;
 
     return GestureDetector(
       onTap: () {
@@ -555,28 +576,50 @@ class _DiscoverPageState extends State<DiscoverPage>
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
                 ),
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.grey.shade100,
-                  child: imageUrl.isNotEmpty
-                      ? Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Center(
-                              child: HeroIcons.photo(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(
+                      color: Colors.grey.shade100,
+                      child: imageUrl.isNotEmpty
+                          ? Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: HeroIcons.photo(
+                                    size: 40,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                );
+                              },
+                            )
+                          : Center(
+                              child: HeroIcons.shoppingBag(
                                 size: 40,
                                 color: Colors.grey.shade400,
                               ),
-                            );
-                          },
-                        )
-                      : Center(
-                          child: HeroIcons.shoppingBag(
-                            size: 40,
-                            color: Colors.grey.shade400,
+                            ),
+                    ),
+                    // 已收藏标记
+                    if (isFavorited)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Icon(
+                            Icons.favorite,
+                            size: 16,
+                            color: Colors.red,
                           ),
                         ),
+                      ),
+                  ],
                 ),
               ),
             ),

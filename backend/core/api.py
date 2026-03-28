@@ -210,6 +210,7 @@ class RecommendationOut(Schema):
     favorite_count: int
     avg_rating: float
     relevance_score: Optional[float] = None  # 推荐相关度分数
+    is_favorited: Optional[bool] = None  # 当前用户是否已收藏
 
 
 class ProductViewOut(Schema):
@@ -788,7 +789,7 @@ def get_personalized_recommendations(user_id, limit=10):
 
     基于用户标签偏好的推荐算法
     1. 获取用户标签偏好（score排序）
-    2. 基于偏好标签找商品，排除已收藏
+    2. 基于偏好标签找商品（包含已收藏）
     3. 无偏好时返回热门推荐
     """
     # 获取用户标签偏好（score排序）
@@ -797,7 +798,7 @@ def get_personalized_recommendations(user_id, limit=10):
     ).order_by('-score')[:10]
 
     if user_prefs.exists():
-        # 基于偏好标签找商品，排除已收藏
+        # 基于偏好标签找商品（包含已收藏）
         preferred_tags = [p.tag for p in user_prefs]
 
         # 使用聚合计算商品的相关度分数
@@ -805,8 +806,6 @@ def get_personalized_recommendations(user_id, limit=10):
         recommended = Product.objects.filter(
             product_tags__tag__in=preferred_tags,
             product_status='APPROVED'
-        ).exclude(
-            favorited_by__user_id=user_id
         ).annotate(
             relevance=Sum(
                 F('product_tags__weight') * F('product_tags__tag__user_preferences__score'),
@@ -859,7 +858,9 @@ def personalized_recommendations(request, user_id: Optional[str] = None, limit: 
     - 已登录用户：基于标签偏好推荐
     - 未登录用户（无user_id）：返回热门推荐
     - 支持offset分页
+    - 返回包含is_favorited字段标记是否已收藏
     """
+    # 获取推荐商品
     if user_id:
         try:
             User.objects.get(user_id=user_id)
@@ -872,6 +873,15 @@ def personalized_recommendations(request, user_id: Optional[str] = None, limit: 
 
     # 分页切片
     paginated_products = products[offset:offset + limit]
+
+    # 获取用户收藏的商品ID集合（用于标记）
+    favorited_product_ids = set()
+    if user_id:
+        favorited_product_ids = set(
+            ProductFavorite.objects.filter(
+                user__user_id=user_id
+            ).values_list('product__product_id', flat=True)
+        )
 
     # 构建响应数据
     result = []
@@ -890,6 +900,7 @@ def personalized_recommendations(request, user_id: Optional[str] = None, limit: 
             "sales_count": p.sales_count,
             "favorite_count": p.favorite_count,
             "avg_rating": p.avg_rating,
+            "is_favorited": p.product_id in favorited_product_ids if user_id else False,
         }
         # 添加相关度分数（如果有）
         if hasattr(p, 'relevance') and p.relevance is not None:
