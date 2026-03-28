@@ -33,7 +33,7 @@ class _DiscoverPageState extends State<DiscoverPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: 1);
     _tabController.addListener(_onTabChanged);
     _scrollController.addListener(_onScroll);
     _loadCategories();
@@ -115,10 +115,20 @@ class _DiscoverPageState extends State<DiscoverPage>
     setState(() => _isLoading = true);
 
     // 根据当前Tab决定加载策略
-    if (_tabController.index == 1) {
-      // 推荐Tab：使用个性化推荐API
-      await _loadRecommendations();
-      return;
+    switch (_tabController.index) {
+      case 0: // 关注 - 占位符空页
+      case 3: // 讨论 - 占位符空页
+        setState(() {
+          _products = [];
+          _hasMoreData = false;
+          _isLoading = false;
+        });
+        return;
+      case 1: // 推荐
+        await _loadRecommendations();
+        return;
+      case 2: // 最新 - 使用products API
+        break; // 继续下面的逻辑
     }
 
     final result = await ApiService.getProducts();
@@ -154,7 +164,7 @@ class _DiscoverPageState extends State<DiscoverPage>
 
       setState(() {
         _products = filteredItems;
-        _hasMoreData = false; // 其他Tab后端不支持分页
+        _hasMoreData = false; // 最新Tab后端不支持分页
         _isLoading = false;
       });
     } else {
@@ -477,6 +487,11 @@ class _DiscoverPageState extends State<DiscoverPage>
 
   /// 商品网格展示
   Widget _buildProductGrid() {
+    // 关注和讨论Tab显示占位符
+    if (_tabController.index == 0 || _tabController.index == 3) {
+      return _buildPlaceholderPage();
+    }
+
     if (_isLoading && _products.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(
@@ -534,6 +549,40 @@ class _DiscoverPageState extends State<DiscoverPage>
         final product = _products[index];
         return _buildProductCard(product);
       },
+    );
+  }
+
+  /// 占位符空页（关注和讨论）
+  Widget _buildPlaceholderPage() {
+    final isFollowing = _tabController.index == 0;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isFollowing ? Icons.people_outline : Icons.forum_outlined,
+            size: 80,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            isFollowing ? '关注功能开发中' : '讨论功能开发中',
+            style: TextStyle(
+              color: Colors.grey.shade500,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '敬请期待...',
+            style: TextStyle(
+              color: Colors.grey.shade400,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
