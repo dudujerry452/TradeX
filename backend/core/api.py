@@ -853,24 +853,29 @@ def get_similar_products(product_id, limit=5):
     summary="获取个性化推荐",
     auth=None,  # 允许未登录用户访问（返回热门推荐）
 )
-def personalized_recommendations(request, user_id: Optional[str] = None, limit: int = 10):
-    """获取个性化推荐商品
+def personalized_recommendations(request, user_id: Optional[str] = None, limit: int = 10, offset: int = 0):
+    """获取个性化推荐商品（支持分页）
 
     - 已登录用户：基于标签偏好推荐
     - 未登录用户（无user_id）：返回热门推荐
+    - 支持offset分页
     """
     if user_id:
         try:
             User.objects.get(user_id=user_id)
-            products = get_personalized_recommendations(user_id, limit)
+            # 获取更多数据用于分页
+            products = list(get_personalized_recommendations(user_id, limit + offset))
         except User.DoesNotExist:
-            products = get_trending_recommendations(limit)
+            products = list(get_trending_recommendations(limit + offset))
     else:
-        products = get_trending_recommendations(limit)
+        products = list(get_trending_recommendations(limit + offset))
+
+    # 分页切片
+    paginated_products = products[offset:offset + limit]
 
     # 构建响应数据
     result = []
-    for p in products:
+    for p in paginated_products:
         data = {
             "product_id": p.product_id,
             "product_name": p.product_name,
@@ -901,12 +906,15 @@ def personalized_recommendations(request, user_id: Optional[str] = None, limit: 
     summary="获取热门推荐",
     auth=None,
 )
-def trending_recommendations(request, limit: int = 10):
-    """获取热门推荐商品
+def trending_recommendations(request, limit: int = 10, offset: int = 0):
+    """获取热门推荐商品（支持分页）
 
     基于浏览量、销量、收藏数和评分的综合热度排序
     """
-    products = get_trending_recommendations(limit)
+    # 获取更多数据用于分页
+    products = list(get_trending_recommendations(limit + offset))
+    # 分页切片
+    paginated_products = products[offset:offset + limit]
 
     return [
         {
@@ -924,7 +932,7 @@ def trending_recommendations(request, limit: int = 10):
             "favorite_count": p.favorite_count,
             "avg_rating": p.avg_rating,
         }
-        for p in products
+        for p in paginated_products
     ]
 
 

@@ -828,6 +828,108 @@ class ProductViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+class RecommendationPaginationTests(TestCase):
+    """推荐系统分页功能测试"""
+
+    def setUp(self):
+        self.client = Client()
+        # 创建测试用户
+        self.user = User.objects.create(
+            user_id="test_user",
+            username="testuser",
+            email="test@example.com",
+            encrypted_password="pwd",
+            real_name="Test User",
+            id_card="123456789012345678",
+            phone="test@test.com",
+            address="Test Address",
+            register_status="APPROVED"
+        )
+        # 创建20个测试商品
+        self.products = []
+        for i in range(20):
+            p = Product.objects.create(
+                product_id=f"prod_{i}",
+                product_name=f"Product {i}",
+                category="electronics",
+                description=f"Description {i}",
+                image_url=f"http://example.com/{i}.jpg",
+                price=100.0 + i,
+                stock=10,
+                publisher=self.user,
+                product_status="APPROVED",
+                view_count=i * 10,
+                sales_count=i * 5,
+                favorite_count=i * 3,
+                avg_rating=4.0
+            )
+            self.products.append(p)
+
+    def test_trending_recommendations_pagination(self):
+        """测试热门推荐分页"""
+        # 第一页
+        response = self.client.get('/api/recommendations/trending/?limit=5&offset=0')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 5)
+
+        # 第二页
+        response = self.client.get('/api/recommendations/trending/?limit=5&offset=5')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 5)
+
+        # 验证两页数据不重复
+        first_page = self.client.get('/api/recommendations/trending/?limit=5&offset=0')
+        second_page = self.client.get('/api/recommendations/trending/?limit=5&offset=5')
+        first_ids = {p['product_id'] for p in first_page.json()}
+        second_ids = {p['product_id'] for p in second_page.json()}
+        self.assertEqual(len(first_ids & second_ids), 0)  # 无交集
+
+    def test_trending_recommendations_offset_beyond_total(self):
+        """测试offset超过总数时返回空列表"""
+        response = self.client.get('/api/recommendations/trending/?limit=10&offset=100')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 0)
+
+    def test_personalized_recommendations_pagination(self):
+        """测试个性化推荐分页"""
+        # 创建用户标签偏好
+        tag = Tag.objects.create(tag_id="tag1", tag_name="Electronics", category="category")
+        UserTagPreference.objects.create(user=self.user, tag=tag, score=5.0)
+
+        # 给商品添加标签
+        for p in self.products[:10]:
+            ProductTag.objects.create(product=p, tag=tag, weight=1.0)
+
+        # 第一页
+        response = self.client.get(f'/api/recommendations/personalized/?user_id={self.user.user_id}&limit=3&offset=0')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 3)
+
+        # 第二页
+        response = self.client.get(f'/api/recommendations/personalized/?user_id={self.user.user_id}&limit=3&offset=3')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 3)
+
+    def test_personalized_recommendations_no_user_fallback(self):
+        """测试无用户时回退到热门推荐"""
+        response = self.client.get('/api/recommendations/personalized/?limit=5&offset=0')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 5)
+
+    def test_invalid_offset_returns_empty(self):
+        """测试负offset返回空列表"""
+        response = self.client.get('/api/recommendations/trending/?limit=10&offset=-1')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 0)
+
+
 class UserTagPreferenceOnFavoriteTests(TestCase):
     """收藏时自动更新标签偏好测试"""
 

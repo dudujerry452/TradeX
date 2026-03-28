@@ -16,20 +16,26 @@ class _DiscoverPageState extends State<DiscoverPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   // 商品数据
   List<dynamic> _products = [];
   bool _isLoading = false;
   String _selectedCategory = 'all';
   List<Map<String, dynamic>> _categories = [];
-  int _currentPage = 1;
-  bool _hasMore = true;
+
+  // 分页相关状态
+  int _currentOffset = 0;        // 当前偏移量
+  final int _pageSize = 10;      // 每页数量
+  bool _isLoadingMore = false;   // 是否正在加载更多
+  bool _hasMoreData = true;      // 是否还有更多数据
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(_onTabChanged);
+    _scrollController.addListener(_onScroll);
     _loadCategories();
     _loadProducts();
   }
@@ -38,17 +44,32 @@ class _DiscoverPageState extends State<DiscoverPage>
   void dispose() {
     _tabController.dispose();
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _onTabChanged() {
     if (_tabController.indexIsChanging) {
-      // 切换Tab时重新加载数据
+      // 切换Tab时重置分页状态
       setState(() {
-        _currentPage = 1;
+        _currentOffset = 0;
+        _hasMoreData = true;
         _products = [];
       });
       _loadProducts();
+    }
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+
+    // 当滚动到底部附近时加载更多（推荐Tab才加载）
+    if (currentScroll >= maxScroll - 100) {
+      if (_tabController.index == 1 && !_isLoadingMore && _hasMoreData && !_isLoading) {
+        _loadMoreRecommendations();
+      }
     }
   }
 
@@ -82,6 +103,14 @@ class _DiscoverPageState extends State<DiscoverPage>
 
   Future<void> _loadProducts({bool refresh = false}) async {
     if (_isLoading && !refresh) return;
+
+    // 如果是刷新，重置分页状态
+    if (refresh) {
+      setState(() {
+        _currentOffset = 0;
+        _hasMoreData = true;
+      });
+    }
 
     setState(() => _isLoading = true);
 
@@ -125,7 +154,7 @@ class _DiscoverPageState extends State<DiscoverPage>
 
       setState(() {
         _products = filteredItems;
-        _hasMore = false; // 后端不支持分页
+        _hasMoreData = false; // 其他Tab后端不支持分页
         _isLoading = false;
       });
     } else {
@@ -138,17 +167,24 @@ class _DiscoverPageState extends State<DiscoverPage>
     }
   }
 
-  /// 加载个性化推荐
+  /// 加载推荐（支持分页）
   Future<void> _loadRecommendations() async {
     final userId = await AuthManager.getUserId();
 
     Map<String, dynamic> result;
     if (userId != null) {
       // 已登录：获取个性化推荐
-      result = await ApiService.getPersonalizedRecommendations(userId: userId);
+      result = await ApiService.getPersonalizedRecommendations(
+        userId: userId,
+        limit: _pageSize,
+        offset: _currentOffset,
+      );
     } else {
       // 未登录：获取热门推荐
-      result = await ApiService.getTrendingRecommendations();
+      result = await ApiService.getTrendingRecommendations(
+        limit: _pageSize,
+        offset: _currentOffset,
+      );
     }
 
     if (result['success']) {
@@ -167,18 +203,39 @@ class _DiscoverPageState extends State<DiscoverPage>
             }).toList();
 
       setState(() {
-        _products = filteredItems;
-        _hasMore = false;
+        if (_currentOffset == 0) {
+          // 首次加载或刷新
+          _products = filteredItems;
+        } else {
+          // 加载更多：追加数据
+          _products.addAll(filteredItems);
+        }
+        // 判断是否还有更多数据
+        _hasMoreData = items.length >= _pageSize;
         _isLoading = false;
+        _isLoadingMore = false;
       });
     } else {
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _isLoadingMore = false;
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result['message'])),
         );
       }
     }
+  }
+
+  /// 加载更多推荐
+  Future<void> _loadMoreRecommendations() async {
+    if (_isLoadingMore || !_hasMoreData) return;
+
+    setState(() => _isLoadingMore = true);
+    _currentOffset += _pageSize;
+
+    await _loadRecommendations();
   }
 
   @override
@@ -430,6 +487,7 @@ class _DiscoverPageState extends State<DiscoverPage>
       onRefresh: () => _loadProducts(refresh: true),
       color: const Color(0xFFCE965B),
       child: GridView.builder(
+        controller: _scrollController,
         padding: const EdgeInsets.all(12),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -437,8 +495,21 @@ class _DiscoverPageState extends State<DiscoverPage>
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
         ),
-        itemCount: _products.length,
+        itemCount: _products.length + (_isLoadingMore ? 2 : 0),
         itemBuilder: (context, index) {
+          // 显示加载指示器
+          if (index >= _products.length) {
+            return const Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCE965B)),
+                ),
+              ),
+            );
+          }
           final product = _products[index];
           return _buildProductCard(product);
         },
