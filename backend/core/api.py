@@ -366,6 +366,84 @@ def create_product(request, data: ProductIn):
     return 201, product
 
 
+# ── 搜索接口（必须在 /products/{product_id}/ 之前）────────────────────────────────
+
+@router.get(
+    "/products/search/",
+    response=list[RecommendationOut],
+    tags=["商品", "搜索"],
+    summary="模糊搜索商品",
+    auth=None,
+)
+def search_products(
+    request,
+    q: str = "",  # 搜索关键词
+    limit: int = 10,
+    offset: int = 0,
+    token: Optional[str] = None,  # 可选用户token，用于个性化
+):
+    """模糊搜索商品
+
+    - 支持按商品名称、描述、分类模糊匹配
+    - 可选token用于后续个性化排序（预留）
+    - 支持分页
+    """
+    if not q.strip():
+        return []
+
+    # 使用Q对象进行多字段模糊匹配
+    products = Product.objects.filter(
+        Q(product_name__icontains=q) |  # 商品名称模糊匹配
+        Q(description__icontains=q) |   # 描述模糊匹配
+        Q(category__icontains=q),       # 分类模糊匹配
+        product_status='APPROVED'       # 只返回已审核商品
+    ).distinct()
+
+    # 如果有token，可以在这里添加个性化排序逻辑（预留）
+    # TODO: 根据token解析用户ID，按用户偏好排序
+
+    # 分页
+    paginated = products[offset:offset + limit]
+
+    # 获取用户收藏的商品ID集合（如果提供了token）
+    favorited_product_ids = set()
+    if token:
+        try:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+            user_id = payload.get("user_id")
+            if user_id:
+                favorited_product_ids = set(
+                    ProductFavorite.objects.filter(
+                        user__user_id=user_id
+                    ).values_list('product__product_id', flat=True)
+                )
+        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+            pass  # Token无效时忽略，继续返回未收藏状态
+
+    # 构建响应（复用RecommendationOut格式）
+    result = []
+    for p in paginated:
+        data = {
+            "product_id": p.product_id,
+            "product_name": p.product_name,
+            "category": p.category,
+            "description": p.description,
+            "image_url": p.image_url,
+            "price": float(p.price),
+            "stock": p.stock,
+            "product_status": p.product_status,
+            "publisher_id": p.publisher_id,
+            "view_count": p.view_count,
+            "sales_count": p.sales_count,
+            "favorite_count": p.favorite_count,
+            "avg_rating": p.avg_rating,
+            "is_favorited": p.product_id in favorited_product_ids,
+        }
+        result.append(data)
+
+    return result
+
+
 @router.get("/products/{product_id}/", response=ProductOut, tags=["商品"], summary="查询商品详情")
 def get_product(request, product_id: str):
     try:
