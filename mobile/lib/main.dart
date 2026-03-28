@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       title: 'tradeX',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Roboto',
+        fontFamily: 'NotoSansSC',
         useMaterial3: true,
       ),
       home: const SplashScreen(),  // 先显示启动页检查登录状态
