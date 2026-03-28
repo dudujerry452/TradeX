@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'api.dart';
 import 'product_detail_page.dart';
+import 'auth_manager.dart';
 
 /// 发现页面 - 包含关注、推荐、最新、讨论四个Tab
 class DiscoverPage extends StatefulWidget {
@@ -84,6 +85,13 @@ class _DiscoverPageState extends State<DiscoverPage>
 
     setState(() => _isLoading = true);
 
+    // 根据当前Tab决定加载策略
+    if (_tabController.index == 1) {
+      // 推荐Tab：使用个性化推荐API
+      await _loadRecommendations();
+      return;
+    }
+
     final result = await ApiService.getProducts();
 
     if (result['success']) {
@@ -118,6 +126,49 @@ class _DiscoverPageState extends State<DiscoverPage>
       setState(() {
         _products = filteredItems;
         _hasMore = false; // 后端不支持分页
+        _isLoading = false;
+      });
+    } else {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'])),
+        );
+      }
+    }
+  }
+
+  /// 加载个性化推荐
+  Future<void> _loadRecommendations() async {
+    final userId = await AuthManager.getUserId();
+
+    Map<String, dynamic> result;
+    if (userId != null) {
+      // 已登录：获取个性化推荐
+      result = await ApiService.getPersonalizedRecommendations(userId: userId);
+    } else {
+      // 未登录：获取热门推荐
+      result = await ApiService.getTrendingRecommendations();
+    }
+
+    if (result['success']) {
+      List<dynamic> items = [];
+      var rawData = result['data'];
+      if (rawData is List) {
+        items = rawData;
+      }
+
+      // 推荐结果也支持分类过滤（如果是全部则不过滤）
+      final filteredItems = _selectedCategory == 'all'
+          ? items
+          : items.where((item) {
+              return item['category']?.toString().toLowerCase() ==
+                  _selectedCategory.toLowerCase();
+            }).toList();
+
+      setState(() {
+        _products = filteredItems;
+        _hasMore = false;
         _isLoading = false;
       });
     } else {

@@ -19,6 +19,7 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   Map<String, dynamic>? _product;
   List<dynamic> _tags = [];
+  List<dynamic> _similarProducts = [];
   bool _isLoading = true;
   bool _isFavorited = false;
   bool _isFavoriteLoading = false;
@@ -27,6 +28,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     super.initState();
+    // 记录商品浏览
+    ApiService.recordProductView(widget.productId);
     _loadUserId();
   }
 
@@ -51,11 +54,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         ApiService.checkFavorite(_currentUserId, widget.productId)
       else
         Future.value({'success': false, 'isFavorited': false}),
+      ApiService.getSimilarProducts(productId: widget.productId),
     ]);
 
     final productResult = results[0];
     final tagsResult = results[1];
     final favoriteResult = results[2];
+    final similarResult = results[3];
 
     if (mounted) {
       setState(() {
@@ -67,6 +72,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         }
         if (favoriteResult['success']) {
           _isFavorited = favoriteResult['isFavorited'] ?? false;
+        }
+        if (similarResult['success']) {
+          _similarProducts = similarResult['data'] is List ? similarResult['data'] : [];
         }
         _isLoading = false;
       });
@@ -216,6 +224,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         SliverToBoxAdapter(
           child: _buildDescriptionSection(),
         ),
+        // 相似商品区域
+        if (_similarProducts.isNotEmpty)
+          SliverToBoxAdapter(
+            child: _buildSimilarProductsSection(),
+          ),
         // 底部留白
         const SliverToBoxAdapter(
           child: SizedBox(height: 20),
@@ -574,6 +587,149 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 相似商品区域
+  Widget _buildSimilarProductsSection() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text(
+                '相似商品',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A2C),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCE965B).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  '推荐',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Color(0xFFCE965B),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 160,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _similarProducts.length,
+              itemBuilder: (context, index) {
+                final product = _similarProducts[index];
+                return _buildSimilarProductCard(product);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 相似商品卡片
+  Widget _buildSimilarProductCard(dynamic product) {
+    final productName = product['product_name'] ?? '未知商品';
+    final price = product['price'] ?? 0.0;
+    final imageUrl = product['image_url'] ?? '';
+
+    return GestureDetector(
+      onTap: () {
+        // 导航到商品详情页（替换当前页面以提供连续的相似商品浏览体验）
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailPage(
+              productId: product['product_id'],
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 120,
+        margin: const EdgeInsets.only(right: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 商品图片
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 120,
+                height: 100,
+                color: Colors.grey.shade100,
+                child: imageUrl.isNotEmpty
+                    ? Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: HeroIcons.photo(
+                              size: 30,
+                              color: Colors.grey.shade400,
+                            ),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: HeroIcons.shoppingBag(
+                          size: 30,
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // 商品名称
+            Text(
+              productName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF1A1A2C),
+              ),
+            ),
+            const SizedBox(height: 4),
+            // 价格
+            Text(
+              '¥${price.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFCE965B),
               ),
             ),
           ],

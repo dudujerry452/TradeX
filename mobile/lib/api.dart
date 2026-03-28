@@ -276,4 +276,109 @@ class ApiService {
 
     return {'success': true, 'data': categories};
   }
+
+  // ── 推荐系统接口 ───────────────────────────────────────────────────────────
+
+  /// 获取个性化推荐
+  /// [userId] 用户ID（可选，未登录时传入null）
+  /// [limit] 返回数量限制
+  static Future<Map<String, dynamic>> getPersonalizedRecommendations({
+    String? userId,
+    int limit = 10,
+  }) async {
+    final queryParams = <String, String>{
+      'limit': limit.toString(),
+    };
+    if (userId != null && userId.isNotEmpty) {
+      queryParams['user_id'] = userId;
+    }
+
+    final url = Uri.parse('\$baseUrl/recommendations/personalized/')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取个性化推荐失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: \$e'};
+    }
+  }
+
+  /// 获取热门推荐
+  /// [limit] 返回数量限制
+  static Future<Map<String, dynamic>> getTrendingRecommendations({
+    int limit = 10,
+  }) async {
+    final url = Uri.parse('\$baseUrl/recommendations/trending/')
+        .replace(queryParameters: {'limit': limit.toString()});
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取热门推荐失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: \$e'};
+    }
+  }
+
+  /// 获取相似商品
+  /// [productId] 商品ID
+  /// [limit] 返回数量限制
+  static Future<Map<String, dynamic>> getSimilarProducts({
+    required String productId,
+    int limit = 5,
+  }) async {
+    final url = Uri.parse('\$baseUrl/recommendations/similar/')
+        .replace(queryParameters: {
+      'product_id': productId,
+      'limit': limit.toString(),
+    });
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取相似商品失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: \$e'};
+    }
+  }
+
+  /// 记录商品浏览
+  /// [productId] 商品ID
+  static Future<Map<String, dynamic>> recordProductView(String productId) async {
+    final url = Uri.parse('\$baseUrl/products/\$productId/view/');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: await getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '记录浏览失败'};
+      }
+    } catch (e) {
+      // 浏览记录失败不影用户体验，静默处理
+      return {'success': false, 'message': '网络连接错误: \$e'};
+    }
+  }
 }

@@ -11,6 +11,7 @@ import jwt
 from openai import OpenAI
 from django.http import StreamingHttpResponse
 from django.db import IntegrityError
+from django.db.models import Sum, F, Count, Q
 from django.conf import settings
 from django.utils import timezone
 from ninja import Router, Schema
@@ -190,6 +191,30 @@ class ProductFavoriteOut(Schema):
 class ProductFavoriteIn(Schema):
     user_id: str
     product_id: str
+
+
+# ── 推荐系统 Schemas ──────────────────────────────────────────────────────────
+
+class RecommendationOut(Schema):
+    product_id: str
+    product_name: str
+    category: str
+    description: str
+    image_url: str
+    price: float
+    stock: int
+    product_status: str
+    publisher_id: str
+    view_count: int
+    sales_count: int
+    favorite_count: int
+    avg_rating: float
+    relevance_score: Optional[float] = None  # 推荐相关度分数
+
+
+class ProductViewOut(Schema):
+    success: bool
+    view_count: int
 
 
 # ── 认证接口 ──────────────────────────────────────────────────────────────────
@@ -530,6 +555,19 @@ def create_product_favorite(request, data: ProductFavoriteIn):
     product.favorite_count = ProductFavorite.objects.filter(product=product).count()
     product.save()
 
+    # 更新用户标签偏好（基于收藏的商品标签）
+    product_tags = ProductTag.objects.filter(product=product).select_related('tag')
+    for pt in product_tags:
+        pref, created = UserTagPreference.objects.get_or_create(
+            user=user,
+            tag=pt.tag,
+            defaults={'score': 1.0}
+        )
+        if not created:
+            # 增加偏好分数（上限为10.0）
+            pref.score = min(pref.score + 0.5, 10.0)
+            pref.save()
+
     return 201, {
         "user_id": user.user_id,
         "product_id": product.product_id,
@@ -726,3 +764,232 @@ def rag_chat_stream(request, data: RagChatIn):
     response["Cache-Control"] = "no-cache"
     response["X-Accel-Buffering"] = "no"
     return response
+
+
+# ── 推荐系统接口 ───────────────────────────────────────────────────────────────
+
+def get_trending_recommendations(limit=10):
+    """获取热门推荐商品
+
+    基于浏览量、销量、收藏数和评分的综合热度算法
+    """
+    return Product.objects.filter(
+        product_status='APPROVED'
+    ).annotate(
+        trending_score=F('view_count') * 0.2 +
+                      F('sales_count') * 0.3 +
+                      F('favorite_count') * 0.3 +
+                      F('avg_rating') * 20 * 0.2
+    ).order_by('-trending_score')[:limit]
+
+
+def get_personalized_recommendations(user_id, limit=10):
+    """获取个性化推荐商品
+
+    基于用户标签偏好的推荐算法
+    1. 获取用户标签偏好（score排序）
+    2. 基于偏好标签找商品，排除已收藏
+    3. 无偏好时返回热门推荐
+    """
+    # 获取用户标签偏好（score排序）
+    user_prefs = UserTagPreference.objects.filter(
+        user_id=user_id
+    ).order_by('-score')[:10]
+
+    if user_prefs.exists():
+        # 基于偏好标签找商品，排除已收藏
+        preferred_tags = [p.tag for p in user_prefs]
+
+        # 使用聚合计算商品的相关度分数
+        # 相关度 = sum(商品标签权重 * 用户标签偏好分数)
+        recommended = Product.objects.filter(
+            product_tags__tag__in=preferred_tags,
+            product_status='APPROVED'
+        ).exclude(
+            favorited_by__user_id=user_id
+        ).annotate(
+            relevance=Sum(
+                F('product_tags__weight') * F('product_tags__tag__user_preferences__score'),
+                filter=Q(product_tags__tag__user_preferences__user_id=user_id)
+            )
+        ).order_by('-relevance').distinct()[:limit]
+
+        return recommended
+
+    # 无偏好时返回热门推荐
+    return get_trending_recommendations(limit)
+
+
+def get_similar_products(product_id, limit=5):
+    """获取相似商品
+
+    基于共同标签数量的相似度算法
+    """
+    # 获取当前商品的标签ID列表
+    product_tag_ids = ProductTag.objects.filter(
+        product_id=product_id
+    ).values_list('tag_id', flat=True)
+
+    if not product_tag_ids:
+        return Product.objects.none()
+
+    # 找有相同标签的其他商品，按共同标签数量排序
+    return Product.objects.filter(
+        product_tags__tag_id__in=product_tag_ids,
+        product_status='APPROVED'
+    ).exclude(
+        product_id=product_id
+    ).annotate(
+        common_tags=Count('product_tags__tag', filter=Q(product_tags__tag_id__in=product_tag_ids))
+    ).filter(
+        common_tags__gt=0  # 至少有一个共同标签
+    ).order_by('-common_tags')[:limit]
+
+
+@router.get(
+    "/recommendations/personalized/",
+    response=list[RecommendationOut],
+    tags=["推荐系统"],
+    summary="获取个性化推荐",
+    auth=None,  # 允许未登录用户访问（返回热门推荐）
+)
+def personalized_recommendations(request, user_id: Optional[str] = None, limit: int = 10):
+    """获取个性化推荐商品
+
+    - 已登录用户：基于标签偏好推荐
+    - 未登录用户（无user_id）：返回热门推荐
+    """
+    if user_id:
+        try:
+            User.objects.get(user_id=user_id)
+            products = get_personalized_recommendations(user_id, limit)
+        except User.DoesNotExist:
+            products = get_trending_recommendations(limit)
+    else:
+        products = get_trending_recommendations(limit)
+
+    # 构建响应数据
+    result = []
+    for p in products:
+        data = {
+            "product_id": p.product_id,
+            "product_name": p.product_name,
+            "category": p.category,
+            "description": p.description,
+            "image_url": p.image_url,
+            "price": float(p.price),
+            "stock": p.stock,
+            "product_status": p.product_status,
+            "publisher_id": p.publisher_id,
+            "view_count": p.view_count,
+            "sales_count": p.sales_count,
+            "favorite_count": p.favorite_count,
+            "avg_rating": p.avg_rating,
+        }
+        # 添加相关度分数（如果有）
+        if hasattr(p, 'relevance') and p.relevance is not None:
+            data["relevance_score"] = float(p.relevance)
+        result.append(data)
+
+    return result
+
+
+@router.get(
+    "/recommendations/trending/",
+    response=list[RecommendationOut],
+    tags=["推荐系统"],
+    summary="获取热门推荐",
+    auth=None,
+)
+def trending_recommendations(request, limit: int = 10):
+    """获取热门推荐商品
+
+    基于浏览量、销量、收藏数和评分的综合热度排序
+    """
+    products = get_trending_recommendations(limit)
+
+    return [
+        {
+            "product_id": p.product_id,
+            "product_name": p.product_name,
+            "category": p.category,
+            "description": p.description,
+            "image_url": p.image_url,
+            "price": float(p.price),
+            "stock": p.stock,
+            "product_status": p.product_status,
+            "publisher_id": p.publisher_id,
+            "view_count": p.view_count,
+            "sales_count": p.sales_count,
+            "favorite_count": p.favorite_count,
+            "avg_rating": p.avg_rating,
+        }
+        for p in products
+    ]
+
+
+@router.get(
+    "/recommendations/similar/",
+    response=list[RecommendationOut],
+    tags=["推荐系统"],
+    summary="获取相似商品",
+    auth=None,
+)
+def similar_recommendations(request, product_id: str, limit: int = 5):
+    """获取与指定商品相似的商品
+
+    基于共同标签数量的相似度算法
+    """
+    try:
+        Product.objects.get(product_id=product_id)
+    except Product.DoesNotExist:
+        raise HttpError(404, "商品不存在")
+
+    products = get_similar_products(product_id, limit)
+
+    result = []
+    for p in products:
+        data = {
+            "product_id": p.product_id,
+            "product_name": p.product_name,
+            "category": p.category,
+            "description": p.description,
+            "image_url": p.image_url,
+            "price": float(p.price),
+            "stock": p.stock,
+            "product_status": p.product_status,
+            "publisher_id": p.publisher_id,
+            "view_count": p.view_count,
+            "sales_count": p.sales_count,
+            "favorite_count": p.favorite_count,
+            "avg_rating": p.avg_rating,
+        }
+        # 添加共同标签数量作为相关度分数
+        if hasattr(p, 'common_tags'):
+            data["relevance_score"] = float(p.common_tags)
+        result.append(data)
+
+    return result
+
+
+@router.post(
+    "/products/{product_id}/view/",
+    response=ProductViewOut,
+    tags=["推荐系统", "商品"],
+    summary="记录商品浏览",
+    auth=None,
+)
+def record_product_view(request, product_id: str):
+    """记录商品浏览，增加view_count
+
+    用于推荐系统的行为数据收集
+    """
+    try:
+        product = Product.objects.get(product_id=product_id)
+    except Product.DoesNotExist:
+        raise HttpError(404, "商品不存在")
+
+    product.view_count += 1
+    product.save(update_fields=["view_count"])
+
+    return {"success": True, "view_count": product.view_count}
