@@ -24,6 +24,10 @@ class _DiscoverPageState extends State<DiscoverPage>
   String _selectedCategory = 'all';
   List<Map<String, dynamic>> _categories = [];
 
+  // 搜索相关状态
+  bool _isSearching = false;     // 是否正在搜索模式
+  String _searchQuery = '';      // 当前搜索关键词
+
   // 分页相关状态
   int _currentOffset = 0;        // 当前偏移量
   final int _pageSize = 10;      // 每页数量
@@ -65,10 +69,18 @@ class _DiscoverPageState extends State<DiscoverPage>
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
 
-    // 当滚动到底部附近时加载更多（推荐Tab才加载）
+    // 当滚动到底部附近时加载更多
     if (currentScroll >= maxScroll - 100) {
-      if (_tabController.index == 1 && !_isLoadingMore && _hasMoreData && !_isLoading) {
-        _loadMoreRecommendations();
+      if (_isSearching) {
+        // 搜索模式下加载更多搜索结果
+        if (!_isLoadingMore && _hasMoreData && !_isLoading) {
+          _loadMoreSearchResults();
+        }
+      } else {
+        // 推荐Tab才加载更多
+        if (_tabController.index == 1 && !_isLoadingMore && _hasMoreData && !_isLoading) {
+          _loadMoreRecommendations();
+        }
       }
     }
   }
@@ -248,6 +260,94 @@ class _DiscoverPageState extends State<DiscoverPage>
     await _loadRecommendations();
   }
 
+  /// 执行搜索
+  Future<void> _performSearch() async {
+    final query = _searchController.text.trim();
+    if (query.isEmpty) return;
+
+    setState(() {
+      _isSearching = true;
+      _searchQuery = query;
+      _isLoading = true;
+      _products = [];
+    });
+
+    final token = await AuthManager.getToken();
+
+    final result = await ApiService.searchProducts(
+      query: query,
+      limit: _pageSize,
+      offset: 0,
+      token: token,
+    );
+
+    if (result['success']) {
+      List<dynamic> items = [];
+      var rawData = result['data'];
+      if (rawData is List) {
+        items = rawData;
+      }
+
+      setState(() {
+        _products = items;
+        _hasMoreData = items.length >= _pageSize;
+        _isLoading = false;
+      });
+    } else {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'])),
+        );
+      }
+    }
+  }
+
+  /// 清除搜索
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {
+      _isSearching = false;
+      _searchQuery = '';
+      _currentOffset = 0;
+      _hasMoreData = true;
+    });
+    _loadProducts(refresh: true);
+  }
+
+  /// 加载更多搜索结果（分页）
+  Future<void> _loadMoreSearchResults() async {
+    if (_isLoadingMore || !_hasMoreData) return;
+
+    setState(() => _isLoadingMore = true);
+    _currentOffset += _pageSize;
+
+    final token = await AuthManager.getToken();
+
+    final result = await ApiService.searchProducts(
+      query: _searchQuery,
+      limit: _pageSize,
+      offset: _currentOffset,
+      token: token,
+    );
+
+    if (result['success']) {
+      List<dynamic> items = [];
+      var rawData = result['data'];
+      if (rawData is List) {
+        items = rawData;
+      }
+
+      setState(() {
+        _products.addAll(items);
+        _hasMoreData = items.length >= _pageSize;
+        _isLoadingMore = false;
+      });
+    } else {
+      setState(() => _isLoadingMore = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -364,6 +464,7 @@ class _DiscoverPageState extends State<DiscoverPage>
                   Expanded(
                     child: TextField(
                       controller: _searchController,
+                      onSubmitted: (_) => _performSearch(),
                       decoration: InputDecoration(
                         hintText: '搜索感兴趣的商品...',
                         hintStyle: TextStyle(
@@ -372,6 +473,21 @@ class _DiscoverPageState extends State<DiscoverPage>
                         ),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  // 搜索按钮
+                  GestureDetector(
+                    onTap: _performSearch,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        '搜索',
+                        style: TextStyle(
+                          color: const Color(0xFFCE965B),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ),
@@ -487,8 +603,8 @@ class _DiscoverPageState extends State<DiscoverPage>
 
   /// 商品网格展示
   Widget _buildProductGrid() {
-    // 关注和讨论Tab显示占位符
-    if (_tabController.index == 0 || _tabController.index == 3) {
+    // 关注和讨论Tab显示占位符（非搜索模式）
+    if ((_tabController.index == 0 || _tabController.index == 3) && !_isSearching) {
       return _buildPlaceholderPage();
     }
 
@@ -511,44 +627,97 @@ class _DiscoverPageState extends State<DiscoverPage>
             ),
             const SizedBox(height: 16),
             Text(
-              '暂无商品',
+              _isSearching ? '未找到相关商品' : '暂无商品',
               style: TextStyle(
                 color: Colors.grey.shade500,
                 fontSize: 16,
               ),
             ),
+            if (_isSearching) ...[
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: _clearSearch,
+                child: const Text(
+                  '清除搜索',
+                  style: TextStyle(color: Color(0xFFCE965B)),
+                ),
+              ),
+            ],
           ],
         ),
       );
     }
 
-    return GridView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.all(12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.75,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
-      itemCount: _products.length + (_isLoadingMore ? 2 : 0),
-      itemBuilder: (context, index) {
-        // 显示加载指示器
-        if (index >= _products.length) {
-          return const Center(
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCE965B)),
-              ),
+    return Column(
+      children: [
+        // 搜索状态提示
+        if (_isSearching)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(Icons.search, size: 16, color: Colors.grey.shade600),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '"$_searchQuery" 的搜索结果',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 13,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                TextButton(
+                  onPressed: _clearSearch,
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text(
+                    '清除',
+                    style: TextStyle(
+                      color: Color(0xFFCE965B),
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          );
-        }
-        final product = _products[index];
-        return _buildProductCard(product);
-      },
+          ),
+        // 商品网格
+        Expanded(
+          child: GridView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(12),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemCount: _products.length + (_isLoadingMore ? 2 : 0),
+            itemBuilder: (context, index) {
+              // 显示加载指示器
+              if (index >= _products.length) {
+                return const Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCE965B)),
+                    ),
+                  ),
+                );
+              }
+              final product = _products[index];
+              return _buildProductCard(product);
+            },
+          ),
+        ),
+      ],
     );
   }
 

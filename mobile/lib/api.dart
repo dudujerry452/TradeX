@@ -367,6 +367,43 @@ class ApiService {
     }
   }
 
+  /// 模糊搜索商品
+  /// [query] 搜索关键词
+  /// [limit] 返回数量限制
+  /// [offset] 分页偏移量
+  /// [token] 可选用户token
+  static Future<Map<String, dynamic>> searchProducts({
+    required String query,
+    int limit = 10,
+    int offset = 0,
+    String? token,
+  }) async {
+    final queryParams = <String, String>{
+      'q': query,
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+    };
+    if (token != null && token.isNotEmpty) {
+      queryParams['token'] = token;
+    }
+
+    final url = Uri.parse('$baseUrl/products/search/')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '搜索失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
   /// 记录商品浏览
   /// [productId] 商品ID
   static Future<Map<String, dynamic>> recordProductView(String productId) async {
