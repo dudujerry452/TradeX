@@ -418,32 +418,42 @@ def update_product_status(request, product_id: str, data: ProductStatusUpdateIn)
     "/products/search/",
     response=list[RecommendationOut],
     tags=["商品", "搜索"],
-    summary="模糊搜索商品",
+    summary="模糊搜索商品（支持分类筛选）",
     auth=None,
 )
 def search_products(
     request,
     q: str = "",  # 搜索关键词
+    category: str = "",  # 分类筛选（精确匹配）
     limit: int = 10,
     offset: int = 0,
     token: Optional[str] = None,  # 可选用户token，用于个性化
 ):
-    """模糊搜索商品
+    """模糊搜索商品（支持分类筛选）
 
     - 支持按商品名称、描述、分类模糊匹配
+    - 支持精确分类筛选（category参数）
     - 可选token用于后续个性化排序（预留）
     - 支持分页
-    """
-    if not q.strip():
-        return []
 
-    # 使用Q对象进行多字段模糊匹配
-    products = Product.objects.filter(
-        Q(product_name__icontains=q) |  # 商品名称模糊匹配
-        Q(description__icontains=q) |   # 描述模糊匹配
-        Q(category__icontains=q),       # 分类模糊匹配
-        product_status='APPROVED'       # 只返回已审核商品
-    ).distinct()
+    使用场景：
+    - q为空 + category有值：返回该分类下所有商品
+    - q有值 + category有值：在该分类内搜索
+    - q有值 + category为空：全站搜索
+    """
+    # 构建基础查询：只返回已审核商品
+    products = Product.objects.filter(product_status='APPROVED')
+
+    # 分类精确筛选（优先处理）
+    if category.strip():
+        products = products.filter(category=category.strip())
+
+    # 关键词模糊搜索
+    if q.strip():
+        products = products.filter(
+            Q(product_name__icontains=q) |  # 商品名称模糊匹配
+            Q(description__icontains=q),    # 描述模糊匹配
+        ).distinct()
 
     # 如果有token，可以在这里添加个性化排序逻辑（预留）
     # TODO: 根据token解析用户ID，按用户偏好排序

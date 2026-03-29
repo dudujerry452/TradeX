@@ -261,17 +261,14 @@ class ApiService {
 
   /// 获取商品分类列表
   static Future<Map<String, dynamic>> getCategories() async {
-    // 目前后端没有专门的分类接口，返回一些预设分类
-    // 实际项目中应该从后端获取
+    // 与后端 seed 数据保持一致
     final categories = [
       {'id': 'all', 'name': '全部'},
-      {'id': 'electronics', 'name': '数码'},
-      {'id': 'clothing', 'name': '服饰'},
-      {'id': 'home', 'name': '家居'},
-      {'id': 'books', 'name': '图书'},
-      {'id': 'sports', 'name': '运动'},
-      {'id': 'beauty', 'name': '美妆'},
-      {'id': 'food', 'name': '食品'},
+      {'id': '手机数码', 'name': '手机数码'},
+      {'id': '音频设备', 'name': '音频设备'},
+      {'id': '电脑外设', 'name': '电脑外设'},
+      {'id': '智能穿戴', 'name': '智能穿戴'},
+      {'id': '生活家电', 'name': '生活家电'},
     ];
 
     return {'success': true, 'data': categories};
@@ -367,13 +364,15 @@ class ApiService {
     }
   }
 
-  /// 模糊搜索商品
+  /// 模糊搜索商品（支持分类筛选）
   /// [query] 搜索关键词
+  /// [category] 分类筛选（精确匹配）
   /// [limit] 返回数量限制
   /// [offset] 分页偏移量
   /// [token] 可选用户token
   static Future<Map<String, dynamic>> searchProducts({
-    required String query,
+    String query = '',
+    String? category,
     int limit = 10,
     int offset = 0,
     String? token,
@@ -383,6 +382,9 @@ class ApiService {
       'limit': limit.toString(),
       'offset': offset.toString(),
     };
+    if (category != null && category.isNotEmpty) {
+      queryParams['category'] = category;
+    }
     if (token != null && token.isNotEmpty) {
       queryParams['token'] = token;
     }

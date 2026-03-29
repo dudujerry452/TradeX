@@ -23,14 +23,28 @@ class _CreateProductPageState extends State<CreateProductPage> {
   bool _isUploading = false;
   bool _isSubmitting = false;
 
-  // 分类与后端 seed 数据保持一致
-  final List<Map<String, String>> _categories = [
-    {'id': '手机数码', 'name': '手机数码'},
-    {'id': '音频设备', 'name': '音频设备'},
-    {'id': '电脑外设', 'name': '电脑外设'},
-    {'id': '智能穿戴', 'name': '智能穿戴'},
-    {'id': '生活家电', 'name': '生活家电'},
-  ];
+  // 分类与后端 seed 数据保持一致（使用发现页的分类数据）
+  List<Map<String, dynamic>> _categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    final result = await ApiService.getCategories();
+    if (result['success'] && mounted) {
+      var rawData = result['data'];
+      if (rawData is List) {
+        setState(() {
+          _categories = List<Map<String, dynamic>>.from(rawData);
+          // 移除 "all" 分类
+          _categories.removeWhere((c) => c['id'] == 'all');
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -513,12 +527,22 @@ class _CreateProductPageState extends State<CreateProductPage> {
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(vertical: 14),
         ),
-        items: _categories.map((category) {
-          return DropdownMenuItem<String>(
-            value: category['id'],
-            child: Text(category['name']!),
-          );
-        }).toList(),
+        items: _categories.isEmpty
+            ? [
+                DropdownMenuItem<String>(
+                  value: '',
+                  child: Text(
+                    '加载中...',
+                    style: TextStyle(color: Colors.grey[400]),
+                  ),
+                ),
+              ]
+            : _categories.map((category) {
+                return DropdownMenuItem<String>(
+                  value: category['id']?.toString(),
+                  child: Text(category['name']?.toString() ?? ''),
+                );
+              }).toList(),
         onChanged: (value) {
           setState(() {
             _selectedCategory = value;

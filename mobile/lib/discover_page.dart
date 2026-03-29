@@ -137,47 +137,57 @@ class _DiscoverPageState extends State<DiscoverPage>
         });
         return;
       case 1: // 推荐
-        await _loadRecommendations();
+        // 如果选择了特定分类，使用搜索API获取该分类商品
+        if (_selectedCategory != 'all') {
+          await _loadLatestProducts();
+        } else {
+          await _loadRecommendations();
+        }
         return;
-      case 2: // 最新 - 使用products API
-        break; // 继续下面的逻辑
+      case 2: // 最新 - 使用搜索API（支持分类筛选和后端分页）
+        await _loadLatestProducts();
+        return;
     }
+  }
 
-    final result = await ApiService.getProducts();
+  /// 加载最新商品（使用搜索API支持分类筛选）
+  Future<void> _loadLatestProducts() async {
+    // 计算当前页
+    final offset = _currentOffset;
+
+    final result = await ApiService.searchProducts(
+      query: '', // 空查询返回所有商品
+      category: _selectedCategory == 'all' ? null : _selectedCategory,
+      limit: _pageSize,
+      offset: offset,
+    );
 
     if (result['success']) {
-      // 确保items是列表类型
-      var rawItems = result['data']['items'];
       List<dynamic> items = [];
-
-      if (rawItems is List) {
-        items = rawItems;
-      } else {
-        // 如果返回的不是列表，记录错误并显示空列表
-        print('API返回的不是列表: $rawItems');
-        items = [];
+      var rawData = result['data'];
+      if (rawData is List) {
+        items = rawData;
       }
 
-      // 在客户端进行排序（最新优先）
+      // 按发布时间排序（最新优先）
       items.sort((a, b) {
-        // 如果有publish_time字段则按时间排序，否则保持原顺序
         final timeA = a['publish_time'] ?? '';
         final timeB = b['publish_time'] ?? '';
         return timeB.toString().compareTo(timeA.toString());
       });
 
-      // 在客户端进行过滤（分类筛选）
-      final filteredItems = _selectedCategory == 'all'
-          ? items
-          : items.where((item) {
-              return item['category']?.toString().toLowerCase() ==
-                  _selectedCategory.toLowerCase();
-            }).toList();
-
       setState(() {
-        _products = filteredItems;
-        _hasMoreData = false; // 最新Tab后端不支持分页
+        if (offset == 0) {
+          // 首次加载或刷新
+          _products = items;
+        } else {
+          // 加载更多：追加数据
+          _products.addAll(items);
+        }
+        // 判断是否还有更多数据
+        _hasMoreData = items.length >= _pageSize;
         _isLoading = false;
+        _isLoadingMore = false;
       });
     } else {
       setState(() => _isLoading = false);
