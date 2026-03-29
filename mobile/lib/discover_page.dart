@@ -3,6 +3,7 @@ import 'icons.dart';
 import 'api.dart';
 import 'product_detail_page.dart';
 import 'auth_manager.dart';
+import 'ai_chat_bottom_sheet.dart';
 
 /// 发现页面 - 包含关注、推荐、最新、讨论四个Tab
 class DiscoverPage extends StatefulWidget {
@@ -378,6 +379,16 @@ class _DiscoverPageState extends State<DiscoverPage>
     }
   }
 
+  /// 显示 AI 聊天弹窗
+  void _showAiChat(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AiChatBottomSheet(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -527,41 +538,44 @@ class _DiscoverPageState extends State<DiscoverPage>
           ),
           const SizedBox(width: 12),
           // AI导购按钮
-          Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFCE965B), Color(0xFFD67F1F)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(22),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFCE965B).withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+          GestureDetector(
+            onTap: () => _showAiChat(context),
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFCE965B), Color(0xFFD67F1F)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                HeroIcons.bolt(
-                  size: 18,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 4),
-                const Text(
-                  'AI',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFCE965B).withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-              ],
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  HeroIcons.bolt(
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'AI',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
