@@ -48,6 +48,26 @@ class User(models.Model):
         return self.username
 
 
+class Category(models.Model):
+    """商品分类实体"""
+    category_id = models.CharField(max_length=50, primary_key=True, verbose_name="分类ID")
+    name = models.CharField(max_length=100, verbose_name="分类名称")
+    description = models.TextField(blank=True, verbose_name="分类描述")
+    sort_order = models.IntegerField(default=0, verbose_name="排序顺序")
+    is_active = models.BooleanField(default=True, verbose_name="是否启用")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        db_table = 'category'
+        verbose_name = "商品分类"
+        verbose_name_plural = "商品分类"
+        ordering = ['sort_order', 'name']
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     """商品实体"""
     class StatusChoices(models.TextChoices):
@@ -58,7 +78,17 @@ class Product(models.Model):
 
     product_id = models.CharField(max_length=50, primary_key=True, verbose_name="商品ID")
     product_name = models.CharField(max_length=200, verbose_name="商品名称")
-    category = models.CharField(max_length=100, verbose_name="商品分类")
+    # 旧字段保留兼容
+    category = models.CharField(max_length=100, blank=True, verbose_name="商品分类(旧)")
+    # 新外键关联
+    category_ref = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products',
+        verbose_name="所属分类"
+    )
     description = models.TextField(verbose_name="详情描述")
     image_url = models.URLField(max_length=500, verbose_name="商品图片地址")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="单价")

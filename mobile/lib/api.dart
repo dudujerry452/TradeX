@@ -261,17 +261,30 @@ class ApiService {
 
   /// 获取商品分类列表
   static Future<Map<String, dynamic>> getCategories() async {
-    // 与后端 seed 数据保持一致
-    final categories = [
-      {'id': 'all', 'name': '全部'},
-      {'id': '手机数码', 'name': '手机数码'},
-      {'id': '音频设备', 'name': '音频设备'},
-      {'id': '电脑外设', 'name': '电脑外设'},
-      {'id': '智能穿戴', 'name': '智能穿戴'},
-      {'id': '生活家电', 'name': '生活家电'},
-    ];
+    final url = Uri.parse('$baseUrl/categories/');
 
-    return {'success': true, 'data': categories};
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        // 转换后端字段名到前端格式
+        final categories = [
+          {'id': 'all', 'name': '全部'},
+          ...List<Map<String, dynamic>>.from(responseData.map((cat) => {
+                'id': cat['category_id'],
+                'name': cat['name'],
+                'description': cat['description'],
+                'sort_order': cat['sort_order'],
+              })),
+        ];
+        return {'success': true, 'data': categories};
+      } else {
+        return {'success': false, 'message': '获取分类列表失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
   }
 
   // ── 推荐系统接口 ───────────────────────────────────────────────────────────

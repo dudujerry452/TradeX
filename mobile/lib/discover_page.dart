@@ -77,9 +77,19 @@ class _DiscoverPageState extends State<DiscoverPage>
           _loadMoreSearchResults();
         }
       } else {
-        // 推荐Tab才加载更多
-        if (_tabController.index == 1 && !_isLoadingMore && _hasMoreData && !_isLoading) {
-          _loadMoreRecommendations();
+        // 根据当前Tab和分类状态决定加载更多
+        if (!_isLoadingMore && _hasMoreData && !_isLoading) {
+          if (_tabController.index == 1) {
+            // 推荐Tab：如果选了特定分类，用搜索API；否则用推荐API
+            if (_selectedCategory != 'all') {
+              _loadMoreLatest();
+            } else {
+              _loadMoreRecommendations();
+            }
+          } else if (_tabController.index == 2) {
+            // 最新Tab：使用搜索API加载更多
+            _loadMoreLatest();
+          }
         }
       }
     }
@@ -268,6 +278,16 @@ class _DiscoverPageState extends State<DiscoverPage>
     _currentOffset += _pageSize;
 
     await _loadRecommendations();
+  }
+
+  /// 加载更多最新商品（使用搜索API）
+  Future<void> _loadMoreLatest() async {
+    if (_isLoadingMore || !_hasMoreData) return;
+
+    setState(() => _isLoadingMore = true);
+    _currentOffset += _pageSize;
+
+    await _loadLatestProducts();
   }
 
   /// 执行搜索

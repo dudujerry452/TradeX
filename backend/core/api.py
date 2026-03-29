@@ -18,7 +18,7 @@ from ninja import Router, Schema
 from ninja.errors import HttpError
 from ninja.security import HttpBearer
 
-from .models import Product, User, Tag, ProductTag, UserTagPreference, ProductFavorite
+from .models import Product, User, Tag, ProductTag, UserTagPreference, ProductFavorite, Category
 from .rag_vector_service import (
     build_product_document,
     get_rag_collection,
@@ -79,6 +79,22 @@ class RegisterIn(Schema):
     phone: str
     phone_display: Optional[str] = None
     address: str
+
+
+class CategoryOut(Schema):
+    category_id: str
+    name: str
+    description: str
+    sort_order: int
+    is_active: bool
+
+
+class CategoryIn(Schema):
+    category_id: Optional[str] = None
+    name: str
+    description: str = ""
+    sort_order: int = 0
+    is_active: bool = True
 
 
 class ProductOut(Schema):
@@ -336,10 +352,19 @@ def create_product(request, data: ProductIn):
     except User.DoesNotExist:
         raise HttpError(404, "Publisher not found")
 
+    # 查找分类外键
+    category_ref = None
+    if data.category:
+        try:
+            category_ref = Category.objects.get(category_id=data.category)
+        except Category.DoesNotExist:
+            pass  # 如果分类不存在，则设为None
+
     product = Product.objects.create(
         product_id=data.product_id or uuid.uuid4().hex[:20],
         product_name=data.product_name,
-        category=data.category,
+        category=data.category,  # 保留旧字段兼容
+        category_ref=category_ref,  # 新外键关联
         description=data.description,
         image_url=data.image_url,
         price=data.price,
@@ -445,8 +470,17 @@ def search_products(
     products = Product.objects.filter(product_status='APPROVED')
 
     # 分类精确筛选（优先处理）
+    # 支持按 category_ref 外键查询（新的分类体系），同时兼容旧 category 字段和分类名称
     if category.strip():
-        products = products.filter(category=category.strip())
+        # 先尝试按 ID 匹配新外键或旧字段
+        filtered = products.filter(
+            Q(category_ref__category_id=category.strip()) |
+            Q(category=category.strip())
+        )
+        # 如果没结果，尝试按分类名称匹配（兼容旧数据）
+        if not filtered.exists():
+            filtered = products.filter(category_ref__name=category.strip())
+        products = filtered
 
     # 关键词模糊搜索
     if q.strip():
@@ -479,10 +513,15 @@ def search_products(
     # 构建响应（复用RecommendationOut格式）
     result = []
     for p in paginated:
+        # 优先使用新分类外键，回退到旧字段
+        category_display = p.category_ref.name if p.category_ref else (p.category or "其他")
+        category_id = p.category_ref.category_id if p.category_ref else (p.category or "other")
+
         data = {
             "product_id": p.product_id,
             "product_name": p.product_name,
-            "category": p.category,
+            "category": category_id,  # 返回分类ID（如 misc, digital）
+            "category_name": category_display,  # 返回分类名称
             "description": p.description,
             "image_url": p.image_url,
             "price": float(p.price),
@@ -506,6 +545,68 @@ def get_product(request, product_id: str):
         return Product.objects.get(product_id=product_id)
     except Product.DoesNotExist:
         raise HttpError(404, "Product not found")
+
+
+# ── 分类接口 ──────────────────────────────────────────────────────────────────
+
+@router.get("/categories/", response=list[CategoryOut], tags=["分类"], summary="获取分类列表", auth=None)
+def list_categories(request):
+    """获取所有启用的分类列表（按sort_order排序）"""
+    return Category.objects.filter(is_active=True).order_by('sort_order', 'name')
+
+
+@router.post("/categories/", response={201: CategoryOut}, tags=["分类"], summary="创建分类")
+def create_category(request, data: CategoryIn):
+    """创建新分类（管理员权限）"""
+    category = Category.objects.create(
+        category_id=data.category_id or uuid.uuid4().hex[:20],
+        name=data.name,
+        description=data.description,
+        sort_order=data.sort_order,
+        is_active=data.is_active,
+    )
+    return 201, category
+
+
+@router.get("/categories/{category_id}/", response=CategoryOut, tags=["分类"], summary="查询分类详情", auth=None)
+def get_category(request, category_id: str):
+    """获取单个分类详情"""
+    try:
+        return Category.objects.get(category_id=category_id)
+    except Category.DoesNotExist:
+        raise HttpError(404, "分类不存在")
+
+
+@router.put("/categories/{category_id}/", response=CategoryOut, tags=["分类"], summary="更新分类")
+def update_category(request, category_id: str, data: CategoryIn):
+    """更新分类信息"""
+    try:
+        category = Category.objects.get(category_id=category_id)
+    except Category.DoesNotExist:
+        raise HttpError(404, "分类不存在")
+
+    category.name = data.name
+    category.description = data.description
+    category.sort_order = data.sort_order
+    category.is_active = data.is_active
+    category.save()
+
+    return category
+
+
+@router.delete("/categories/{category_id}/", tags=["分类"], summary="删除分类")
+def delete_category(request, category_id: str):
+    """删除分类（软删除：将is_active设为False）"""
+    try:
+        category = Category.objects.get(category_id=category_id)
+    except Category.DoesNotExist:
+        raise HttpError(404, "分类不存在")
+
+    # 软删除，避免影响已有商品
+    category.is_active = False
+    category.save()
+
+    return {"success": True, "message": "分类已禁用"}
 
 
 # ── 标签接口 ──────────────────────────────────────────────────────────────────
