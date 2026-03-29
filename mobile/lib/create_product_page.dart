@@ -522,21 +522,19 @@ class _CreateProductPageState extends State<CreateProductPage> {
           '请选择分类',
           style: TextStyle(color: Colors.grey[400], fontSize: 14),
         ),
+        disabledHint: _categories.isEmpty
+            ? Text(
+                '加载中...',
+                style: TextStyle(color: Colors.grey[400], fontSize: 14),
+              )
+            : null,
         alignment: AlignmentDirectional.centerStart,
         decoration: const InputDecoration(
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(vertical: 14),
         ),
         items: _categories.isEmpty
-            ? [
-                DropdownMenuItem<String>(
-                  value: '',
-                  child: Text(
-                    '加载中...',
-                    style: TextStyle(color: Colors.grey[400]),
-                  ),
-                ),
-              ]
+            ? [] // 加载中时不显示选项，只显示 hint
             : _categories.map((category) {
                 return DropdownMenuItem<String>(
                   value: category['id']?.toString(),
