@@ -426,4 +426,28 @@ class ApiService {
       return {'success': false, 'message': '网络连接错误: $e'};
     }
   }
+
+  /// 创建商品
+  /// [productData] 商品数据 Map
+  static Future<Map<String, dynamic>> createProduct(
+    Map<String, dynamic> productData,
+  ) async {
+    final url = Uri.parse('$baseUrl/products/');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: await getHeaders(),
+        body: jsonEncode(productData),
+      );
+
+      if (response.statusCode == 201) {
+        return {'success': true, 'data': jsonDecode(response.body)};
+      } else {
+        return {'success': false, 'message': '发布失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络错误: $e'};
+    }
+  }
 }

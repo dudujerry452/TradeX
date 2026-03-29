@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'discover_page.dart';
+import 'create_product_page.dart';
 import 'message_page.dart';
 import 'profile_page.dart';
 
@@ -17,6 +18,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     const DiscoverPage(),
+    const CreateProductPage(),
     const MessagePage(),
     const ProfilePage(),
   ];
@@ -43,8 +45,9 @@ class _MainScreenState extends State<MainScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(_getIconWidget(0), '发现', 0),
-                _buildNavItem(_getIconWidget(1), '消息', 1),
-                _buildNavItem(_getIconWidget(2), '我的', 2),
+                _buildNavItem(_getIconWidget(1), '发布', 1),
+                _buildNavItem(_getIconWidget(2), '消息', 2),
+                _buildNavItem(_getIconWidget(3), '我的', 3),
               ],
             ),
           ),
@@ -58,8 +61,10 @@ class _MainScreenState extends State<MainScreen> {
       case 0:
         return HeroIcons.globeAlt();
       case 1:
-        return HeroIcons.chatBubble();
+        return HeroIcons.photo();
       case 2:
+        return HeroIcons.chatBubble();
+      case 3:
         return HeroIcons.user();
       default:
         return HeroIcons.globeAlt();
@@ -113,8 +118,10 @@ class _MainScreenState extends State<MainScreen> {
       case 0:
         return 'globe-alt';
       case 1:
-        return 'chat-bubble-left-ellipsis';
+        return 'photo';
       case 2:
+        return 'chat-bubble-left-ellipsis';
+      case 3:
         return 'user';
       default:
         return 'globe-alt';

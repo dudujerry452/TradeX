@@ -345,6 +345,7 @@ def create_product(request, data: ProductIn):
         price=data.price,
         stock=data.stock,
         publisher=publisher,
+        product_status=Product.StatusChoices.APPROVED,  # 默认批准
     )
 
     # 关联标签（如有）
@@ -364,6 +365,51 @@ def create_product(request, data: ProductIn):
                 pass  # 忽略不存在的标签
 
     return 201, product
+
+
+class ProductStatusUpdateIn(Schema):
+    """更新商品状态请求参数"""
+    product_status: str  # APPROVED, OFF_SHELF, REJECTED
+
+
+class ProductStatusUpdateOut(Schema):
+    """更新商品状态响应"""
+    product_id: str
+    product_status: str
+    message: str
+
+
+@router.patch(
+    "/products/{product_id}/status/",
+    response=ProductStatusUpdateOut,
+    tags=["商品"],
+    summary="更新商品状态（批准/下架/拒绝）",
+)
+def update_product_status(request, product_id: str, data: ProductStatusUpdateIn):
+    """更新商品状态
+
+    - APPROVED: 审核通过
+    - OFF_SHELF: 下架
+    - REJECTED: 审核驳回
+    """
+    try:
+        product = Product.objects.get(product_id=product_id)
+    except Product.DoesNotExist:
+        raise HttpError(404, "商品不存在")
+
+    # 验证状态值是否有效
+    valid_statuses = [choice[0] for choice in Product.StatusChoices.choices]
+    if data.product_status not in valid_statuses:
+        raise HttpError(400, f"无效的状态值，可选: {', '.join(valid_statuses)}")
+
+    product.product_status = data.product_status
+    product.save(update_fields=["product_status"])
+
+    return {
+        "product_id": product.product_id,
+        "product_status": product.product_status,
+        "message": f"商品状态已更新为: {product.get_product_status_display()}",
+    }
 
 
 # ── 搜索接口（必须在 /products/{product_id}/ 之前）────────────────────────────────
