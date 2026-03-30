@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 允许 47.104.69.18 的明文 HTTP 流量 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">47.104.69.18</domain>
+    </domain-config>
+
+    <!-- 调试/开发环境：允许所有明文流量 -->
+    <!-- 生产环境请删除下面这行！ -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
