@@ -25,17 +25,35 @@ jobs:
 
       - name: Read deploy config
         id: config
+        working-directory: .
         run: |
-          # 读取 deploy-config.json 中的配置
-          ENVIRONMENT=$(cat deploy-config.json | jq -r '.environment')
-          API_URL=$(cat deploy-config.json | jq -r '.api_base_url')
-          FLUTTER_VERSION=$(cat deploy-config.json | jq -r '.flutter_version')
+          # 检查文件是否存在（在仓库根目录）
+          if [ ! -f deploy-config.json ]; then
+            echo "❌ 错误: deploy-config.json 不存在!"
+            ls -la
+            exit 1
+          fi
 
-          echo "environment=${ENVIRONMENT}" >> $GITHUB_OUTPUT
-          echo "api_url=${API_URL}" >> $GITHUB_OUTPUT
-          echo "flutter_version=${FLUTTER_VERSION}" >> $GITHUB_OUTPUT
+          echo "=== deploy-config.json 内容 ==="
+          cat deploy-config.json
+          echo ""
 
-          echo "=== 配置信息 ==="
+          # 读取配置（带错误检查）
+          ENVIRONMENT=$(jq -r '.environment // empty' deploy-config.json)
+          API_URL=$(jq -r '.api_base_url // empty' deploy-config.json)
+          FLUTTER_VERSION=$(jq -r '.flutter_version // "3.22.0"' deploy-config.json)
+
+          # 检查是否读取成功
+          if [ -z "$API_URL" ]; then
+            echo "❌ 错误: 无法读取 api_base_url"
+            exit 1
+          fi
+
+          echo "environment=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
+          echo "api_url=${API_URL}" >> "$GITHUB_OUTPUT"
+          echo "flutter_version=${FLUTTER_VERSION}" >> "$GITHUB_OUTPUT"
+
+          echo "=== 读取到的配置 ==="
           echo "环境: ${ENVIRONMENT}"
           echo "API地址: ${API_URL}"
           echo "Flutter版本: ${FLUTTER_VERSION}"
@@ -54,15 +72,18 @@ jobs:
           cache: true
 
       - name: Get dependencies
+        working-directory: ./mobile
         run: flutter pub get
 
       - name: Build APK
+        working-directory: ./mobile
         run: |
           API_URL="${{ steps.config.outputs.api_url }}"
           echo "Building with API: ${API_URL}"
           flutter build apk --release --dart-define=API_BASE_URL="${API_URL}"
 
       - name: Show build artifacts
+        working-directory: ./mobile
         run: |
           echo "=== APK 文件 ==="
           ls -lh build/app/outputs/flutter-apk/
