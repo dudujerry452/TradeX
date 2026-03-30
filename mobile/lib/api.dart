@@ -3,10 +3,12 @@ import 'package:http/http.dart' as http;
 import 'auth_manager.dart';
 
 class ApiService {
-  // 请替换为你实际的 Django 后端地址
-  // 如果在安卓模拟器测试本地服务，请使用 http://10.0.2.2:8000
-  // 如果是 iOS 模拟器，请使用 http://127.0.0.1:8000
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  // 从编译时环境变量读取 API 地址，默认为本地开发地址
+  // 打包命令: flutter build apk --dart-define=API_BASE_URL=https://api.example.com
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://127.0.0.1:8000/api',
+  );
 
   /// 获取带认证的请求头
   static Future<Map<String, String>> getHeaders() async {

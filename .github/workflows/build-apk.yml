@@ -1,0 +1,92 @@
+name: Build Flutter APK
+
+on:
+  # 手动触发 - 从 deploy-config.json 读取配置
+  workflow_dispatch:
+
+  # 可选：推送到 main 分支时自动构建
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'mobile/**'
+  #     - 'deploy-config.json'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./mobile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read deploy config
+        id: config
+        run: |
+          # 读取 deploy-config.json 中的配置
+          ENVIRONMENT=$(cat deploy-config.json | jq -r '.environment')
+          API_URL=$(cat deploy-config.json | jq -r '.api_base_url')
+          FLUTTER_VERSION=$(cat deploy-config.json | jq -r '.flutter_version')
+
+          echo "environment=${ENVIRONMENT}" >> $GITHUB_OUTPUT
+          echo "api_url=${API_URL}" >> $GITHUB_OUTPUT
+          echo "flutter_version=${FLUTTER_VERSION}" >> $GITHUB_OUTPUT
+
+          echo "=== 配置信息 ==="
+          echo "环境: ${ENVIRONMENT}"
+          echo "API地址: ${API_URL}"
+          echo "Flutter版本: ${FLUTTER_VERSION}"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.config.outputs.flutter_version }}
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: |
+          API_URL="${{ steps.config.outputs.api_url }}"
+          echo "Building with API: ${API_URL}"
+          flutter build apk --release --dart-define=API_BASE_URL="${API_URL}"
+
+      - name: Show build artifacts
+        run: |
+          echo "=== APK 文件 ==="
+          ls -lh build/app/outputs/flutter-apk/
+          du -h build/app/outputs/flutter-apk/*.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradex-${{ steps.config.outputs.environment }}-${{ github.run_number }}
+          path: mobile/build/app/outputs/flutter-apk/*.apk
+          retention-days: 30
+
+      - name: Create Release
+        if: github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}-${{ steps.config.outputs.environment }}
+          name: TradeX ${{ steps.config.outputs.environment }} Build ${{ github.run_number }}
+          body: |
+            ## TradeX APK
+
+            - 环境: ${{ steps.config.outputs.environment }}
+            - API地址: ${{ steps.config.outputs.api_url }}
+            - Flutter版本: ${{ steps.config.outputs.flutter_version }}
+          files: mobile/build/app/outputs/flutter-apk/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

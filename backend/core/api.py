@@ -1247,3 +1247,11 @@ def record_product_view(request, product_id: str):
     product.save(update_fields=["view_count"])
 
     return {"success": True, "view_count": product.view_count}
+
+
+# ── System Endpoints ──────────────────────────────────────────────────────────
+
+@router.get("/health", tags=["System"], auth=None)
+def health_check(request):
+    """健康检查接口"""
+    return {"status": "ok", "timestamp": datetime.now().isoformat()}
