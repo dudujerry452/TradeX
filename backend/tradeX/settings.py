@@ -26,14 +26,21 @@ def _load_local_env(env_path: Path):
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 根据环境加载不同的 .env 文件
+# local: 本地开发 (前后端都在本地)
+# development: 远程开发 (前端localhost -> 远程后端，CORS宽松)
+# production: 生产环境 (严格配置)
 ENVIRONMENT = os.getenv("DJANGO_ENV", "local")
 
-if ENVIRONMENT == "local":
-    _load_local_env(BASE_DIR / ".env")
-elif ENVIRONMENT == "production":
-    _load_local_env(BASE_DIR / ".env.production")
-elif ENVIRONMENT == "test":
-    _load_local_env(BASE_DIR / ".env.test")
+env_file = BASE_DIR / f".env.{ENVIRONMENT}"
+if env_file.exists():
+    _load_local_env(env_file)
+    print(f"Loaded config from {env_file}")
+else:
+    # 回退到旧的 .env 文件
+    fallback = BASE_DIR / ".env"
+    if fallback.exists():
+        _load_local_env(fallback)
+        print(f"Warning: {env_file} not found, using {fallback}")
 
 # 从环境变量读取配置
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-me")

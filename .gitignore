@@ -15,3 +15,4 @@ backend/media/
 *.pem
 *.key
 nginx/ssl/
+*.tar.gz
