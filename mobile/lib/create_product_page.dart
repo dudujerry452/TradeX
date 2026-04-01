@@ -262,6 +262,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
                   if (price <= 0) {
                     return '价格必须大于0';
                   }
+                  // DecimalField(max_digits=10, decimal_places=2) 限制
+                  // 最多 8 位整数 + 2 位小数
+                  if (price > 99999999.99) {
+                    return '价格不能超过 99,999,999.99';
+                  }
                   return null;
                 },
               ),

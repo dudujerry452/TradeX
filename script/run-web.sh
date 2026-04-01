@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/bash
 # 从 deploy-config.json 读取配置并运行 Flutter Web
 
-cd "$(dirname "$0")/mobile" || exit 1
+cd "mobile" || exit 1
 
 API_URL=$(cat ../deploy-config.json | jq -r '.api_base_url')
 
