@@ -3,7 +3,7 @@
 
 dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-cd dir/../mobile || exit 1
+cd ${dir}/../mobile || exit 1
 
 API_URL=$(cat ../deploy-config.json | jq -r '.api_base_url')
 

@@ -9,6 +9,8 @@ from core.models import (
     Message,
     Order,
     OrderDetail,
+    OrderLog,
+    Notification,
     Product,
     ProductReview,
     ProductFavorite,
@@ -1735,6 +1737,189 @@ ORDER_DETAILS = [
     ),
 ]
 
+# 订单操作日志种子数据
+ORDER_LOGS = [
+    # seed_ord001 的日志 - 已完成订单
+    dict(
+        log_id="seed_ol001",
+        order_id="seed_ord001",
+        operator_id="seed_buyer001",
+        action=OrderLog.ActionChoices.CREATE,
+        to_status=Order.StatusChoices.PENDING_PAY,
+        remark="创建订单",
+    ),
+    dict(
+        log_id="seed_ol002",
+        order_id="seed_ord001",
+        operator_id="seed_buyer001",
+        action=OrderLog.ActionChoices.PAY,
+        from_status=Order.StatusChoices.PENDING_PAY,
+        to_status=Order.StatusChoices.PENDING_SHIP,
+        remark="支付方式: mock",
+    ),
+    dict(
+        log_id="seed_ol003",
+        order_id="seed_ord001",
+        operator_id="seed_seller001",
+        action=OrderLog.ActionChoices.SHIP,
+        from_status=Order.StatusChoices.PENDING_SHIP,
+        to_status=Order.StatusChoices.SHIPPED,
+        remark="物流公司: 顺丰速运, 单号: SF1234567890",
+    ),
+    dict(
+        log_id="seed_ol004",
+        order_id="seed_ord001",
+        operator_id="seed_buyer001",
+        action=OrderLog.ActionChoices.RECEIVE,
+        from_status=Order.StatusChoices.SHIPPED,
+        to_status=Order.StatusChoices.COMPLETED,
+        remark="买家确认收货",
+    ),
+    # seed_ord002 的日志 - 已发货订单
+    dict(
+        log_id="seed_ol005",
+        order_id="seed_ord002",
+        operator_id="seed_buyer002",
+        action=OrderLog.ActionChoices.CREATE,
+        to_status=Order.StatusChoices.PENDING_PAY,
+        remark="创建订单",
+    ),
+    dict(
+        log_id="seed_ol006",
+        order_id="seed_ord002",
+        operator_id="seed_buyer002",
+        action=OrderLog.ActionChoices.PAY,
+        from_status=Order.StatusChoices.PENDING_PAY,
+        to_status=Order.StatusChoices.PENDING_SHIP,
+        remark="支付方式: mock",
+    ),
+    dict(
+        log_id="seed_ol007",
+        order_id="seed_ord002",
+        operator_id="seed_seller001",
+        action=OrderLog.ActionChoices.SHIP,
+        from_status=Order.StatusChoices.PENDING_SHIP,
+        to_status=Order.StatusChoices.SHIPPED,
+        remark="物流公司: 中通快递, 单号: ZTO9876543210",
+    ),
+]
+
+# 通知种子数据
+NOTIFICATIONS = [
+    # 买家1的通知
+    dict(
+        notification_id="seed_notif001",
+        user_id="seed_buyer001",
+        type=Notification.TypeChoices.ORDER,
+        title="订单已支付",
+        content="订单 #seed_ord001 支付成功，等待卖家发货",
+        related_order_id="seed_ord001",
+        is_read=True,
+    ),
+    dict(
+        notification_id="seed_notif002",
+        user_id="seed_buyer001",
+        type=Notification.TypeChoices.ORDER,
+        title="订单已发货",
+        content="订单 #seed_ord001 已发货，物流：顺丰速运 SF1234567890，请注意查收",
+        related_order_id="seed_ord001",
+        is_read=True,
+    ),
+    dict(
+        notification_id="seed_notif003",
+        user_id="seed_buyer001",
+        type=Notification.TypeChoices.ORDER,
+        title="交易完成",
+        content="订单 #seed_ord001 交易完成，感谢您的购买",
+        related_order_id="seed_ord001",
+        is_read=False,
+    ),
+    # 买家2的通知
+    dict(
+        notification_id="seed_notif004",
+        user_id="seed_buyer002",
+        type=Notification.TypeChoices.ORDER,
+        title="订单已支付",
+        content="订单 #seed_ord002 支付成功，等待卖家发货",
+        related_order_id="seed_ord002",
+        is_read=True,
+    ),
+    dict(
+        notification_id="seed_notif005",
+        user_id="seed_buyer002",
+        type=Notification.TypeChoices.ORDER,
+        title="订单已发货",
+        content="订单 #seed_ord002 已发货，物流：中通快递 ZTO9876543210，请注意查收",
+        related_order_id="seed_ord002",
+        is_read=False,
+    ),
+    # 卖家1的通知
+    dict(
+        notification_id="seed_notif006",
+        user_id="seed_seller001",
+        type=Notification.TypeChoices.ORDER,
+        title="您有新订单",
+        content="订单 #seed_ord001，商品：苹果 iPhone 16 Pro，金额：¥9999.00",
+        related_order_id="seed_ord001",
+        is_read=True,
+    ),
+    dict(
+        notification_id="seed_notif007",
+        user_id="seed_seller001",
+        type=Notification.TypeChoices.ORDER,
+        title="订单已支付",
+        content="订单 #seed_ord001 买家已支付 ¥9999.00，请及时发货",
+        related_order_id="seed_ord001",
+        is_read=True,
+    ),
+    dict(
+        notification_id="seed_notif008",
+        user_id="seed_seller001",
+        type=Notification.TypeChoices.ORDER,
+        title="订单已完成",
+        content="订单 #seed_ord001 买家已确认收货，交易完成",
+        related_order_id="seed_ord001",
+        is_read=False,
+    ),
+    dict(
+        notification_id="seed_notif009",
+        user_id="seed_seller001",
+        type=Notification.TypeChoices.ORDER,
+        title="您有新订单",
+        content="订单 #seed_ord002，商品：索尼 WH-1000XM5 降噪耳机 等2件商品，金额：¥4998.00",
+        related_order_id="seed_ord002",
+        is_read=True,
+    ),
+    dict(
+        notification_id="seed_notif010",
+        user_id="seed_seller001",
+        type=Notification.TypeChoices.ORDER,
+        title="订单已支付",
+        content="订单 #seed_ord002 买家已支付 ¥4998.00，请及时发货",
+        related_order_id="seed_ord002",
+        is_read=True,
+    ),
+    # 系统通知
+    dict(
+        notification_id="seed_notif011",
+        user_id="seed_buyer001",
+        type=Notification.TypeChoices.SYSTEM,
+        title="欢迎来到 TradeX",
+        content="感谢您注册 TradeX 平台，发现更多精彩内容，开启您的购物之旅！",
+        related_order_id=None,
+        is_read=False,
+    ),
+    dict(
+        notification_id="seed_notif012",
+        user_id="seed_seller001",
+        type=Notification.TypeChoices.SYSTEM,
+        title="卖家入驻成功",
+        content="恭喜您成功入驻 TradeX 平台，开始发布您的商品吧！",
+        related_order_id=None,
+        is_read=True,
+    ),
+]
+
 MESSAGES = [
     dict(
         message_id="seed_msg001",
@@ -2114,6 +2299,12 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("── 商品收藏 ──"))
         total += self._upsert_product_favorites()
 
+        self.stdout.write(self.style.MIGRATE_HEADING("── 订单操作日志 ──"))
+        total += self._upsert_order_logs()
+
+        self.stdout.write(self.style.MIGRATE_HEADING("── 用户通知 ──"))
+        total += self._upsert_notifications()
+
         self.stdout.write(
             self.style.SUCCESS(f"\n完成. 共新增 {total} 条记录.")
         )
@@ -2171,5 +2362,70 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(
                     self.style.WARNING(f"  ~ ProductFavorite: {data['user_id']} - {data['product_id']} (已存在, 跳过)")
+                )
+        return created_count
+
+    def _upsert_order_logs(self):
+        created_count = 0
+        for data in ORDER_LOGS:
+            order = Order.objects.get(order_id=data["order_id"])
+            operator = None
+            if data.get("operator_id"):
+                try:
+                    operator = User.objects.get(user_id=data["operator_id"])
+                except User.DoesNotExist:
+                    pass
+            defaults = {
+                "order": order,
+                "action": data["action"],
+                "to_status": data["to_status"],
+                "remark": data.get("remark", ""),
+            }
+            if operator:
+                defaults["operator"] = operator
+            if data.get("from_status"):
+                defaults["from_status"] = data["from_status"]
+            _, created = OrderLog.objects.get_or_create(
+                log_id=data["log_id"],
+                defaults=defaults,
+            )
+            if created:
+                created_count += 1
+                self.stdout.write(f"  + OrderLog: {data['log_id']}")
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f"  ~ OrderLog: {data['log_id']} (已存在, 跳过)")
+                )
+        return created_count
+
+    def _upsert_notifications(self):
+        created_count = 0
+        for data in NOTIFICATIONS:
+            user = User.objects.get(user_id=data["user_id"])
+            related_order = None
+            if data.get("related_order_id"):
+                try:
+                    related_order = Order.objects.get(order_id=data["related_order_id"])
+                except Order.DoesNotExist:
+                    pass
+            defaults = {
+                "user": user,
+                "type": data["type"],
+                "title": data["title"],
+                "content": data["content"],
+                "is_read": data.get("is_read", False),
+            }
+            if related_order:
+                defaults["related_order"] = related_order
+            _, created = Notification.objects.get_or_create(
+                notification_id=data["notification_id"],
+                defaults=defaults,
+            )
+            if created:
+                created_count += 1
+                self.stdout.write(f"  + Notification: {data['notification_id']}")
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f"  ~ Notification: {data['notification_id']} (已存在, 跳过)")
                 )
         return created_count

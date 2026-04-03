@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'discover_page.dart';
 import 'create_product_page.dart';
 import 'message_page.dart';
 import 'profile_page.dart';
+import 'services/notification_service.dart';
 
 /// 主屏幕 - 包含底部导航栏
 class MainScreen extends StatefulWidget {
@@ -15,6 +17,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  int _unreadCount = 0;
+  Timer? _pollingTimer;
 
   final List<Widget> _pages = [
     const DiscoverPage(),
@@ -22,6 +26,41 @@ class _MainScreenState extends State<MainScreen> {
     const MessagePage(),
     const ProfilePage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startNotificationPolling();
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startNotificationPolling() {
+    // 立即获取一次
+    _fetchUnreadCount();
+
+    // 每30秒轮询一次
+    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _fetchUnreadCount();
+    });
+  }
+
+  Future<void> _fetchUnreadCount() async {
+    try {
+      final count = await NotificationService.getUnreadCount();
+      if (mounted && count != _unreadCount) {
+        setState(() {
+          _unreadCount = count;
+        });
+      }
+    } catch (e) {
+      // 静默处理错误
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -44,10 +83,10 @@ class _MainScreenState extends State<MainScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(_getIconWidget(0), '发现', 0),
-                _buildNavItem(_getIconWidget(1), '发布', 1),
-                _buildNavItem(_getIconWidget(2), '消息', 2),
-                _buildNavItem(_getIconWidget(3), '我的', 3),
+                _buildNavItem('globe-alt', '发现', 0),
+                _buildNavItem('photo', '发布', 1),
+                _buildNavItem('chat-bubble-left-ellipsis', '消息', 2, badgeCount: _unreadCount),
+                _buildNavItem('user', '我的', 3),
               ],
             ),
           ),
@@ -56,22 +95,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _getIconWidget(int index) {
-    switch (index) {
-      case 0:
-        return HeroIcons.globeAlt();
-      case 1:
-        return HeroIcons.photo();
-      case 2:
-        return HeroIcons.chatBubble();
-      case 3:
-        return HeroIcons.user();
-      default:
-        return HeroIcons.globeAlt();
-    }
-  }
-
-  Widget _buildNavItem(Widget iconWidget, String label, int index) {
+  Widget _buildNavItem(String iconName, String label, int index, {int badgeCount = 0}) {
     final isSelected = _currentIndex == index;
 
     return GestureDetector(
@@ -79,6 +103,10 @@ class _MainScreenState extends State<MainScreen> {
         setState(() {
           _currentIndex = index;
         });
+        // 切换到消息页面时刷新未读数
+        if (index == 2) {
+          _fetchUnreadCount();
+        }
       },
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -86,17 +114,48 @@ class _MainScreenState extends State<MainScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFFCE965B).withValues(alpha: 0.1)
+              ? const Color(0xFFCE965B).withOpacity(0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            HeroIcons.icon(
-              _getIconName(index),
-              size: 24,
-              color: isSelected ? const Color(0xFFCE965B) : Colors.grey,
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                HeroIcons.icon(
+                  iconName,
+                  size: 24,
+                  color: isSelected ? const Color(0xFFCE965B) : Colors.grey,
+                ),
+                if (badgeCount > 0)
+                  Positioned(
+                    right: -6,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        badgeCount > 99 ? '99+' : badgeCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 4),
             Text(
@@ -111,20 +170,5 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
-  }
-
-  String _getIconName(int index) {
-    switch (index) {
-      case 0:
-        return 'globe-alt';
-      case 1:
-        return 'photo';
-      case 2:
-        return 'chat-bubble-left-ellipsis';
-      case 3:
-        return 'user';
-      default:
-        return 'globe-alt';
-    }
   }
 }

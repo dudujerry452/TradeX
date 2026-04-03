@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'api.dart';
 import 'auth_manager.dart';
+import 'services/order_service.dart';
+import 'pages/order/order_detail_page.dart';
 
 /// 商品详情页面
 class ProductDetailPage extends StatefulWidget {
@@ -495,6 +497,110 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
+  Future<void> _buyNow() async {
+    if (_currentUserId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请先登录'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final product = _product;
+    if (product == null) return;
+
+    // 获取用户地址
+    final user = await AuthManager.getUser();
+    final address = user?['address'] ?? '';
+    final phone = user?['phone_display'] ?? '';
+
+    if (address.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('请先设置收货地址'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
+    // 显示确认对话框
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('确认购买'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('商品: ${product['product_name']}'),
+            const SizedBox(height: 8),
+            Text('价格: ¥${product['price']}'),
+            const SizedBox(height: 8),
+            Text('收货地址: $address'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFCE965B),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('确认'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final result = await OrderService.createOrder(
+          productId: widget.productId,
+          quantity: 1,
+          address: address,
+          phone: phone,
+        );
+
+        if (mounted) {
+          // 跳转到订单详情页
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderDetailPage(
+                orderId: result['order_id'],
+              ),
+            ),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('订单创建成功'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('创建订单失败: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   Widget _buildBottomBar() {
     final stock = _product?['stock'] ?? 0;
 
@@ -570,7 +676,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             // 立即购买按钮
             Expanded(
               child: ElevatedButton(
-                onPressed: stock > 0 ? () {} : null,
+                onPressed: stock > 0 ? _buyNow : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFCE965B),
                   foregroundColor: Colors.white,
