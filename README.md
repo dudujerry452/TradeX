@@ -17,7 +17,7 @@
 
 # 成员
 
-Contributors: dudujerry452(周致远) Junhan327(刘俊含) morose098(李子豪) HKJay(黄坤) 
+Contributors: dudujerry452(周致远) Junhan327(刘俊涵) morose098(李子豪) HKJay(黄坤) 
 
 # 环境
 
