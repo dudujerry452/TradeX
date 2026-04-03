@@ -1,5 +1,6 @@
 <script setup>
 import { nextTick, reactive, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { RAG_CHAT_STREAM_API_URL } from '../config/api'
 
 const state = reactive({
@@ -172,6 +173,47 @@ const onChatEnter = (event) => {
     sendRagMessage()
   }
 }
+
+const getSourceLink = (item) => {
+  if (typeof item?.url === 'string' && item.url) {
+    return item.url
+  }
+
+  if (typeof item?.id === 'string' && item.id) {
+    return `/product/${item.id}`
+  }
+
+  return ''
+}
+
+const linkPattern = /\[([^\]]+)\]\((\/[^)]+)\)/g
+
+const parseMessageSegments = (content) => {
+  if (typeof content !== 'string' || !content) {
+    return []
+  }
+
+  const segments = []
+  let lastIndex = 0
+
+  for (const match of content.matchAll(linkPattern)) {
+    const [fullMatch, label, to] = match
+    const index = match.index ?? 0
+
+    if (index > lastIndex) {
+      segments.push({ type: 'text', value: content.slice(lastIndex, index) })
+    }
+
+    segments.push({ type: 'link', label, to })
+    lastIndex = index + fullMatch.length
+  }
+
+  if (lastIndex < content.length) {
+    segments.push({ type: 'text', value: content.slice(lastIndex) })
+  }
+
+  return segments.length ? segments : [{ type: 'text', value: content }]
+}
 </script>
 
 <template>
@@ -195,12 +237,21 @@ const onChatEnter = (event) => {
         <div class="source-head">命中商品</div>
         <p v-if="!state.chatSources.length" class="source-empty">提问后将展示当前命中的候选商品。</p>
         <ul v-else class="source-list">
-          <li v-for="item in state.chatSources" :key="item.id || item.name" class="source-card">
-            <div class="source-main">
-              <strong>{{ item.name }}</strong>
-              <small>{{ item.category }}</small>
+          <li v-for="item in state.chatSources" :key="item.id || item.name">
+            <RouterLink v-if="getSourceLink(item)" class="source-card source-link" :to="getSourceLink(item)">
+              <div class="source-main">
+                <strong>{{ item.name }}</strong>
+                <small>{{ item.category }}</small>
+              </div>
+              <span class="source-price">¥{{ item.price }}</span>
+            </RouterLink>
+            <div v-else class="source-card">
+              <div class="source-main">
+                <strong>{{ item.name }}</strong>
+                <small>{{ item.category }}</small>
+              </div>
+              <span class="source-price">¥{{ item.price }}</span>
             </div>
-            <span class="source-price">¥{{ item.price }}</span>
           </li>
         </ul>
       </aside>
@@ -217,7 +268,14 @@ const onChatEnter = (event) => {
               {{ msg.role === 'user' ? 'U' : 'AI' }}
             </div>
             <div class="message-bubble" :class="msg.role === 'user' ? 'bubble-user' : 'bubble-assistant'">
-              <p>{{ msg.content }}</p>
+              <p>
+                <template v-for="(segment, index) in parseMessageSegments(msg.content)" :key="index">
+                  <RouterLink v-if="segment.type === 'link'" class="message-link" :to="segment.to">
+                    {{ segment.label }}
+                  </RouterLink>
+                  <span v-else>{{ segment.value }}</span>
+                </template>
+              </p>
             </div>
           </div>
 
@@ -363,14 +421,26 @@ const onChatEnter = (event) => {
 }
 
 .source-card {
-  border: 1px solid #e6ebf2;
-  background: #fff;
-  border-radius: 12px;
-  padding: 10px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
+  border: 1px solid #e6ebf2;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.source-link {
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.source-link:hover {
+  transform: translateY(-1px);
+  border-color: #cfd8e3;
+  box-shadow: 0 10px 20px rgba(16, 24, 40, 0.08);
 }
 
 .source-main {
@@ -467,6 +537,17 @@ const onChatEnter = (event) => {
 
 .message-bubble p {
   margin: 0;
+}
+
+.message-link {
+  color: #1d4ed8;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.bubble-user .message-link {
+  color: #93c5fd;
 }
 
 .bubble-assistant {

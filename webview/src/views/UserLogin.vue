@@ -1,24 +1,32 @@
 <script setup>
 import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { LOGIN_API_URL } from '../config/api'
-import { floatingIcons } from '../config/loginFloatingIcons'
-import bagIcon from '../assets/login/bag.svg'
-import mailIcon from '../assets/login/mail.svg'
-import lockIcon from '../assets/login/lock.svg'
-import eyeIcon from '../assets/login/eye.svg'
+import { useRoute, useRouter } from 'vue-router'
+import { login } from '../config/api'
+import { saveLogin } from '../utils/auth'
+
+const router = useRouter()
+const route = useRoute()
 
 const form = reactive({
   loginMode: 'username',
   identifier: '',
   password: '',
-  remember: false,
   loading: false,
   error: '',
   success: '',
 })
 
-const router = useRouter()
+const getRedirectTarget = () => {
+  return typeof route.query.redirect === 'string' && route.query.redirect ? route.query.redirect : '/home'
+}
+
+const persistLogin = async (result) => {
+  await saveLogin(result.token, {
+    user_id: result.user_id,
+    username: result.username,
+    role: result.role,
+  })
+}
 
 const onSubmit = async () => {
   if (form.loading) return
@@ -28,39 +36,49 @@ const onSubmit = async () => {
   form.success = ''
 
   try {
-    const loginPayload = {
+    const result = await login({
+      identifier: form.identifier,
       password: form.password,
-      //remember: form.remember,
-    }
-    if (form.loginMode === 'email') {
-      loginPayload.email = form.identifier
-    } else {
-      loginPayload.username = form.identifier
-    }
-
-    const response = await fetch(LOGIN_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(loginPayload),
+      isEmail: form.loginMode === 'email',
     })
 
-    if (!response.ok) {
-      let message = `Login failed: ${response.status}`
-      try {
-        const err = await response.json()
-        message = err?.detail || message
-      } catch (_) {
-        // Keep fallback message when response body is not JSON.
-      }
-      throw new Error(message)
+    if (!result.success) {
+      throw new Error(result.message || '登录失败')
     }
 
+    await persistLogin(result)
     form.success = '登录成功'
-    await router.push('/home')
+    await router.push(getRedirectTarget())
   } catch (error) {
     form.error = error instanceof Error ? error.message : '登录请求失败'
+  } finally {
+    form.loading = false
+  }
+}
+
+const debugLogin = async () => {
+  if (form.loading) return
+
+  form.loading = true
+  form.error = ''
+  form.success = ''
+
+  try {
+    const result = await login({
+      identifier: 'admin_root',
+      password: 'hashed_admin_pw',
+      isEmail: false,
+    })
+
+    if (!result.success) {
+      throw new Error(result.message || '调试登录失败')
+    }
+
+    await persistLogin(result)
+    form.success = '调试登录成功'
+    await router.push(getRedirectTarget())
+  } catch (error) {
+    form.error = error instanceof Error ? error.message : '调试登录失败'
   } finally {
     form.loading = false
   }
@@ -69,100 +87,64 @@ const onSubmit = async () => {
 
 <template>
   <div class="login-page">
-    <div class="bg-dots" aria-hidden="true"></div>
-    <div
-      v-for="(icon, index) in floatingIcons"
-      :key="`${icon.top}-${icon.left}-${index}`"
-      class="floating-icon"
-      :style="{
-        top: icon.top,
-        left: icon.left,
-        width: icon.size,
-        '--float-duration': icon.duration,
-        '--float-delay': icon.delay,
-      }"
-      aria-hidden="true"
-    >
-      <img :src="icon.src" alt="" />
-    </div>
-
-    <section class="login-card">
+    <section class="login-card page-card">
       <header class="login-header">
-        <div class="brand-icon">
-          <img :src="bagIcon" alt="" />
+        <div class="brand-icon">TX</div>
+        <div>
+          <p class="eyebrow">tradeX</p>
+          <h1>欢迎回来</h1>
+          <p class="subtitle">使用用户名或邮箱登录，体验与 mobile 一致的账号流。</p>
         </div>
-        <h1>
-          Welcome to
-          <span>tradeX</span>
-        </h1>
-        <p class="subtitle">Sign in to continue shopping</p>
       </header>
 
+      <div class="mode-switch">
+        <button
+          type="button"
+          class="mode-btn"
+          :class="{ active: form.loginMode === 'username' }"
+          @click="form.loginMode = 'username'"
+        >
+          用户名登录
+        </button>
+        <button
+          type="button"
+          class="mode-btn"
+          :class="{ active: form.loginMode === 'email' }"
+          @click="form.loginMode = 'email'"
+        >
+          邮箱登录
+        </button>
+      </div>
+
       <form class="login-form" @submit.prevent="onSubmit">
-        <div class="mode-switch" role="tablist" aria-label="登录方式切换">
-          <button
-            type="button"
-            class="mode-btn"
-            :class="{ active: form.loginMode === 'username' }"
-            @click="form.loginMode = 'username'"
-          >
-            用户名登录
-          </button>
-          <button
-            type="button"
-            class="mode-btn"
-            :class="{ active: form.loginMode === 'email' }"
-            @click="form.loginMode = 'email'"
-          >
-            邮箱登录
-          </button>
-        </div>
-
-        <label class="field" :for="form.loginMode === 'email' ? 'login-email' : 'login-username'">
+        <label class="field">
           <span>{{ form.loginMode === 'email' ? 'Email Address' : 'Username' }}</span>
-          <div class="input-wrap">
-            <img :src="mailIcon" alt="" />
-            <input
-              :id="form.loginMode === 'email' ? 'login-email' : 'login-username'"
-              v-model="form.identifier"
-              :type="form.loginMode === 'email' ? 'email' : 'text'"
-              :name="form.loginMode === 'email' ? 'email' : 'username'"
-              :autocomplete="form.loginMode === 'email' ? 'email' : 'username'"
-              :placeholder="form.loginMode === 'email' ? 'you@example.com' : 'Enter username'"
-              required
-            />
-          </div>
+          <input
+            v-model="form.identifier"
+            :type="form.loginMode === 'email' ? 'email' : 'text'"
+            :placeholder="form.loginMode === 'email' ? 'you@example.com' : '输入用户名'"
+            autocomplete="username"
+            required
+          />
         </label>
 
-        <label class="field" for="login-password">
+        <label class="field">
           <span>Password</span>
-          <div class="input-wrap">
-            <img :src="lockIcon" alt="" />
-            <input
-              id="login-password"
-              v-model="form.password"
-              type="password"
-              name="password"
-              autocomplete="current-password"
-              placeholder="Enter your password"
-              required
-            />
-            <button type="button" class="eye-btn" aria-label="toggle password visibility">
-              <img :src="eyeIcon" alt="" />
-            </button>
-          </div>
+          <input
+            v-model="form.password"
+            type="password"
+            placeholder="请输入密码"
+            autocomplete="current-password"
+            required
+          />
         </label>
 
-        <div class="row">
-          <label class="remember">
-            <input v-model="form.remember" type="checkbox" />
-            <span>Remember me</span>
-          </label>
-          <a href="#" class="link">Forgot password?</a>
-        </div>
+        <button type="submit" class="primary-btn submit-btn" :disabled="form.loading">
+          {{ form.loading ? '登录中...' : '登录' }}
+        </button>
 
-        <button type="submit" class="submit-btn" :disabled="form.loading">
-          {{ form.loading ? 'Signing In...' : 'Sign In' }}
+        <button type="button" class="ghost-btn submit-btn" :disabled="form.loading" @click="debugLogin">
+          调试登录 (admin)
         </button>
 
         <p v-if="form.error" class="status error">{{ form.error }}</p>
@@ -170,8 +152,8 @@ const onSubmit = async () => {
       </form>
 
       <footer class="login-footer">
-        <span>Don't have an account?</span>
-        <RouterLink to="/register" class="link">Sign up for free</RouterLink>
+        <span>还没有账号？</span>
+        <RouterLink to="/register" class="link">去注册</RouterLink>
       </footer>
     </section>
   </div>
@@ -179,141 +161,89 @@ const onSubmit = async () => {
 
 <style scoped>
 .login-page {
-  --bg: #f4f3fa;
-  --card-bg: #f7f7fa;
-  --card-border: rgba(29, 34, 55, 0.08);
-  --text-main: #11131f;
-  --text-sub: #475569;
-  --accent: #d4a373;
-  --accent-2: #8b2f4a;
-  --btn: #020226;
-
   min-height: 100vh;
+  padding: 24px;
   display: grid;
   place-items: center;
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  padding: 26px;
   background: linear-gradient(180deg, #f2f1f8 0%, #f7f6fc 100%);
-  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-}
-
-.bg-dots {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  opacity: 0.4;
-  background-image: radial-gradient(circle, rgba(153, 158, 184, 0.42) 1px, transparent 1px);
-  background-size: 13px 13px;
-}
-
-.floating-icon {
-  position: absolute;
-  z-index: -1;
-  opacity: 0.9;
-  will-change: transform;
-  animation: floatDrift var(--float-duration) ease-in-out infinite;
-  animation-delay: var(--float-delay);
-}
-
-.floating-icon:nth-of-type(even) {
-  animation-direction: reverse;
-}
-
-.floating-icon img {
-  width: 100%;
-  display: block;
-  filter: drop-shadow(0 6px 11px rgba(61, 70, 102, 0.1));
-  animation: iconSwing calc(var(--float-duration) * 0.7) ease-in-out infinite alternate;
 }
 
 .login-card {
-  width: min(100%, 430px);
-  border-radius: 20px;
-  border: 1px solid var(--card-border);
-  background: var(--card-bg);
-  box-shadow: 0 20px 40px rgba(16, 24, 40, 0.1);
-  padding: 30px 30px 26px;
-  position: relative;
-  z-index: 1;
-  animation: reveal 0.6s ease-out;
+  width: min(100%, 460px);
+  padding: 22px;
+  display: grid;
+  gap: 18px;
 }
 
 .login-header {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.login-header h1 {
-  margin: 0 0 8px;
-  color: var(--text-main);
-  font-size: 47px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-}
-
-.login-header h1 span {
-  margin-left: 7px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 14px;
+  align-items: center;
 }
 
 .brand-icon {
-  width: 68px;
-  height: 68px;
-  margin: 0 auto 16px;
+  width: 64px;
+  height: 64px;
   border-radius: 18px;
   display: grid;
   place-items: center;
-  background: linear-gradient(150deg, #d0661a 0%, #e09018 100%);
-  box-shadow: 0 12px 24px rgba(80, 74, 200, 0.34);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  color: #fff;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 0.04em;
 }
 
-.brand-icon img {
-  width: 31px;
-  filter: brightness(0) invert(1);
+.eyebrow {
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-header h1 {
+  font-size: 30px;
+  line-height: 1.08;
+  font-weight: 900;
+  margin-top: 4px;
 }
 
 .subtitle {
-  margin: 0;
-  font-size: 16px;
-  letter-spacing: -0.02em;
-  font-weight: 600;
-  color: var(--text-sub);
-}
-
-.login-form {
-  display: grid;
-  gap: 16px;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .mode-switch {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  background: #ececf0;
-  border-radius: 12px;
   padding: 4px;
+  border-radius: 16px;
+  background: rgba(17, 19, 31, 0.04);
 }
 
 .mode-btn {
+  min-height: 44px;
   border: 0;
+  border-radius: 12px;
   background: transparent;
-  height: 38px;
-  border-radius: 9px;
-  cursor: pointer;
-  font-weight: 700;
-  color: #4a4f63;
+  color: #4f5568;
+  font-weight: 800;
 }
 
 .mode-btn.active {
   background: #fff;
-  color: #11131f;
-  box-shadow: 0 3px 8px rgba(30, 38, 66, 0.12);
+  color: var(--primary);
+  box-shadow: 0 10px 18px rgba(16, 24, 40, 0.08);
+}
+
+.login-form {
+  display: grid;
+  gap: 14px;
 }
 
 .field {
@@ -323,213 +253,58 @@ const onSubmit = async () => {
 
 .field span {
   font-size: 14px;
-  font-weight: 700;
-  color: #202124;
+  font-weight: 800;
+  color: #1f2937;
 }
 
-.input-wrap {
-  height: 50px;
-  border-radius: 12px;
-  background: #ececf0;
-  border: 1px solid transparent;
-  display: flex;
-  align-items: center;
-  padding: 0 13px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.input-wrap:focus-within {
-  border-color: rgba(84, 98, 186, 0.45);
-  box-shadow: 0 0 0 3px rgba(84, 98, 186, 0.12);
-}
-
-.input-wrap > img {
-  width: 22px;
-  flex-shrink: 0;
-}
-
-.input-wrap input {
-  flex: 1;
+.field input {
   width: 100%;
-  border: 0;
-  background: transparent;
-  font-size: 16px;
-  font-weight: 500;
-  color: #464c5f;
-  padding: 0 11px;
-}
-
-.input-wrap input::placeholder {
-  color: #757c8f;
-}
-
-.input-wrap input:focus {
+  border: 1px solid rgba(17, 19, 31, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 14px 16px;
   outline: none;
 }
 
-.eye-btn {
-  border: 0;
-  background: transparent;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  cursor: pointer;
-  opacity: 0.9;
-}
-
-.eye-btn img {
-  width: 22px;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-top: 1px;
-}
-
-.remember {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #1f2437;
-  font-weight: 600;
-}
-
-.remember input {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  accent-color: #6570c7;
-}
-
-.link {
-  color: #1f56ef;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
 .submit-btn {
-  margin-top: 6px;
-  border: 0;
-  border-radius: 12px;
-  height: 50px;
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.02em;
-  color: white;
-  cursor: pointer;
-  background: var(--btn);
-  box-shadow: 0 12px 20px rgba(1, 1, 24, 0.24);
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 26px rgba(1, 1, 24, 0.28);
-}
-
-.submit-btn:active {
-  transform: translateY(0);
+  width: 100%;
+  min-height: 52px;
 }
 
 .login-footer {
-  margin-top: 24px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-sub);
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 8px;
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
-.status {
-  margin: 4px 2px 0;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.status.error {
-  color: #b42318;
+.link {
+  color: var(--primary);
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .status.success {
-  color: #0d7a33;
+  color: #067647;
 }
 
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(14px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.status.error {
+  color: var(--danger);
 }
 
-@keyframes floatDrift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  25% {
-    transform: translate3d(10px, -14px, 0);
-  }
-  50% {
-    transform: translate3d(-12px, -24px, 0);
-  }
-  75% {
-    transform: translate3d(12px, -10px, 0);
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes iconSwing {
-  0% {
-    transform: rotate(-4deg) scale(1);
-  }
-  100% {
-    transform: rotate(4deg) scale(1.05);
-  }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 720px) {
   .login-page {
     padding: 14px;
   }
 
   .login-card {
-    padding: 22px 18px 18px;
-    border-radius: 18px;
+    padding: 16px;
   }
 
   .login-header h1 {
-    font-size: 33px;
-  }
-
-  .subtitle {
-    font-size: 15px;
-  }
-
-  .input-wrap input,
-  .submit-btn {
-    font-size: 15px;
-  }
-
-  .floating-icon {
-    opacity: 0.58;
+    font-size: 24px;
   }
 }
 </style>

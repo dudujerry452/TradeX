@@ -1,7 +1,7 @@
 <script setup>
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { REGISTER_API_URL } from '../config/api'
+import { register } from '../config/api'
 import { floatingIcons } from '../config/loginFloatingIcons'
 import bagIcon from '../assets/login/bag.svg'
 import mailIcon from '../assets/login/mail.svg'
@@ -39,24 +39,18 @@ const onSubmit = async () => {
   form.loading = true
 
   try {
-    const response = await fetch(REGISTER_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: form.email,
-        username: form.username,
-        encrypted_password: form.password, //这里暂时没有加密
-        real_name: form.realName,
-        id_card: form.idCard,
-        phone: form.phone,
-        address: form.address,
-      }),
+    const result = await register({
+      email: form.email,
+      username: form.username,
+      encrypted_password: form.password,
+      real_name: form.realName,
+      id_card: form.idCard,
+      phone: form.phone,
+      address: form.address,
     })
 
-    if (!response.ok) {
-      form.error = response.status === 400 ? '邮箱/用户名/身份证可能已存在，或字段不合法' : '注册失败'
+    if (!result.success) {
+      form.error = result.message || '注册失败'
       return
     }
 
