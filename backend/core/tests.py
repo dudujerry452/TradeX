@@ -132,6 +132,90 @@ class UserDetailTests(TestCase):
         self.assertIn("detail", response.json())
 
 
+class UserUpdateTests(TestCase):
+    """测试更新用户信息"""
+
+    def setUp(self):
+        self.user = make_user(
+            user_id="u_update",
+            username="updateuser",
+            email="update@test.com",
+            address="旧地址",
+            phone_display="13800138000",
+            real_name="张三",
+        )
+        self.token = generate_token(self.user.user_id)
+        self.headers = {"HTTP_AUTHORIZATION": f"Bearer {self.token}"}
+
+    def test_update_address(self):
+        """测试更新收货地址"""
+        response = self.client.generic(
+            "PUT",
+            "/api/users/me/",
+            data=json.dumps({"address": "新收货地址"}),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["address"], "新收货地址")
+
+        # 验证数据库已更新
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.address, "新收货地址")
+
+    def test_update_phone_display(self):
+        """测试更新联系电话"""
+        response = self.client.put(
+            "/api/users/me/",
+            data=json.dumps({"phone_display": "13900139000"}),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["phone_display"], "13900139000")
+
+    def test_update_real_name(self):
+        """测试更新真实姓名"""
+        response = self.client.put(
+            "/api/users/me/",
+            data=json.dumps({"real_name": "李四"}),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["real_name"], "李四")
+
+    def test_update_multiple_fields(self):
+        """测试同时更新多个字段"""
+        response = self.client.put(
+            "/api/users/me/",
+            data=json.dumps({
+                "address": "完整地址",
+                "phone_display": "13700137000",
+                "real_name": "王五",
+            }),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["address"], "完整地址")
+        self.assertEqual(data["phone_display"], "13700137000")
+        self.assertEqual(data["real_name"], "王五")
+
+    def test_update_without_auth(self):
+        """测试未认证无法更新"""
+        response = self.client.put(
+            "/api/users/me/",
+            data=json.dumps({"address": "新地址"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 401)
+
+
 # ── Product API tests ──────────────────────────────────────────────────────────
 
 class ProductListCreateTests(TestCase):

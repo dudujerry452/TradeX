@@ -5,6 +5,7 @@ import 'api.dart';
 import 'favorites_page.dart';
 import 'auth_manager.dart';
 import 'pages/order/order_list_page.dart';
+import 'pages/address/address_manage_page.dart';
 
 /// 我的页面 - 展示用户账户信息
 class ProfilePage extends StatefulWidget {
@@ -93,6 +94,20 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+
+  void _navigateToAddressManage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddressManagePage(),
+      ),
+    ).then((result) {
+      // 返回后刷新用户信息
+      if (result == true) {
+        _loadUserInfo();
+      }
+    });
   }
 
   // 功能菜单列表
@@ -714,6 +729,8 @@ class _ProfilePageState extends State<ProfilePage> {
       onTap: () {
         if (title == '我的收藏') {
           _navigateToFavorites();
+        } else if (title == '收货地址') {
+          _navigateToAddressManage();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('$title 功能开发中')),

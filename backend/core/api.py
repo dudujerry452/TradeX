@@ -332,6 +332,36 @@ def create_user(request, data: RegisterIn):
     return 201, user  # (状态码, ORM对象)，ninja 按 response={201: UserOut} 序列化
 
 
+class UserUpdateIn(Schema):
+    """更新用户信息输入"""
+    address: Optional[str] = None
+    phone_display: Optional[str] = None
+    real_name: Optional[str] = None
+
+
+@router.put("/users/me/", response=UserOut, tags=["用户"], summary="更新当前用户信息", auth=auth)
+def update_current_user(request, data: UserUpdateIn):
+    """更新当前登录用户的信息（收货地址、联系电话、真实姓名等）"""
+    user = request.auth
+
+    # 只更新提供的字段
+    update_fields = []
+    if data.address is not None:
+        user.address = data.address
+        update_fields.append("address")
+    if data.phone_display is not None:
+        user.phone_display = data.phone_display
+        update_fields.append("phone_display")
+    if data.real_name is not None:
+        user.real_name = data.real_name
+        update_fields.append("real_name")
+
+    if update_fields:
+        user.save(update_fields=update_fields)
+
+    return user
+
+
 @router.get("/users/{user_id}/", response=UserOut, tags=["用户"], summary="查询用户详情")
 def get_user(request, user_id: str):
     try:
