@@ -214,6 +214,7 @@ class ProductFavoriteIn(Schema):
 class RecommendationOut(Schema):
     product_id: str
     product_name: str
+    product_url: Optional[str] = None
     category: str
     description: str
     image_url: str
@@ -926,6 +927,7 @@ def rag_add_product(request, data: RagAddProductIn):
                     "price": data.price,
                     "desc": data.desc,
                     "category": data.category,
+                    "url": f"/product/{data.id}",
                 }
             ],
             ids=[data.id],
@@ -949,7 +951,15 @@ def rag_chat_stream(request, data: RagChatIn):
         raise HttpError(500, f"初始化向量库失败: {exc}")
     top_k = max(1, min(data.n_results, 10))
     res = collection.query(query_texts=[data.question], n_results=top_k)
-    products = (res.get("metadatas") or [[]])[0]
+    products = []
+    for item in (res.get("metadatas") or [[]])[0]:
+        if not item:
+            continue
+        product_item = dict(item)
+        product_id = product_item.get("id")
+        if product_id and not product_item.get("url"):
+            product_item["url"] = f"/product/{product_id}"
+        products.append(product_item)
 
     if not products:
         raise HttpError(404, "未检索到匹配商品，请先添加商品到知识库")
@@ -1124,6 +1134,7 @@ def personalized_recommendations(request, user_id: Optional[str] = None, limit: 
         data = {
             "product_id": p.product_id,
             "product_name": p.product_name,
+            "product_url": f"/product/{p.product_id}",
             "category": p.category,
             "description": p.description,
             "image_url": p.image_url,
@@ -1166,6 +1177,7 @@ def trending_recommendations(request, limit: int = 10, offset: int = 0):
         {
             "product_id": p.product_id,
             "product_name": p.product_name,
+            "product_url": f"/product/{p.product_id}",
             "category": p.category,
             "description": p.description,
             "image_url": p.image_url,
@@ -1206,6 +1218,7 @@ def similar_recommendations(request, product_id: str, limit: int = 5):
         data = {
             "product_id": p.product_id,
             "product_name": p.product_name,
+            "product_url": f"/product/{p.product_id}",
             "category": p.category,
             "description": p.description,
             "image_url": p.image_url,
