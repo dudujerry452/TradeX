@@ -1,11 +1,12 @@
 <script setup>
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { createProduct, getCategories } from '../config/api'
 import { uploadImage } from '../services/imageUpload'
 import { getUserId } from '../utils/auth'
 
 const router = useRouter()
+const imageInputRef = ref(null)
 
 const form = reactive({
   name: '',
@@ -41,14 +42,26 @@ const loadCategories = async () => {
   }
 }
 
-const pickImage = async () => {
+const pickImage = () => {
   if (form.uploadingImage) return
+
+  form.error = ''
+  imageInputRef.value?.click()
+}
+
+const handleImageChange = async (event) => {
+  const file = event.target.files?.[0]
+  event.target.value = ''
+
+  if (!file) {
+    return
+  }
 
   form.uploadingImage = true
   form.error = ''
 
   try {
-    const result = await uploadImage()
+    const result = await uploadImage(file)
     if (result.success) {
       form.uploadedImageUrl = result.url
     } else {
@@ -157,6 +170,7 @@ onMounted(() => {
           <span>选择后会直接上传到后端 COS 服务</span>
         </div>
       </div>
+      <input ref="imageInputRef" type="file" accept="image/*" class="hidden-file-input" @change="handleImageChange" />
 
       <form class="form-grid" @submit.prevent="submitForm">
         <label class="field">
@@ -251,6 +265,10 @@ onMounted(() => {
 .image-state strong {
   color: #11131f;
   font-size: 18px;
+}
+
+.hidden-file-input {
+  display: none;
 }
 
 .form-grid {
