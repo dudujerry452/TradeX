@@ -207,37 +207,45 @@ class Order(models.Model):
         CANCELED = 'CANCELED', '已取消'
 
     order_id = models.CharField(max_length=50, primary_key=True, verbose_name="订单ID")
-    
+
     # 买家用户ID：关联USER (USER ||--o{ ORDER 下单)
     buyer = models.ForeignKey(
-        User, 
-        on_delete=models.PROTECT, 
-        related_name='buy_orders', 
+        User,
+        on_delete=models.PROTECT,
+        related_name='buy_orders',
         verbose_name="买家"
     )
-    
+
     # 卖家用户ID：关联USER (USER ||--o{ ORDER 接单出货)
     seller = models.ForeignKey(
-        User, 
-        on_delete=models.PROTECT, 
-        related_name='sell_orders', 
+        User,
+        on_delete=models.PROTECT,
+        related_name='sell_orders',
         verbose_name="卖家"
     )
-    
+
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="订单总金额")
     address_snapshot = models.CharField(max_length=255, verbose_name="收货地址快照")
     phone_snapshot = models.CharField(max_length=20, verbose_name="联系电话快照")
-    
+
     order_status = models.CharField(
-        max_length=20, 
-        choices=StatusChoices.choices, 
-        default=StatusChoices.PENDING_PAY, 
+        max_length=20,
+        choices=StatusChoices.choices,
+        default=StatusChoices.PENDING_PAY,
         verbose_name="订单状态"
     )
-    
+
     order_time = models.DateTimeField(auto_now_add=True, verbose_name="下单时间")
     ship_time = models.DateTimeField(null=True, blank=True, verbose_name="出货时间")
     receive_time = models.DateTimeField(null=True, blank=True, verbose_name="收货时间")
+
+    # 新增物流相关字段
+    logistics_company = models.CharField(max_length=100, blank=True, verbose_name="物流公司")
+    logistics_number = models.CharField(max_length=100, blank=True, verbose_name="物流单号")
+    logistics_info = models.JSONField(default=dict, blank=True, verbose_name="物流信息快照")
+    cancel_reason = models.TextField(blank=True, verbose_name="取消原因")
+    pay_time = models.DateTimeField(null=True, blank=True, verbose_name="付款时间")
+    auto_receive_time = models.DateTimeField(null=True, blank=True, verbose_name="自动确认收货时间")
 
     class Meta:
         db_table = 'order'
@@ -246,6 +254,17 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.order_id}"
+
+    def can_transition_to(self, new_status):
+        """检查状态是否允许转换"""
+        valid_transitions = {
+            'PENDING_PAY': ['PENDING_SHIP', 'CANCELED'],
+            'PENDING_SHIP': ['SHIPPED', 'CANCELED'],
+            'SHIPPED': ['COMPLETED', 'CANCELED'],
+            'COMPLETED': [],
+            'CANCELED': [],
+        }
+        return new_status in valid_transitions.get(self.order_status, [])
 
 
 class OrderDetail(models.Model):
@@ -408,3 +427,82 @@ class ProductFavorite(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.product_name}"
+
+
+class OrderLog(models.Model):
+    """订单操作日志"""
+    class ActionChoices(models.TextChoices):
+        CREATE = 'CREATE', '创建订单'
+        PAY = 'PAY', '支付订单'
+        SHIP = 'SHIP', '卖家发货'
+        RECEIVE = 'RECEIVE', '确认收货'
+        CANCEL = 'CANCEL', '取消订单'
+        AUTO_COMPLETE = 'AUTO_COMPLETE', '自动完成'
+
+    log_id = models.CharField(max_length=50, primary_key=True, verbose_name="日志ID")
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='logs',
+        verbose_name="所属订单"
+    )
+    operator = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='order_logs',
+        verbose_name="操作人"
+    )
+    action = models.CharField(max_length=20, choices=ActionChoices.choices, verbose_name="操作类型")
+    from_status = models.CharField(max_length=20, null=True, blank=True, verbose_name="原状态")
+    to_status = models.CharField(max_length=20, verbose_name="新状态")
+    remark = models.TextField(blank=True, verbose_name="备注")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="操作时间")
+
+    class Meta:
+        db_table = 'order_log'
+        verbose_name = "订单操作日志"
+        verbose_name_plural = verbose_name
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Log {self.log_id} for Order {self.order_id}"
+
+
+class Notification(models.Model):
+    """用户通知"""
+    class TypeChoices(models.TextChoices):
+        ORDER = 'ORDER', '订单通知'
+        SYSTEM = 'SYSTEM', '系统通知'
+        MESSAGE = 'MESSAGE', '消息通知'
+
+    notification_id = models.CharField(max_length=50, primary_key=True, verbose_name="通知ID")
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        verbose_name="接收用户"
+    )
+    type = models.CharField(max_length=20, choices=TypeChoices.choices, verbose_name="通知类型")
+    title = models.CharField(max_length=200, verbose_name="通知标题")
+    content = models.TextField(verbose_name="通知内容")
+    related_order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='notifications',
+        verbose_name="关联订单"
+    )
+    is_read = models.BooleanField(default=False, verbose_name="是否已读")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        db_table = 'notification'
+        verbose_name = "用户通知"
+        verbose_name_plural = verbose_name
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Notification {self.notification_id} for {self.user.username}"

@@ -1,12 +1,27 @@
 import json
-
-from django.test import TestCase
+import jwt
+from datetime import datetime, timedelta
+from django.test import Client, TestCase
 from django.urls import reverse
+from django.conf import settings
 
-from .models import Product, User, Tag, ProductTag, UserTagPreference, ProductFavorite
+from .models import Product, User, Tag, ProductTag, UserTagPreference, ProductFavorite, Order, OrderDetail, OrderLog, Notification, Category
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
+
+JWT_SECRET = getattr(settings, 'SECRET_KEY', 'your-secret-key')
+
+
+def generate_token(user_id):
+    """生成测试用的 JWT Token"""
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.utcnow() + timedelta(days=30),
+        "iat": datetime.utcnow(),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
 
 def make_user(**kwargs):
     defaults = dict(
@@ -17,7 +32,7 @@ def make_user(**kwargs):
         real_name="张三",
         id_card="110101199001011234",
         phone="13800000000",
-        phone_display=None, 
+        phone_display=None,
         address="北京市朝阳区",
     )
     defaults.update(kwargs)
@@ -1031,3 +1046,366 @@ class UserTagPreferenceOnFavoriteTests(TestCase):
         # 验证分数不超过10.0 (9.8 + 0.5 = 10.3, 但上限为10.0)
         tag1_pref = UserTagPreference.objects.get(user=self.user, tag=self.tag1)
         self.assertEqual(tag1_pref.score, 10.0)
+
+
+# ── 订单系统测试 ───────────────────────────────────────────────────────────────
+
+class OrderAPITests(TestCase):
+    """订单系统API测试"""
+
+    def setUp(self):
+        self.buyer = make_user(user_id="u_buyer", username="buyer", email="buyer@test.com", id_card="110101199001011111", phone="13800000001")
+        self.seller = make_user(user_id="u_seller", username="seller", email="seller@test.com", id_card="110101199001011112", phone="13800000002")
+        self.product = make_product(
+            self.seller,
+            product_id="p_order001",
+            product_name="测试商品",
+            price="100.00",
+            stock=10,
+            product_status=Product.StatusChoices.APPROVED,
+        )
+        # 生成认证token
+        self.buyer_token = generate_token(self.buyer.user_id)
+        self.seller_token = generate_token(self.seller.user_id)
+        self.buyer_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.buyer_token}"}
+        self.seller_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.seller_token}"}
+
+    def test_create_order(self):
+        """测试创建订单"""
+        payload = {
+            "product_id": "p_order001",
+            "quantity": 2,
+            "address": "北京市测试地址",
+            "phone": "13800138000",
+        }
+        response = self.client.post(
+            "/api/orders/",
+            data=json.dumps(payload),
+            content_type="application/json",
+            **self.buyer_headers,
+        )
+        self.assertEqual(response.status_code, 201)
+        data = response.json()
+        self.assertEqual(data["order_status"], "PENDING_PAY")
+        self.assertEqual(float(data["total_amount"]), 200.00)
+
+        # 验证库存减少
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock, 8)
+
+    def test_create_order_insufficient_stock(self):
+        """测试库存不足时无法创建订单"""
+        payload = {
+            "product_id": "p_order001",
+            "quantity": 100,  # 超过库存
+            "address": "北京市测试地址",
+            "phone": "13800138000",
+        }
+        response = self.client.post(
+            "/api/orders/",
+            data=json.dumps(payload),
+            content_type="application/json",
+            **self.buyer_headers,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("detail", response.json())
+
+    def test_list_orders(self):
+        """测试获取订单列表"""
+        # 先创建订单
+        order = Order.objects.create(
+            order_id="o001",
+            buyer=self.buyer,
+            seller=self.seller,
+            total_amount=100.00,
+            address_snapshot="测试地址",
+            phone_snapshot="13800138000",
+            order_status=Order.StatusChoices.PENDING_PAY,
+        )
+        OrderDetail.objects.create(
+            detail_id="od001",
+            order=order,
+            product=self.product,
+            quantity=1,
+            price_snapshot=100.00,
+            subtotal=100.00,
+        )
+
+        response = self.client.get("/api/orders/?role=buyer", **self.buyer_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["total"], 1)
+        self.assertEqual(len(data["orders"]), 1)
+
+    def test_order_status_filter(self):
+        """测试按状态筛选订单"""
+        # 创建不同状态的订单
+        for i, status in enumerate([Order.StatusChoices.PENDING_PAY, Order.StatusChoices.COMPLETED]):
+            order = Order.objects.create(
+                order_id=f"o_filter_{i}",
+                buyer=self.buyer,
+                seller=self.seller,
+                total_amount=100.00,
+                address_snapshot="测试地址",
+                phone_snapshot="13800138000",
+                order_status=status,
+            )
+            OrderDetail.objects.create(
+                detail_id=f"od_filter_{i}",
+                order=order,
+                product=self.product,
+                quantity=1,
+                price_snapshot=100.00,
+                subtotal=100.00,
+            )
+
+        response = self.client.get("/api/orders/?role=buyer&status=PENDING_PAY", **self.buyer_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["total"], 1)
+        self.assertEqual(data["orders"][0]["order_status"], "PENDING_PAY")
+
+
+class OrderLifecycleTests(TestCase):
+    """订单生命周期测试"""
+
+    def setUp(self):
+        self.buyer = make_user(user_id="u_buyer", username="buyer", email="buyer@test.com", id_card="110101199001011111", phone="13800000001")
+        self.seller = make_user(user_id="u_seller", username="seller", email="seller@test.com", id_card="110101199001011112", phone="13800000002")
+        self.product = make_product(
+            self.seller,
+            product_id="p_order001",
+            product_name="测试商品",
+            price="100.00",
+            stock=10,
+            product_status=Product.StatusChoices.APPROVED,
+        )
+        self.order = Order.objects.create(
+            order_id="o_lifecycle",
+            buyer=self.buyer,
+            seller=self.seller,
+            total_amount=100.00,
+            address_snapshot="测试地址",
+            phone_snapshot="13800138000",
+            order_status=Order.StatusChoices.PENDING_PAY,
+        )
+        OrderDetail.objects.create(
+            detail_id="od_lifecycle",
+            order=self.order,
+            product=self.product,
+            quantity=1,
+            price_snapshot=100.00,
+            subtotal=100.00,
+        )
+        # 生成认证token
+        self.buyer_token = generate_token(self.buyer.user_id)
+        self.seller_token = generate_token(self.seller.user_id)
+        self.buyer_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.buyer_token}"}
+        self.seller_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.seller_token}"}
+
+    def test_pay_order(self):
+        """测试支付订单"""
+        response = self.client.post(
+            f"/api/orders/{self.order.order_id}/pay/",
+            data=json.dumps({"payment_method": "mock"}),
+            content_type="application/json",
+            **self.buyer_headers,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["order_status"], "PENDING_SHIP")
+        self.assertIsNotNone(data["pay_time"])
+
+    def test_ship_order(self):
+        """测试卖家发货"""
+        # 先将订单状态改为已支付
+        self.order.order_status = Order.StatusChoices.PENDING_SHIP
+        self.order.save()
+
+        response = self.client.post(
+            f"/api/orders/{self.order.order_id}/ship/",
+            data=json.dumps({
+                "logistics_company": "顺丰速运",
+                "logistics_number": "SF1234567890",
+            }),
+            content_type="application/json",
+            **self.seller_headers,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["order_status"], "SHIPPED")
+        self.assertEqual(data["logistics_company"], "顺丰速运")
+        self.assertEqual(data["logistics_number"], "SF1234567890")
+
+    def test_receive_order(self):
+        """测试确认收货"""
+        # 先将订单状态改为已发货
+        self.order.order_status = Order.StatusChoices.SHIPPED
+        self.order.save()
+
+        initial_sales = self.product.sales_count
+
+        response = self.client.post(f"/api/orders/{self.order.order_id}/receive/", **self.buyer_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["order_status"], "COMPLETED")
+        self.assertIsNotNone(data["receive_time"])
+
+        # 验证商品销量增加
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.sales_count, initial_sales + 1)
+
+    def test_cancel_order(self):
+        """测试取消订单"""
+        initial_stock = self.product.stock
+
+        response = self.client.post(
+            f"/api/orders/{self.order.order_id}/cancel/",
+            data=json.dumps({"reason": "不想要了"}),
+            content_type="application/json",
+            **self.buyer_headers,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["order_status"], "CANCELED")
+
+        # 验证库存恢复
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock, initial_stock + 1)
+
+
+class OrderLogTests(TestCase):
+    """订单日志测试"""
+
+    def setUp(self):
+        self.buyer = make_user(user_id="u_buyer", username="buyer", email="buyer@test.com", id_card="110101199001011111", phone="13800000001")
+        self.seller = make_user(user_id="u_seller", username="seller", email="seller@test.com", id_card="110101199001011112", phone="13800000002")
+        self.product = make_product(self.seller, product_id="p_order001", product_name="测试商品")
+        self.order = Order.objects.create(
+            order_id="o_log",
+            buyer=self.buyer,
+            seller=self.seller,
+            total_amount=100.00,
+            address_snapshot="测试地址",
+            phone_snapshot="13800138000",
+            order_status=Order.StatusChoices.PENDING_PAY,
+        )
+        # 生成认证token
+        self.buyer_token = generate_token(self.buyer.user_id)
+        self.buyer_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.buyer_token}"}
+
+    def test_get_order_logs(self):
+        """测试获取订单日志"""
+        # 创建日志
+        OrderLog.objects.create(
+            log_id="ol001",
+            order=self.order,
+            operator=self.buyer,
+            action=OrderLog.ActionChoices.CREATE,
+            to_status=Order.StatusChoices.PENDING_PAY,
+            remark="创建订单",
+        )
+        OrderLog.objects.create(
+            log_id="ol002",
+            order=self.order,
+            operator=self.buyer,
+            action=OrderLog.ActionChoices.PAY,
+            from_status=Order.StatusChoices.PENDING_PAY,
+            to_status=Order.StatusChoices.PENDING_SHIP,
+            remark="支付订单",
+        )
+
+        response = self.client.get(f"/api/orders/{self.order.order_id}/logs/", **self.buyer_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 2)
+
+
+# ── 通知系统测试 ───────────────────────────────────────────────────────────────
+
+class NotificationAPITests(TestCase):
+    """通知系统API测试"""
+
+    def setUp(self):
+        self.user = make_user()
+        self.notification1 = Notification.objects.create(
+            notification_id="n001",
+            user=self.user,
+            type=Notification.TypeChoices.ORDER,
+            title="测试通知1",
+            content="这是测试通知内容1",
+            is_read=False,
+        )
+        self.notification2 = Notification.objects.create(
+            notification_id="n002",
+            user=self.user,
+            type=Notification.TypeChoices.SYSTEM,
+            title="测试通知2",
+            content="这是测试通知内容2",
+            is_read=True,
+        )
+        self.notification3 = Notification.objects.create(
+            notification_id="n003",
+            user=self.user,
+            type=Notification.TypeChoices.ORDER,
+            title="测试通知3",
+            content="这是测试通知内容3",
+            is_read=False,
+        )
+        # 生成认证token
+        self.user_token = generate_token(self.user.user_id)
+        self.user_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.user_token}"}
+
+    def test_list_notifications(self):
+        """测试获取通知列表"""
+        response = self.client.get("/api/notifications/", **self.user_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 3)
+
+    def test_list_notifications_with_read_filter(self):
+        """测试按已读状态筛选通知"""
+        response = self.client.get("/api/notifications/?is_read=false", **self.user_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 2)
+        for notif in data:
+            self.assertFalse(notif["is_read"])
+
+    def test_get_unread_count(self):
+        """测试获取未读通知数量"""
+        response = self.client.get("/api/notifications/unread-count/", **self.user_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 2)
+
+    def test_mark_notification_read(self):
+        """测试标记通知为已读"""
+        response = self.client.post(f"/api/notifications/{self.notification1.notification_id}/read/", **self.user_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+
+        # 验证数据库已更新
+        self.notification1.refresh_from_db()
+        self.assertTrue(self.notification1.is_read)
+
+    def test_mark_all_notifications_read(self):
+        """测试标记所有通知为已读"""
+        response = self.client.post("/api/notifications/read-all/", **self.user_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+
+        # 验证所有通知已读
+        self.assertEqual(Notification.objects.filter(user=self.user, is_read=False).count(), 0)
+
+    def test_delete_notification(self):
+        """测试删除通知"""
+        response = self.client.delete(f"/api/notifications/{self.notification1.notification_id}/", **self.user_headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+
+        # 验证通知已删除
+        self.assertFalse(Notification.objects.filter(notification_id="n001").exists())
