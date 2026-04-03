@@ -16,19 +16,37 @@ const chooseLocalImageFile = () =>
     input.accept = 'image/*'
     input.style.display = 'none'
 
+    let settled = false
+
+    const resolveOnce = (file) => {
+      if (settled) return
+      settled = true
+      cleanup()
+      resolve(file || null)
+    }
+
     const cleanup = () => {
+      window.removeEventListener('focus', handleWindowFocus)
+      input.removeEventListener('change', handleChange)
       input.value = ''
       input.remove()
     }
 
-    input.addEventListener('change', () => {
+    const handleChange = () => {
       const file = input.files?.[0]
-      cleanup()
-      resolve(file || null)
-    })
+      resolveOnce(file || null)
+    }
+
+    const handleWindowFocus = () => {
+      resolveOnce(input.files?.[0] || null)
+    }
+
+    input.addEventListener('change', handleChange)
 
     document.body.appendChild(input)
     input.click()
+
+    window.addEventListener('focus', handleWindowFocus, { once: true })
   })
 
 export const uploadImage = async () => {
