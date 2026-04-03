@@ -218,19 +218,26 @@ onMounted(() => {
 }
 
 .image-box {
-  min-height: 240px;
+  height: 220px;
+  max-height: 220px;
   border-radius: 18px;
   overflow: hidden;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, rgba(206, 150, 91, 0.08), rgba(17, 19, 31, 0.04));
   cursor: pointer;
+  padding: 14px;
 }
 
 .image-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 14px;
 }
 
 .image-state {
@@ -238,6 +245,7 @@ onMounted(() => {
   gap: 6px;
   text-align: center;
   color: var(--text-muted);
+  padding: 0 16px;
 }
 
 .image-state strong {
