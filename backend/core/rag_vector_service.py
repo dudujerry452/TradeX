@@ -47,6 +47,7 @@ def _to_float(value: Decimal | float | int) -> float:
 
 
 def build_product_payload(product: Product):
+    product_url = f"/product/{product.product_id}"
     text = build_product_document(
         name=product.product_name,
         category=product.category,
@@ -59,6 +60,7 @@ def build_product_payload(product: Product):
         "price": _to_float(product.price),
         "desc": product.description,
         "category": product.category,
+        "url": product_url,
     }
     return product.product_id, text, metadata
 
