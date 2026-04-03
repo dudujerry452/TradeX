@@ -16,60 +16,42 @@ const chooseLocalImageFile = () =>
     input.accept = 'image/*'
     input.style.display = 'none'
 
-    let settled = false
-
-    const resolveOnce = (file) => {
-      if (settled) return
-      settled = true
-      cleanup()
-      resolve(file || null)
-    }
-
     const cleanup = () => {
-      window.removeEventListener('focus', handleWindowFocus)
-      input.removeEventListener('change', handleChange)
       input.value = ''
       input.remove()
     }
 
-    const handleChange = () => {
+    input.addEventListener('change', () => {
       const file = input.files?.[0]
-      resolveOnce(file || null)
-    }
-
-    const handleWindowFocus = () => {
-      resolveOnce(input.files?.[0] || null)
-    }
-
-    input.addEventListener('change', handleChange)
+      cleanup()
+      resolve(file || null)
+    })
 
     document.body.appendChild(input)
     input.click()
-
-    window.addEventListener('focus', handleWindowFocus, { once: true })
   })
 
-export const uploadImage = async () => {
+export const uploadImage = async (file) => {
   const token = await getToken()
   if (!token) {
     return { success: false, message: '请先登录' }
   }
 
-  const file = await chooseLocalImageFile()
-  if (!file) {
+  const selectedFile = file || (await chooseLocalImageFile())
+  if (!selectedFile) {
     return { success: false, message: '未选择图片' }
   }
 
-  if (!ALLOWED_TYPES.has(file.type)) {
+  if (!ALLOWED_TYPES.has(selectedFile.type)) {
     return { success: false, message: '仅支持 jpeg、png、webp、gif 图片' }
   }
 
-  if (file.size > MAX_UPLOAD_SIZE) {
+  if (selectedFile.size > MAX_UPLOAD_SIZE) {
     return { success: false, message: '图片大小不能超过 10MB' }
   }
 
   const formData = new FormData()
-  formData.append('file', file, file.name || 'image.jpg')
+  formData.append('file', selectedFile, selectedFile.name || 'image.jpg')
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/uploads/image/`, {
@@ -93,7 +75,7 @@ export const uploadImage = async () => {
       success: true,
       url: payload.url || '',
       key: payload.key || '',
-      filename: payload.filename || file.name || 'image.jpg',
+      filename: payload.filename || selectedFile.name || 'image.jpg',
     }
   } catch (error) {
     return {
