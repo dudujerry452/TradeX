@@ -1107,13 +1107,13 @@ def get_trending_recommendations(limit=10):
     ).order_by('-trending_score')[:limit]
 
 
-def get_personalized_recommendations(user_id, limit=10):
+def get_personalized_recommendations(user_id, limit=10, exclude_product_ids=None):
     """获取个性化推荐商品
 
     基于用户标签偏好的推荐算法
     1. 获取用户标签偏好（score排序）
     2. 基于偏好标签找商品（包含已收藏）
-    3. 无偏好时返回热门推荐
+    3. 无偏好时返回空QuerySet
     """
     # 获取用户标签偏好（score排序）
     user_prefs = UserTagPreference.objects.filter(
@@ -1124,12 +1124,19 @@ def get_personalized_recommendations(user_id, limit=10):
         # 基于偏好标签找商品（包含已收藏）
         preferred_tags = [p.tag for p in user_prefs]
 
-        # 使用聚合计算商品的相关度分数
-        # 相关度 = sum(商品标签权重 * 用户标签偏好分数)
-        recommended = Product.objects.filter(
+        # 构建基础查询
+        queryset = Product.objects.filter(
             product_tags__tag__in=preferred_tags,
             product_status='APPROVED'
-        ).annotate(
+        )
+
+        # 排除指定商品ID
+        if exclude_product_ids:
+            queryset = queryset.exclude(product_id__in=exclude_product_ids)
+
+        # 使用聚合计算商品的相关度分数
+        # 相关度 = sum(商品标签权重 * 用户标签偏好分数)
+        recommended = queryset.annotate(
             relevance=Sum(
                 F('product_tags__weight') * F('product_tags__tag__user_preferences__score'),
                 filter=Q(product_tags__tag__user_preferences__user_id=user_id)
@@ -1138,8 +1145,71 @@ def get_personalized_recommendations(user_id, limit=10):
 
         return recommended
 
-    # 无偏好时返回热门推荐
-    return get_trending_recommendations(limit)
+    # 无偏好时返回空QuerySet
+    return Product.objects.none()
+
+
+def get_mixed_recommendations(user_id, limit=10, offset=0):
+    """获取混合推荐（偏好+热门）
+
+    策略：
+    1. 优先返回个性化推荐商品（带relevance分数）
+    2. 个性化不足时用热门推荐补充
+    3. 支持分页
+    """
+    result = []
+    personalized_count = 0
+
+    # 获取用户已收藏的商品ID（用于排除）
+    favorited_ids = set(
+        ProductFavorite.objects.filter(
+            user__user_id=user_id
+        ).values_list('product__product_id', flat=True)
+    )
+
+    # 1. 获取个性化推荐（排除已收藏）
+    personalized = list(get_personalized_recommendations(
+        user_id,
+        limit=limit + offset,
+        exclude_product_ids=favorited_ids
+    ))
+
+    # 2. 如果offset在个性化范围内，从个性化开始取
+    if offset < len(personalized):
+        # 从个性化中取一部分
+        start_idx = offset
+        end_idx = min(offset + limit, len(personalized))
+        result.extend(personalized[start_idx:end_idx])
+        personalized_count = len(result)
+
+    # 3. 如果个性化不足，用热门推荐补充
+    remaining = limit - len(result)
+    if remaining > 0:
+        # 计算需要从热门中取的offset
+        # 如果offset超过了个性化数量，热门需要跳过前面的
+        trending_offset = max(0, offset - len(personalized))
+
+        # 获取热门推荐，排除已收藏和已在个性化中的商品
+        personalized_ids = {p.product_id for p in personalized}
+        exclude_ids = favorited_ids | personalized_ids
+
+        # 直接构建QuerySet（不调用get_trending_recommendations，因为它已经切片了）
+        trending = Product.objects.filter(
+            product_status='APPROVED'
+        ).exclude(
+            product_id__in=exclude_ids
+        ).annotate(
+            trending_score=F('view_count') * 0.2 +
+                          F('sales_count') * 0.3 +
+                          F('favorite_count') * 0.3 +
+                          F('avg_rating') * 20 * 0.2
+        ).order_by('-trending_score')
+
+        # 切片获取需要的部分
+        trending_list = list(trending[trending_offset:trending_offset + remaining])
+        result.extend(trending_list)
+
+    return result, personalized_count
 
 
 def get_similar_products(product_id, limit=5):
@@ -1178,24 +1248,23 @@ def get_similar_products(product_id, limit=5):
 def personalized_recommendations(request, user_id: Optional[str] = None, limit: int = 10, offset: int = 0):
     """获取个性化推荐商品（支持分页）
 
-    - 已登录用户：基于标签偏好推荐
+    - 已登录用户：基于标签偏好推荐，不足时用热门补充
     - 未登录用户（无user_id）：返回热门推荐
     - 支持offset分页
     - 返回包含is_favorited字段标记是否已收藏
     """
-    # 获取推荐商品
+    # 获取推荐商品（混合偏好+热门）
     if user_id:
         try:
             User.objects.get(user_id=user_id)
-            # 获取更多数据用于分页
-            products = list(get_personalized_recommendations(user_id, limit + offset))
+            # 获取混合推荐（偏好+热门）
+            paginated_products, personalized_count = get_mixed_recommendations(user_id, limit, offset)
         except User.DoesNotExist:
-            products = list(get_trending_recommendations(limit + offset))
+            paginated_products = list(get_trending_recommendations(limit + offset)[offset:offset + limit])
+            personalized_count = 0
     else:
-        products = list(get_trending_recommendations(limit + offset))
-
-    # 分页切片
-    paginated_products = products[offset:offset + limit]
+        paginated_products = list(get_trending_recommendations(limit + offset)[offset:offset + limit])
+        personalized_count = 0
 
     # 获取用户收藏的商品ID集合（用于标记）
     favorited_product_ids = set()
@@ -1246,6 +1315,14 @@ def trending_recommendations(request, limit: int = 10, offset: int = 0):
 
     基于浏览量、销量、收藏数和评分的综合热度排序
     """
+    # 负offset返回空列表
+    if offset < 0:
+        return []
+
+    # 限制最大返回数量，防止内存问题
+    if limit > 100:
+        limit = 100
+
     # 获取更多数据用于分页
     products = list(get_trending_recommendations(limit + offset))
     # 分页切片
