@@ -229,6 +229,7 @@ class RecommendationOut(Schema):
     favorite_count: int
     avg_rating: float
     relevance_score: Optional[float] = None  # 推荐相关度分数
+    trending_score: Optional[float] = None  # 热度评分
     is_favorited: Optional[bool] = None  # 当前用户是否已收藏
 
 
@@ -571,6 +572,14 @@ def search_products(
     # 如果有token，可以在这里添加个性化排序逻辑（预留）
     # TODO: 根据token解析用户ID，按用户偏好排序
 
+    # 添加热度分计算并排序
+    products = products.annotate(
+        trending_score=F('view_count') * 0.2 +
+                      F('sales_count') * 0.3 +
+                      F('favorite_count') * 0.3 +
+                      F('avg_rating') * 20 * 0.2
+    ).order_by('-trending_score')
+
     # 分页
     paginated = products[offset:offset + limit]
 
@@ -611,6 +620,7 @@ def search_products(
             "sales_count": p.sales_count,
             "favorite_count": p.favorite_count,
             "avg_rating": p.avg_rating,
+            "trending_score": float(getattr(p, 'trending_score', 0)),
             "is_favorited": p.product_id in favorited_product_ids,
         }
         result.append(data)
@@ -1134,13 +1144,18 @@ def get_personalized_recommendations(user_id, limit=10, exclude_product_ids=None
         if exclude_product_ids:
             queryset = queryset.exclude(product_id__in=exclude_product_ids)
 
-        # 使用聚合计算商品的相关度分数
+        # 使用聚合计算商品的相关度分数和热度分数
         # 相关度 = sum(商品标签权重 * 用户标签偏好分数)
+        # 热度分 = 浏览量×0.2 + 销量×0.3 + 收藏数×0.3 + 评分×4
         recommended = queryset.annotate(
             relevance=Sum(
                 F('product_tags__weight') * F('product_tags__tag__user_preferences__score'),
                 filter=Q(product_tags__tag__user_preferences__user_id=user_id)
-            )
+            ),
+            trending_score=F('view_count') * 0.2 +
+                          F('sales_count') * 0.3 +
+                          F('favorite_count') * 0.3 +
+                          F('avg_rating') * 20 * 0.2
         ).order_by('-relevance').distinct()[:limit]
 
         return recommended
@@ -1296,8 +1311,13 @@ def personalized_recommendations(request, user_id: Optional[str] = None, limit: 
             "is_favorited": p.product_id in favorited_product_ids if user_id else False,
         }
         # 添加相关度分数（如果有）
-        if hasattr(p, 'relevance') and p.relevance is not None:
-            data["relevance_score"] = float(p.relevance)
+        relevance = getattr(p, 'relevance', None)
+        if relevance is not None:
+            data["relevance_score"] = float(relevance)
+        # 添加热度分数（如果有）
+        trending_score = getattr(p, 'trending_score', None)
+        if trending_score is not None:
+            data["trending_score"] = float(trending_score)
         result.append(data)
 
     return result
@@ -1344,6 +1364,9 @@ def trending_recommendations(request, limit: int = 10, offset: int = 0):
             "sales_count": p.sales_count,
             "favorite_count": p.favorite_count,
             "avg_rating": p.avg_rating,
+            "relevance_score": None,  # 热门推荐没有相关度分数
+            "trending_score": float(getattr(p, 'trending_score', 0)),
+            "is_favorited": None,  # 热门接口不返回收藏状态
         }
         for p in paginated_products
     ]

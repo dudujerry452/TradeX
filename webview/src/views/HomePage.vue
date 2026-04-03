@@ -395,7 +395,12 @@ onBeforeUnmount(() => {
               <div class="product-body">
                 <div class="product-topline">
                   <h4>{{ item.product_name }}</h4>
-                  <span class="price">¥{{ Number(item.price || 0).toFixed(2) }}</span>
+                  <div class="price-line">
+                    <span class="price">¥{{ Number(item.price || 0).toFixed(2) }}</span>
+                    <span v-if="item.relevance_score != null" class="relevance-debug" title="DEBUG: 用户关联度评分">
+                      [R:{{ Number(item.relevance_score).toFixed(2) }}]
+                    </span>
+                  </div>
                 </div>
                 <p class="product-meta">{{ item.category }} · 库存 {{ item.stock }}</p>
                 <p class="product-desc">{{ item.description }}</p>
@@ -768,10 +773,22 @@ onBeforeUnmount(() => {
   gap: 10px;
 }
 
-.product-topline h4 {
-  font-size: 17px;
-  line-height: 1.35;
-  font-weight: 800;
+.price-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.relevance-debug {
+  font-size: 11px;
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 600;
+  cursor: help;
 }
 
 .product-meta {

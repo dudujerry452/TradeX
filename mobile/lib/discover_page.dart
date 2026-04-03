@@ -801,11 +801,17 @@ class _DiscoverPageState extends State<DiscoverPage>
 
   /// 商品卡片
   Widget _buildProductCard(dynamic product) {
+    // DEBUG: 打印原始数据
+    print('DEBUG product: ${product['product_name']} keys=${product.keys.toList()}');
+
     final productName = product['product_name'] ?? '未知商品';
     final price = product['price'] ?? 0.0;
     final imageUrl = product['image_url'] ?? '';
     final category = product['category'] ?? '其他';
     final isFavorited = product['is_favorited'] ?? false;
+    final relevanceScore = product['relevance_score'];
+    final trendingScore = product['trending_score'];
+    print('DEBUG trendingScore=$trendingScore');
 
     return GestureDetector(
       onTap: () {
@@ -916,6 +922,61 @@ class _DiscoverPageState extends State<DiscoverPage>
                             color: Color(0xFFCE965B),
                           ),
                         ),
+                        // DEBUG: 用户关联度评分
+                        if (relevanceScore != null)
+                          Container(
+                            margin: const EdgeInsets.only(left: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: Colors.red.shade200,
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Text(
+                              '[R:${relevanceScore.toStringAsFixed(2)}]',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red.shade600,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ),
+                        // DEBUG: 热度评分
+                        if (trendingScore != null)
+                          Container(
+                            margin: const EdgeInsets.only(left: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade50,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: Colors.orange.shade200,
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Text(
+                              '[H:${trendingScore.toStringAsFixed(0)}]',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.orange.shade600,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ),
+                        // DEBUG: 打印到控制台
+                        if (trendingScore == null)
+                          Text('NO-H', style: TextStyle(fontSize: 8, color: Colors.grey)),
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(
