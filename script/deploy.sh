@@ -1,3 +1,6 @@
+
+# 要求服务器在~下有venv
+
 dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 now=$(date +"%Y%m%d%H%M%S")
 
@@ -6,7 +9,9 @@ cd ${dir}/../
 tar zcvf backend_${now}.tar.gz ./backend
 
 scp backend_${now}.tar.gz cloud:~/
-scp deploy-config.json cloud:~/
+rm backend_${now}.tar.gz 
+scp deploy-config.json* cloud:~/
+scp -r script cloud:~/
 
 ssh cloud << EOF
 rm backend
@@ -16,7 +21,7 @@ ln -s backend_${now} backend
 
 source venv/bin/activate
 
-python3 backend/generate_env.py
+bash script/switch-config.sh development
 
 rm backend/db.sqlite3
 rm -rf backend/vector_db/*
