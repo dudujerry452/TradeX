@@ -21,7 +21,7 @@ from .common import (
 router = Router()
 
 
-@router.post("/login", response=LoginOut, tags=["认证"], summary="用户登录",
+@router.post("", response=LoginOut, tags=["认证"], summary="用户登录",
              auth=None)  # auth=None 明确标记无需鉴权
 def login(request, data: LoginIn):
     """验证用户名和密码，返回基本用户信息。
