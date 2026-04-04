@@ -17,6 +17,10 @@ erDiagram
     TAG ||--o{ USER_TAG_PREFERENCE : "被偏好"
     USER ||--o{ PRODUCT_FAVORITE : "收藏"
     PRODUCT ||--o{ PRODUCT_FAVORITE : "被收藏"
+    ORDER ||--o{ ORDER_LOG : "记录"
+    USER ||--o{ ORDER_LOG : "操作"
+    USER ||--o{ NOTIFICATION : "接收"
+    CATEGORY ||--o{ PRODUCT : "包含"
 
     %% ------------------------------ 实体与属性定义 ------------------------------
     USER {
@@ -78,10 +82,15 @@ erDiagram
         decimal total_amount "订单总金额"
         string address_snapshot "收货地址快照"
         string phone_snapshot "联系电话快照"
-        string order_status "订单状态（枚举：待付款/已付款待出货/已出货待收货/已收货交易完成/已取消）"
+        string order_status "订单状态（枚举：待付款/待发货/已发货/已完成/已取消）"
         datetime order_time "下单时间"
-        datetime ship_time "出货时间"
+        datetime pay_time "付款时间"
+        datetime ship_time "发货时间"
         datetime receive_time "收货时间"
+        datetime auto_receive_time "自动确认收货时间"
+        string logistics_company "物流公司"
+        string logistics_number "物流单号"
+        string cancel_reason "取消原因"
     }
 
     ORDER_DETAIL {
@@ -129,4 +138,34 @@ erDiagram
         string user_id FK "用户ID（外键，关联USER.user_id）"
         string product_id FK "商品ID（外键，关联PRODUCT.product_id）"
         datetime favorited_time "收藏时间"
+    }
+
+    CATEGORY {
+        string category_id PK "分类ID（主键）"
+        string name "分类名称"
+        string description "分类描述"
+        int sort_order "排序序号"
+        bool is_active "是否启用"
+    }
+
+    ORDER_LOG {
+        string log_id PK "日志ID（主键）"
+        string order_id FK "订单ID（外键，关联ORDER.order_id）"
+        string operator_id FK "操作人ID（外键，关联USER.user_id）"
+        string action "操作类型（CREATE/PAY/SHIP/RECEIVE/CANCEL）"
+        string from_status "原状态"
+        string to_status "新状态"
+        string remark "备注"
+        datetime created_at "操作时间"
+    }
+
+    NOTIFICATION {
+        string notification_id PK "通知ID（主键）"
+        string user_id FK "用户ID（外键，关联USER.user_id）"
+        string type "通知类型（ORDER/SYSTEM/MESSAGE）"
+        string title "标题"
+        string content "内容"
+        string related_order_id FK "关联订单ID"
+        bool is_read "是否已读"
+        datetime created_at "创建时间"
     }
