@@ -23,3 +23,7 @@ Contributors: dudujerry452(周致远) Junhan327(刘俊涵) morose098(李子豪) 
 
 见开发手册
 
+# 注意
+
+脚本系统要求必须先生成deploy-config.json才能进行后续部署!!
+

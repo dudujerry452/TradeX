@@ -4,6 +4,7 @@
 支持三个级别: local / development / production
 """
 
+import argparse
 import json
 import re
 from pathlib import Path
@@ -101,13 +102,17 @@ def get_config_for_environment(env: str, api_url: str) -> dict:
 
 
 def main():
+    parser = argparse.ArgumentParser(description="生成 .env 文件")
+    parser.add_argument("-f", "--force", action="store_true", help="强制覆盖已存在的文件")
+    args = parser.parse_args()
+
     backend_dir = Path(__file__).parent
     root_dir = backend_dir.parent
 
     # 读取 deploy-config.json
     config_path = root_dir / "deploy-config.json"
     if not config_path.exists():
-        print(f"❌ 错误: 未找到 {config_path}")
+        print(f"[错误] 未找到 {config_path}")
         return 1
 
     with open(config_path, "r", encoding="utf-8") as f:
@@ -120,8 +125,18 @@ def main():
     try:
         cfg = get_config_for_environment(environment, api_url)
     except ValueError as e:
-        print(f"❌ {e}")
+        print(f"[错误] {e}")
         return 1
+
+    # 根据环境决定文件名
+    env_filename = f".env.{environment}"
+    env_path = backend_dir / env_filename
+
+    # 检查文件是否已存在
+    if env_path.exists() and not args.force:
+        print(f"[提示] {env_filename} 已存在，跳过生成")
+        print(f"如需覆盖，请使用: python {Path(__file__).name} -f")
+        return 0
 
     # 生成 .env 内容
     env_content = f"""# 由 deploy-config.json 自动生成
@@ -161,30 +176,27 @@ TIME_ZONE=Asia/Shanghai
 LANGUAGE_CODE=zh-hans
 """
 
-    # 根据环境决定文件名
-    env_filename = f".env.{environment}"
-    env_path = backend_dir / env_filename
-
     with open(env_path, "w", encoding="utf-8") as f:
         f.write(env_content)
 
-    print(f"✅ 已生成 {env_filename}")
-    print(f"   级别: {environment}")
-    print(f"   说明: {cfg['description']}")
-    print(f"   API: {api_url}")
-    print(f"   DEBUG: {cfg['debug']}")
-    print(f"   CORS: {'允许所有' if cfg['cors_allow_all'] == 'True' else '受限'}")
-    print(f"   ALLOWED_HOSTS: {cfg['allowed_hosts']}")
+    action = "已覆盖" if args.force else "已生成"
+    print(f"[{action}] {env_filename}")
+    print(f"    级别: {environment}")
+    print(f"    说明: {cfg['description']}")
+    print(f"    API: {api_url}")
+    print(f"    DEBUG: {cfg['debug']}")
+    print(f"    CORS: {'允许所有' if cfg['cors_allow_all'] == 'True' else '受限'}")
+    print(f"    ALLOWED_HOSTS: {cfg['allowed_hosts']}")
 
     # 提示
     if environment == "local":
-        print(f"\n💡 运行: python manage.py runserver")
+        print(f"\n运行: python manage.py runserver")
     elif environment == "development":
-        print(f"\n💡 运行: DJANGO_ENV=development python manage.py runserver 0.0.0.0:{cfg['port']}")
-        print(f"   Flutter: flutter run -d chrome --dart-define=API_BASE_URL={api_url}")
+        print(f"\n运行: DJANGO_ENV=development python manage.py runserver 0.0.0.0:{cfg['port']}")
+        print(f"    Flutter: flutter run -d chrome --dart-define=API_BASE_URL={api_url}")
     elif environment == "production":
-        print(f"\n⚠️  生产环境请使用 gunicorn:")
-        print(f"   DJANGO_ENV=production gunicorn -b 0.0.0.0:{cfg['port']} tradeX.wsgi:application")
+        print(f"\n生产环境请使用 gunicorn:")
+        print(f"    DJANGO_ENV=production gunicorn -b 0.0.0.0:{cfg['port']} tradeX.wsgi:application")
 
     return 0
 

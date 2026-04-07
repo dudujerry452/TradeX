@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 # 要求服务器在~下有venv
 

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # 从 deploy-config.json 读取配置并运行 Flutter Web
 
 dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
