@@ -5,6 +5,7 @@ db.sqlite3
 .envrc.local
 .env
 .env.production
+.env.development
 .env.local
 backend/.env
 backend/.env.production

@@ -139,6 +139,12 @@ DATABASE_URL=sqlite:///db.sqlite3
 OPENROUTER_API_KEY=
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 
+# 腾讯云COS图床配置
+COS_SECRET_ID=
+COS_SECRET_KEY=
+COS_REGION=ap-nanjing
+COS_BUCKET=
+
 # CORS配置: {'允许所有来源' if cfg['cors_allow_all'] == 'True' else '限制特定域名'}
 CORS_ALLOW_ALL_ORIGINS={cfg['cors_allow_all']}
 CORS_ALLOWED_ORIGINS={cfg['cors_origins']}
