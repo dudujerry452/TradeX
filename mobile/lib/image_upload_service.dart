@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'api.dart';
@@ -13,6 +14,26 @@ import 'auth_manager.dart';
 /// 2. 上传到后端 /api/uploads/image/
 /// 3. 后端转存到腾讯云 COS，返回对象访问 URL
 class ImageUploadService {
+  /// 根据文件名获取对应的 MIME 类型
+  static MediaType? _getMediaTypeFromFilename(String filename) {
+    final ext = filename.split('.').last.toLowerCase();
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return MediaType('image', 'jpeg');
+      case 'png':
+        return MediaType('image', 'png');
+      case 'gif':
+        return MediaType('image', 'gif');
+      case 'webp':
+        return MediaType('image', 'webp');
+      case 'bmp':
+        return MediaType('image', 'bmp');
+      default:
+        return null;
+    }
+  }
+
   /// 上传图片到图床
   ///
   static Future<Map<String, dynamic>> uploadImage() async {
@@ -38,13 +59,17 @@ class ImageUploadService {
     }
 
     final uri = Uri.parse('${ApiService.baseUrl}/uploads/image/');
+    final filename = pickedFile.name.isNotEmpty ? pickedFile.name : 'image.jpg';
+    final contentType = _getMediaTypeFromFilename(filename);
+
     final request = http.MultipartRequest('POST', uri)
       ..headers['Authorization'] = 'Bearer $token'
       ..files.add(
         http.MultipartFile.fromBytes(
           'file',
           imageBytes,
-          filename: pickedFile.name.isNotEmpty ? pickedFile.name : 'image.jpg',
+          filename: filename,
+          contentType: contentType ?? MediaType('application', 'octet-stream'),
         ),
       );
 

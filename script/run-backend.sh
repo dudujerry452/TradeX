@@ -4,7 +4,7 @@ dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 cd ${dir}/../
 
-source venv/bin/activate || true
+source .venv/bin/activate || true
 
 ENVIR=$(cat deploy-config.json | jq -r '.environment')
 

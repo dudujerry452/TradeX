@@ -4,7 +4,7 @@ dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 cd ${dir}/../
 
-source venv/bin/activate || true
+source .venv/bin/activate || true
 
 rm backend/db.sqlite3
 rm -rf backend/vector_db/*

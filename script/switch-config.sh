@@ -7,7 +7,7 @@ cd ${dir}/../
 rm deploy-config.json 
 cp deploy-config.json.${1} deploy-config.json
 
-source venv/bin/activate || true
+source .venv/bin/activate || true
 
 cd backend && python3 generate_env.py
 

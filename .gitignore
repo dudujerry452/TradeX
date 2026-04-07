@@ -17,3 +17,4 @@ backend/media/
 *.key
 nginx/ssl/
 *.tar.gz
+deploy-config.json
