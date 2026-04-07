@@ -2,6 +2,7 @@
 core/api/rag.py — RAG AI相关接口
 """
 import json
+import re
 from ninja import Router
 from ninja.errors import HttpError
 from django.http import StreamingHttpResponse
@@ -12,6 +13,31 @@ from core.rag_vector_service import build_product_document, get_rag_collection
 from .common import RagAddProductIn, RagAddProductOut, RagChatIn
 
 router = Router()
+
+
+def _normalize_query_fragments(query):
+    query_text = str(query or "").strip().lower()
+    if not query_text:
+        return []
+
+    fragments = [part for part in re.split(r"[\s,，。\.、;；:：/|\\_\-\(\)\[\]{}<>]+", query_text) if part]
+    if query_text not in fragments:
+        fragments.append(query_text)
+    return fragments
+
+
+def _has_query_overlap(query, product_item):
+    haystack = " ".join(
+        str(product_item.get(field, "") or "")
+        for field in ("name", "category", "desc")
+    ).lower()
+    if not haystack.strip():
+        return False
+
+    for fragment in _normalize_query_fragments(query):
+        if fragment and fragment in haystack:
+            return True
+    return False
 
 
 @router.post(
@@ -67,19 +93,49 @@ def rag_chat_stream(request, data: RagChatIn):
         raise HttpError(500, f"初始化向量库失败: {exc}")
 
     top_k = max(1, min(data.n_results, 10))
-    res = collection.query(query_texts=[data.question], n_results=top_k)
+    max_distance = float(getattr(settings, "RAG_MAX_DISTANCE", 0.95))
+    res = collection.query(
+        query_texts=[data.question],
+        n_results=top_k,
+        include=["metadatas", "distances"],
+    )
+
+    metadatas = (res.get("metadatas") or [[]])[0]
+    distances = (res.get("distances") or [[]])[0]
+
     products = []
-    for item in (res.get("metadatas") or [[]])[0]:
+    for index, item in enumerate(metadatas):
         if not item:
             continue
         product_item = dict(item)
         product_id = product_item.get("id")
         if product_id and not product_item.get("url"):
             product_item["url"] = f"/product/{product_id}"
+        distance = distances[index] if index < len(distances) else None
+
+        is_relevant = False
+        if distance is not None:
+            try:
+                is_relevant = float(distance) <= max_distance
+            except (TypeError, ValueError):
+                is_relevant = False
+
+        if not is_relevant:
+            is_relevant = _has_query_overlap(data.question, product_item)
+
+        if not is_relevant:
+            continue
+
+        if distance is not None:
+            try:
+                product_item["distance"] = float(distance)
+            except (TypeError, ValueError):
+                pass
+
         products.append(product_item)
 
     if not products:
-        raise HttpError(404, "未检索到匹配商品，请先添加商品到知识库")
+        raise HttpError(404, "未检索到足够相关的商品，请尝试换个关键词")
 
     api_key = settings.OPENROUTER_API_KEY.strip()
     if not api_key:
