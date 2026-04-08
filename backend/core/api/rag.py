@@ -144,7 +144,7 @@ def rag_add_product(request, data: RagAddProductIn):
                     "price": data.price,
                     "desc": data.desc,
                     "category": data.category,
-                    "url": f"/product/{data.id}",
+                    "product_url": f"/product/{data.id}",
                 }
             ],
             ids=[data.id],
@@ -263,7 +263,7 @@ def rag_chat_stream(request, data: RagChatIn):
         "你是电商智能导购，只根据以下商品回答，不许编造。\n"
         f"商品信息：{products}\n"
         f"用户问题：{data.question}\n"
-        "请自然语言回答，并推荐商品。"
+        "请自然语言回答，重点说明推荐理由，不要输出商品详情链接，不要优先展示图片。"
     )
 
     def event_stream():

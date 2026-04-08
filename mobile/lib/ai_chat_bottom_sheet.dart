@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'ai_chat_service.dart';
-import 'icons.dart';
 import 'product_detail_page.dart';
 
 /// 聊天消息模型
@@ -59,11 +58,14 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
   /// 添加欢迎消息
   void _addWelcomeMessage() {
     setState(() {
-      _messages.add(ChatMessage(
-        id: 'welcome',
-        isUser: false,
-        content: '你好！我是你的智能导购助手。\n\n告诉我你想买什么，比如 "我想买一台笔记本电脑" 或 "推荐一些适合运动的装备"，我会为你推荐合适的商品！',
-      ));
+      _messages.add(
+        ChatMessage(
+          id: 'welcome',
+          isUser: false,
+          content:
+              '你好！我是你的智能导购助手。\n\n告诉我你想买什么，比如 "我想买一台笔记本电脑" 或 "推荐一些适合运动的装备"，我会为你推荐合适的商品！',
+        ),
+      );
     });
   }
 
@@ -74,11 +76,13 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
 
     // 添加用户消息
     setState(() {
-      _messages.add(ChatMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        isUser: true,
-        content: text,
-      ));
+      _messages.add(
+        ChatMessage(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          isUser: true,
+          content: text,
+        ),
+      );
       _isAiResponding = true;
     });
 
@@ -105,81 +109,75 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
     String accumulatedContent = '';
     List<Map<String, dynamic>> products = [];
 
-    _streamSubscription = AiChatService.sendMessage(
-      question: question,
-      nResults: 3,
-    ).listen(
-      (event) {
-        setState(() {
-          if (event is MetaEvent) {
-            // 收到元数据，包含商品列表
-            products = event.products;
-            _currentAiMessage = ChatMessage(
-              id: _currentAiMessage!.id,
-              isUser: false,
-              content: accumulatedContent,
-              products: products,
-              isLoading: true,
-            );
-            _updateLastMessage(_currentAiMessage!);
-          } else if (event is TokenEvent) {
-            // 收到 token，累加到内容
-            accumulatedContent += event.token;
-            _currentAiMessage = ChatMessage(
-              id: _currentAiMessage!.id,
-              isUser: false,
-              content: accumulatedContent,
-              products: products,
-              isLoading: true,
-            );
-            _updateLastMessage(_currentAiMessage!);
-            _scrollToBottom();
-          } else if (event is DoneEvent) {
-            // 流结束
-            _currentAiMessage = ChatMessage(
-              id: _currentAiMessage!.id,
-              isUser: false,
-              content: accumulatedContent,
-              products: products,
-              isLoading: false,
-            );
-            _updateLastMessage(_currentAiMessage!);
-            _isAiResponding = false;
-          } else if (event is ErrorEvent) {
-            // 发生错误
-            _currentAiMessage = ChatMessage(
-              id: _currentAiMessage!.id,
-              isUser: false,
-              content: accumulatedContent.isEmpty
-                  ? '抱歉，发生了错误: ${event.message}'
-                  : accumulatedContent,
-              products: products,
-              isLoading: false,
-            );
-            _updateLastMessage(_currentAiMessage!);
-            _isAiResponding = false;
-          }
-        });
-      },
-      onError: (error) {
-        setState(() {
-          _currentAiMessage = ChatMessage(
-            id: _currentAiMessage!.id,
-            isUser: false,
-            content: '抱歉，网络连接出现问题，请稍后重试。',
-            products: products,
-            isLoading: false,
-          );
-          _updateLastMessage(_currentAiMessage!);
-          _isAiResponding = false;
-        });
-      },
-      onDone: () {
-        setState(() {
-          _isAiResponding = false;
-        });
-      },
-    );
+    _streamSubscription =
+        AiChatService.sendMessage(question: question, nResults: 3).listen(
+          (event) {
+            setState(() {
+              if (event is MetaEvent) {
+                products = event.products;
+                _currentAiMessage = ChatMessage(
+                  id: _currentAiMessage!.id,
+                  isUser: false,
+                  content: accumulatedContent,
+                  products: products,
+                  isLoading: true,
+                );
+                _updateLastMessage(_currentAiMessage!);
+              } else if (event is TokenEvent) {
+                accumulatedContent += event.token;
+                _currentAiMessage = ChatMessage(
+                  id: _currentAiMessage!.id,
+                  isUser: false,
+                  content: accumulatedContent,
+                  products: products,
+                  isLoading: true,
+                );
+                _updateLastMessage(_currentAiMessage!);
+                _scrollToBottom();
+              } else if (event is DoneEvent) {
+                _currentAiMessage = ChatMessage(
+                  id: _currentAiMessage!.id,
+                  isUser: false,
+                  content: accumulatedContent,
+                  products: products,
+                  isLoading: false,
+                );
+                _updateLastMessage(_currentAiMessage!);
+                _isAiResponding = false;
+              } else if (event is ErrorEvent) {
+                _currentAiMessage = ChatMessage(
+                  id: _currentAiMessage!.id,
+                  isUser: false,
+                  content: accumulatedContent.isEmpty
+                      ? '抱歉，发生了错误: ${event.message}'
+                      : accumulatedContent,
+                  products: products,
+                  isLoading: false,
+                );
+                _updateLastMessage(_currentAiMessage!);
+                _isAiResponding = false;
+              }
+            });
+          },
+          onError: (error) {
+            setState(() {
+              _currentAiMessage = ChatMessage(
+                id: _currentAiMessage!.id,
+                isUser: false,
+                content: '抱歉，网络连接出现问题，请稍后重试。',
+                products: products,
+                isLoading: false,
+              );
+              _updateLastMessage(_currentAiMessage!);
+              _isAiResponding = false;
+            });
+          },
+          onDone: () {
+            setState(() {
+              _isAiResponding = false;
+            });
+          },
+        );
   }
 
   /// 更新最后一条消息
@@ -212,6 +210,27 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
     );
   }
 
+  String _sanitizeAiMessageContent(String content) {
+    var result = content;
+
+    result = result.replaceAllMapped(
+      RegExp(r'\[([^\]]+)\]\(([^)]+)\)'),
+      (match) => match.group(1) ?? '',
+    );
+    result = result.replaceAllMapped(
+      RegExp(r'(?<!\])(/product/[A-Za-z0-9_\-]+)'),
+      (match) => '',
+    );
+    result = result.replaceAllMapped(
+      RegExp(r'https?://[^\s)]+'),
+      (match) => '',
+    );
+    result = result.replaceAll(RegExp(r'\s+'), ' ');
+    result = result.replaceAll(RegExp(r'\s+([,，。.!?！？:：;；])'), r'$1');
+
+    return result.trim();
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
@@ -231,9 +250,7 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
           _buildHeader(),
 
           // 消息列表
-          Expanded(
-            child: _buildMessageList(),
-          ),
+          Expanded(child: _buildMessageList()),
 
           // 输入框区域
           _buildInputArea(bottomPadding),
@@ -262,9 +279,7 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         children: [
@@ -305,10 +320,7 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
                 ),
                 Text(
                   '为你推荐最合适的商品',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
@@ -411,7 +423,10 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
             Expanded(
               child: Container(
                 margin: const EdgeInsets.only(right: 60, bottom: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF5F6FA),
                   borderRadius: const BorderRadius.only(
@@ -446,7 +461,7 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
                         ],
                       )
                     : Text(
-                        message.content,
+                        _sanitizeAiMessageContent(message.content),
                         style: const TextStyle(
                           color: Color(0xFF1A1A2C),
                           fontSize: 14,
@@ -464,7 +479,7 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
   /// 商品卡片横向滚动列表
   Widget _buildProductCardsRow(List<Map<String, dynamic>> products) {
     return Container(
-      height: 120,
+      height: 170,
       margin: const EdgeInsets.only(left: 44, bottom: 16),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -479,17 +494,21 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
 
   /// 商品卡片
   Widget _buildProductCard(Map<String, dynamic> product) {
-    // 适配后端返回的字段名
     final productName = product['product_name'] ?? product['name'] ?? '未知商品';
     final price = product['price'] ?? 0.0;
-    final imageUrl = product['image_url'] ?? '';
     final category = product['category'] ?? '其他';
+    final productId =
+        product['product_id']?.toString() ?? product['id']?.toString() ?? '';
+    final productUrl =
+        product['product_url']?.toString() ?? product['url']?.toString() ?? '';
+    final hasDetailLink = productId.isNotEmpty || productUrl.isNotEmpty;
 
     return GestureDetector(
       onTap: () => _showProductDetail(context, product),
       child: Container(
-        width: 200,
+        width: 220,
         margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -502,84 +521,56 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 商品图片
-            ClipRRect(
-              borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(12),
-              ),
-              child: Container(
-                width: 80,
-                height: double.infinity,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
                 color: Colors.grey.shade100,
-                child: imageUrl.isNotEmpty
-                    ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(
-                            child: HeroIcons.photo(
-                              size: 24,
-                              color: Colors.grey.shade400,
-                            ),
-                          );
-                        },
-                      )
-                    : Center(
-                        child: HeroIcons.shoppingBag(
-                          size: 24,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                category,
+                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
               ),
             ),
-            // 商品信息
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      productName,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF1A1A2C),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '¥${price.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFCE965B),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        category,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ),
-                  ],
+            const SizedBox(height: 8),
+            Text(
+              productName,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF1A1A2C),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '¥${price.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFCE965B),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: hasDetailLink
+                    ? () => _showProductDetail(context, product)
+                    : null,
+                icon: const Icon(Icons.open_in_new, size: 16),
+                label: const Text('查看详情'),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFFCE965B),
+                  backgroundColor: const Color(0xFFCE965B).withOpacity(0.08),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
             ),
@@ -595,9 +586,7 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
       padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + bottomPadding),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -662,11 +651,7 @@ class _AiChatBottomSheetState extends State<AiChatBottomSheet> {
                         ),
                       ],
               ),
-              child: const Icon(
-                Icons.send,
-                color: Colors.white,
-                size: 20,
-              ),
+              child: const Icon(Icons.send, color: Colors.white, size: 20),
             ),
           ),
         ],
@@ -686,10 +671,10 @@ class _ProductDetailCard extends StatelessWidget {
     // 适配后端返回的字段名
     final productName = product['product_name'] ?? product['name'] ?? '未知商品';
     final price = product['price'] ?? 0.0;
-    final imageUrl = product['image_url'] ?? '';
     final category = product['category'] ?? '其他';
     final description = product['description'] ?? product['desc'] ?? '暂无描述';
-    final productId = product['product_id']?.toString() ?? product['id']?.toString() ?? '';
+    final productId =
+        product['product_id']?.toString() ?? product['id']?.toString() ?? '';
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.6,
@@ -712,42 +697,7 @@ class _ProductDetailCard extends StatelessWidget {
             ),
           ),
 
-          // 商品图片
-          Expanded(
-            flex: 2,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: imageUrl.isNotEmpty
-                    ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(
-                            child: HeroIcons.photo(
-                              size: 60,
-                              color: Colors.grey.shade400,
-                            ),
-                          );
-                        },
-                      )
-                    : Center(
-                        child: HeroIcons.shoppingBag(
-                          size: 60,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
 
           // 商品信息
           Expanded(

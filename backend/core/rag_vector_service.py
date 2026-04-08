@@ -60,7 +60,7 @@ def build_product_payload(product: Product):
         "price": _to_float(product.price),
         "desc": product.description,
         "category": product.category,
-        "url": product_url,
+        "product_url": product_url,
     }
     return product.product_id, text, metadata
 
