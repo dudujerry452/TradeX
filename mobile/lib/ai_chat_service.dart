@@ -37,6 +37,31 @@ class ErrorEvent extends AiStreamEvent {
 /// AI 聊天服务类
 /// 处理与后端 RAG 接口的 SSE 流式通信
 class AiChatService {
+  static String _extractErrorMessage(String body, int statusCode) {
+    final trimmed = body.trim();
+    if (trimmed.isEmpty) {
+      return statusCode == 404 ? '未检索到足够相关的商品，请尝试换个关键词' : '请求失败: HTTP $statusCode';
+    }
+
+    try {
+      final jsonData = jsonDecode(trimmed);
+      if (jsonData is Map<String, dynamic>) {
+        final message = jsonData['detail'] ?? jsonData['message'] ?? jsonData['msg'];
+        if (message is String && message.trim().isNotEmpty) {
+          return message.trim();
+        }
+      }
+    } catch (_) {
+      // 非 JSON 响应，继续走兜底逻辑
+    }
+
+    if (statusCode == 404) {
+      return '未检索到足够相关的商品，请尝试换个关键词';
+    }
+
+    return trimmed;
+  }
+
   /// SSE 流式请求 AI 回复
   /// [question] 用户问题
   /// [nResults] 返回的商品数量
@@ -67,8 +92,9 @@ class AiChatService {
       final response = await client.send(request);
 
       if (response.statusCode != 200) {
+        final errorBody = await response.stream.bytesToString();
         yield ErrorEvent(
-          message: '请求失败: HTTP ${response.statusCode}',
+          message: _extractErrorMessage(errorBody, response.statusCode),
         );
         client.close();
         return;
