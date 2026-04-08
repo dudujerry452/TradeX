@@ -134,9 +134,27 @@ class ProductStatusUpdateOut(Schema):
     message: str
 
 
+class ProductUpdateIn(Schema):
+    """更新商品信息输入"""
+    product_name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    stock: Optional[int] = None
+    category: Optional[str] = None
+    image_url: Optional[str] = None
+
+
 class ProductViewOut(Schema):
     success: bool
     view_count: int
+
+
+class SellerStatsOut(Schema):
+    """卖家统计数据输出"""
+    on_sale_count: int          # 在售商品数
+    pending_ship_count: int     # 待发货订单数
+    today_sales: float          # 今日销售额
+    total_sales: float          # 总销售额
 
 
 # ── 分类相关 Schemas ─────────────────────────────────────────────────────────

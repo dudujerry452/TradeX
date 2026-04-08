@@ -18,6 +18,8 @@ from .common import (
     RecommendationOut,
     TagOut,
     ProductFavoriteOut,
+    ProductUpdateIn,
+    SellerStatsOut,
 )
 
 router = Router()
@@ -279,3 +281,140 @@ def get_product_favorites(request, product_id: str):
         }
         for pf in pfs
     ]
+
+
+# ── 卖家中心接口 ──────────────────────────────────────────────────────────────
+
+@router.get("/my/", response=list[ProductOut], tags=["商品", "卖家中心"], summary="获取我发布的商品")
+def list_my_products(
+    request,
+    status: Optional[str] = None,
+    limit: int = 20,
+    offset: int = 0,
+):
+    """获取当前用户发布的商品列表
+
+    - status: 筛选状态 (APPROVED/OFF_SHELF/PENDING/REJECTED)
+    - limit: 每页数量
+    - offset: 分页偏移量
+    """
+    if not request.auth:
+        raise HttpError(401, "请先登录")
+
+    products = Product.objects.filter(publisher=request.auth)
+
+    if status:
+        products = products.filter(product_status=status)
+
+    return products[offset:offset + limit]
+
+
+@router.put("/{product_id}/", response=ProductOut, tags=["商品", "卖家中心"], summary="更新商品信息")
+def update_product(request, product_id: str, data: ProductUpdateIn):
+    """更新商品信息
+
+    - 只允许修改自己发布的商品
+    - 只更新传入的字段
+    """
+    if not request.auth:
+        raise HttpError(401, "请先登录")
+
+    try:
+        product = Product.objects.get(product_id=product_id)
+    except Product.DoesNotExist:
+        raise HttpError(404, "商品不存在")
+
+    # 检查权限
+    if product.publisher_id != request.auth.user_id:
+        raise HttpError(403, "只能修改自己发布的商品")
+
+    # 更新字段
+    update_fields = []
+    if data.product_name is not None:
+        product.product_name = data.product_name
+        update_fields.append("product_name")
+    if data.description is not None:
+        product.description = data.description
+        update_fields.append("description")
+    if data.price is not None:
+        product.price = data.price
+        update_fields.append("price")
+    if data.stock is not None:
+        product.stock = data.stock
+        update_fields.append("stock")
+    if data.image_url is not None:
+        product.image_url = data.image_url
+        update_fields.append("image_url")
+    if data.category is not None:
+        product.category = data.category
+        # 更新分类外键
+        try:
+            category_ref = Category.objects.get(category_id=data.category)
+            product.category_ref = category_ref
+            update_fields.append("category_ref")
+        except Category.DoesNotExist:
+            pass
+        update_fields.append("category")
+
+    if update_fields:
+        product.save(update_fields=update_fields)
+
+    return product
+
+
+@router.get("/seller/stats/", response=SellerStatsOut, tags=["卖家中心"], summary="获取卖家统计数据")
+def get_seller_stats(request):
+    """获取卖家统计数据
+
+    返回：
+    - on_sale_count: 在售商品数
+    - pending_ship_count: 待发货订单数
+    - today_sales: 今日销售额
+    - total_sales: 总销售额
+    """
+    if not request.auth:
+        raise HttpError(401, "请先登录")
+
+    from core.models import Order
+    from django.utils import timezone
+    from datetime import datetime, time
+
+    user = request.auth
+
+    # 在售商品数
+    on_sale_count = Product.objects.filter(
+        publisher=user,
+        product_status=Product.StatusChoices.APPROVED
+    ).count()
+
+    # 待发货订单数
+    pending_ship_count = Order.objects.filter(
+        seller=user,
+        order_status='PENDING_SHIP'
+    ).count()
+
+    # 今日销售额
+    today = timezone.now().date()
+    today_start = datetime.combine(today, time.min)
+    today_end = datetime.combine(today, time.max)
+
+    today_orders = Order.objects.filter(
+        seller=user,
+        order_status__in=['SHIPPED', 'COMPLETED'],
+        pay_time__range=(today_start, today_end)
+    )
+    today_sales = sum(o.total_amount for o in today_orders)
+
+    # 总销售额
+    total_orders = Order.objects.filter(
+        seller=user,
+        order_status__in=['SHIPPED', 'COMPLETED']
+    )
+    total_sales = sum(o.total_amount for o in total_orders)
+
+    return {
+        "on_sale_count": on_sale_count,
+        "pending_ship_count": pending_ship_count,
+        "today_sales": float(today_sales),
+        "total_sales": float(total_sales),
+    }

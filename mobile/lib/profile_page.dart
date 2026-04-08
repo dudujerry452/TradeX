@@ -6,6 +6,7 @@ import 'favorites_page.dart';
 import 'auth_manager.dart';
 import 'pages/order/order_list_page.dart';
 import 'pages/address/address_manage_page.dart';
+import 'pages/seller/seller_center_page.dart';
 
 /// 我的页面 - 展示用户账户信息
 class ProfilePage extends StatefulWidget {
@@ -110,11 +111,21 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  void _navigateToSellerCenter() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SellerCenterPage(),
+      ),
+    );
+  }
+
   // 功能菜单列表
   final List<Map<String, dynamic>> _menuItems = [
     {'icon': 'heart', 'title': '我的收藏', 'color': Colors.red},
     {'icon': 'clock', 'title': '浏览历史', 'color': Colors.blue},
     {'icon': 'map-pin', 'title': '收货地址', 'color': Colors.green},
+    {'icon': 'shopping-bag', 'title': '卖家中心', 'color': Color(0xFFCE965B)},
     {'icon': 'bell', 'title': '消息通知', 'color': Colors.orange},
     {'icon': 'gift', 'title': '优惠券', 'color': Colors.purple},
     {'icon': 'currency-dollar', 'title': '我的钱包', 'color': Colors.amber},
@@ -731,6 +742,8 @@ class _ProfilePageState extends State<ProfilePage> {
           _navigateToFavorites();
         } else if (title == '收货地址') {
           _navigateToAddressManage();
+        } else if (title == '卖家中心') {
+          _navigateToSellerCenter();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('$title 功能开发中')),
