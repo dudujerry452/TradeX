@@ -1,7 +1,7 @@
 name: Build Flutter APK
 
 on:
-  # 手动触发 - 从 deploy-config.json 读取配置
+  # 手动触发 - 从 deploy-config.json.development 读取配置
   workflow_dispatch:
 
   # 可选：推送到 main 分支时自动构建
@@ -10,7 +10,7 @@ on:
   #     - main
   #   paths:
   #     - 'mobile/**'
-  #     - 'deploy-config.json'
+  #     - 'deploy-config.json.development'
 
 jobs:
   build-apk:
@@ -28,20 +28,20 @@ jobs:
         working-directory: .
         run: |
           # 检查文件是否存在（在仓库根目录）
-          if [ ! -f deploy-config.json ]; then
-            echo "❌ 错误: deploy-config.json 不存在!"
+          if [ ! -f deploy-config.json.development ]; then
+            echo "❌ 错误: deploy-config.json.development 不存在!"
             ls -la
             exit 1
           fi
 
-          echo "=== deploy-config.json 内容 ==="
-          cat deploy-config.json
+          echo "=== deploy-config.json.development 内容 ==="
+          cat deploy-config.json.development
           echo ""
 
           # 读取配置（带错误检查）
-          ENVIRONMENT=$(jq -r '.environment // empty' deploy-config.json)
-          API_URL=$(jq -r '.api_base_url // empty' deploy-config.json)
-          FLUTTER_VERSION=$(jq -r '.flutter_version // "3.22.0"' deploy-config.json)
+          ENVIRONMENT=$(jq -r '.environment // empty' deploy-config.json.development)
+          API_URL=$(jq -r '.api_base_url // empty' deploy-config.json.development)
+          FLUTTER_VERSION=$(jq -r '.flutter_version // "3.22.0"' deploy-config.json.development)
 
           # 检查是否读取成功
           if [ -z "$API_URL" ]; then
