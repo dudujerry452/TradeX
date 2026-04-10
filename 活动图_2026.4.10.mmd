@@ -1,0 +1,72 @@
+---
+config:
+  theme: neo
+---
+flowchart TB
+    A1["1:项目初始化<br>2026-03-13 | 1d"] --> A2["2:Django后端初始化<br>2026-03-13 | 1d"]
+    A2 --> A3["3:前端项目初始化<br>2026-03-15 | 1d"]
+    A3 --> A4["4:基础环境配置<br>Nix/依赖/跨域<br>2026-03-15~03-17 | 3d"]
+    A4 --> E_HEAD["**核心后端开发**"] & F_HEAD["**多端并行开发**"] & G_HEAD["**AI功能迭代**"] & H_HEAD["**问题修复**"] & I_HEAD["**CI/CD与部署**"]
+    E_HEAD --> E1["5.1:数据库模型设计<br>2026-03-17 | 1d"]
+    E1 --> E2["5.2:API接口开发<br>django-ninja<br>2026-03-17~03-18 | 2d"]
+    E2 --> E3["5.3:用户认证<br>JWT/Token<br>2026-03-18 | 1d"]
+    E3 --> E4["5.4:订单流功能开发<br>2026-04-03 | 1d"]
+    E4 --> E5["5.5:RAG推荐系统开发<br>2026-04-07 | 1d"]
+    E5 --> E6["5.6:接入OpenAI依赖<br>2026-04-07 | 1d"]
+    F_HEAD --> F1["6.1:Web端开发<br>登陆/注册/COS图床<br>2026-04-03 | 1d"]
+    F1 --> F2["6.2:移动端Flutter初始化<br>2026-03-20 | 1d"]
+    F2 --> F3["6.3:移动端基础页面<br>主/发现/商品<br>2026-03-27~03-29 | 3d"]
+    F3 --> F4["6.4:移动端AI导购功能<br>2026-03-25 | 1d"]
+    F4 --> F5["6.5:移动端卖家中心开发<br>2026-04-08 | 1d"]
+    G_HEAD --> G1["7.1:基础AI导购实现<br>2026-03-25 | 1d"]
+    G1 --> G2["7.2:RAG泛化推荐开发<br>2026-04-07 | 1d"]
+    G2 --> G3["7.3:修复推荐乱推荐<br>无标签问题<br>2026-04-03~04-04 | 2d"]
+    G3 --> G4["7.4:AI导购界面与返回值优化<br>2026-04-08 | 1d"]
+    H_HEAD --> H1["8.1:后端接口/路径修复<br>2026-04-04 | 1d"]
+    H1 --> H2["8.2:移动端网络/字体<br>订单API修复<br>2026-03-30~04-10 | 2d"]
+    H2 --> H3["8.3:Web端图片上传bug修复<br>2026-04-03 | 1d"]
+    H3 --> H4["8.4:CI/CD流程修复<br>2026-03-30 | 1d"]
+    I_HEAD --> I1["9.1:开发部署脚本<br>2026-04-03 | 1d"]
+    I1 --> I2["9.2:配置deploy-config<br>2026-04-09 | 1d"]
+    I2 --> I3["9.3:增加Release权限<br>2026-04-09 | 1d"]
+    I3 --> I4["9.4:APK构建配置<br>2026-04-09 | 1d"]
+    E6 --> J["10:功能测试与文档更新<br>全周期"]
+    F5 --> J
+    G4 --> J
+    H4 --> J
+    I4 --> J
+    J --> K["11:功能测试与显著问题修复<br>2026-4-10 ｜7d"]
+    K --> T_HEAD["主要功能实现及调试"] & U_HEAD["分支功能实现及调试"]
+    T_HEAD --> T0["12.1:图床开发<br>本周 | 1d | 已完成"]
+    T0 --> T1["12.2:测试订单流<br>本周 | 2d | 进行中"]
+    T1 --> T2["12.3:测试消息机制<br>购买/付款/发货提示<br>本周 | 2d | 进行中"]
+    T2 --> T3["12.4:实现实时消息<br>本周 | 2d | 进行中"]
+    T3 --> T4["12.5:讨论机制<br>本周 | 2d | 进行中"]
+    U_HEAD --> n1@{ label: "13.1:RAG搜索测试优化<br style=\"--tw-scale-x:\">本周 | 7d | 进行中" } & n2@{ label: "13.2:推荐系统测试优化<br style=\"--tw-scale-x:\">本周 | 3d | 进行中" }
+
+    n1@{ shape: rect}
+    n2@{ shape: rect}
+    style A1 fill:#FFEBEE,stroke:#D32F2F
+    style A2 fill:#FFEBEE,stroke:#D32F2F
+    style A3 fill:#FFEBEE,stroke:#D32F2F
+    style A4 fill:#FFEBEE,stroke:#D32F2F
+    style E_HEAD fill:#FFEBEE,stroke:#D32F2F
+    style F_HEAD fill:#E3F2FD,stroke:#1976D2
+    style G_HEAD fill:#E3F2FD,stroke:#1976D2
+    style H_HEAD fill:#E3F2FD,stroke:#1976D2
+    style I_HEAD fill:#E3F2FD,stroke:#1976D2
+    style E1 fill:#FFEBEE,stroke:#D32F2F
+    style E2 fill:#FFEBEE,stroke:#D32F2F
+    style E3 fill:#FFEBEE,stroke:#D32F2F
+    style E4 fill:#FFEBEE,stroke:#D32F2F
+    style E5 fill:#FFEBEE,stroke:#D32F2F
+    style E6 fill:#FFEBEE,stroke:#D32F2F
+    style J fill:#FFEBEE,stroke:#D32F2F
+    style K fill:#FFEBEE,stroke:#D32F2F
+    style T_HEAD fill:#FFEBEE,stroke:#D32F2F
+    style U_HEAD fill:#E3F2FD,stroke:#1976D2
+    style T0 fill:#FFEBEE,stroke:#D32F2F
+    style T1 fill:#FFEBEE,stroke:#D32F2F
+    style T2 fill:#FFEBEE,stroke:#D32F2F
+    style T3 fill:#FFEBEE,stroke:#D32F2F
+    style T4 fill:#FFEBEE,stroke:#D32F2F
