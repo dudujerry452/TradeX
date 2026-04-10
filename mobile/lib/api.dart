@@ -289,6 +289,207 @@ class ApiService {
     }
   }
 
+  // ── 论坛接口 ───────────────────────────────────────────────────────────────
+
+  /// 获取论坛分类列表
+  static Future<Map<String, dynamic>> getForumCategories() async {
+    final url = Uri.parse('$baseUrl/forum/categories/');
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final categories = [
+          {'id': 'all', 'name': '全部', 'description': '全部帖子'},
+          ...List<Map<String, dynamic>>.from(responseData.map((cat) => {
+                'id': cat['category_id'],
+                'name': cat['name'],
+                'description': cat['description'],
+                'sort_order': cat['sort_order'],
+              })),
+        ];
+        return {'success': true, 'data': categories};
+      } else {
+        return {'success': false, 'message': '获取论坛分类失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 获取论坛标签列表
+  static Future<Map<String, dynamic>> getForumTags({String query = ''}) async {
+    final url = Uri.parse('$baseUrl/forum/tags/').replace(
+      queryParameters: query.isNotEmpty ? {'q': query} : null,
+    );
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取论坛标签失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 获取论坛帖子列表
+  static Future<Map<String, dynamic>> getForumPosts({
+    String query = '',
+    String? categoryId,
+    String? tag,
+    String ordering = '-published_at',
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    final queryParams = <String, String>{
+      'ordering': ordering,
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+    };
+    if (query.isNotEmpty) {
+      queryParams['q'] = query;
+    }
+    if (categoryId != null && categoryId.isNotEmpty && categoryId != 'all') {
+      queryParams['category_id'] = categoryId;
+    }
+    if (tag != null && tag.isNotEmpty) {
+      queryParams['tag'] = tag;
+    }
+
+    final url = Uri.parse('$baseUrl/forum/posts/').replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取论坛帖子失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 获取论坛帖子详情
+  static Future<Map<String, dynamic>> getForumPostDetail(String postId) async {
+    final url = Uri.parse('$baseUrl/forum/posts/$postId/');
+
+    try {
+      final response = await http.get(url, headers: await getHeaders());
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        return {'success': false, 'message': '获取帖子详情失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 发布论坛帖子
+  static Future<Map<String, dynamic>> createForumPost({
+    required String title,
+    required String content,
+    String? categoryId,
+    List<String> tagNames = const [],
+    String? coverImageUrl,
+  }) async {
+    final url = Uri.parse('$baseUrl/forum/posts/');
+
+    final body = <String, dynamic>{
+      'title': title,
+      'content': content,
+      'tag_names': tagNames,
+    };
+    if (categoryId != null && categoryId.isNotEmpty && categoryId != 'all') {
+      body['category_id'] = categoryId;
+    }
+    if (coverImageUrl != null && coverImageUrl.isNotEmpty) {
+      body['cover_image_url'] = coverImageUrl;
+    }
+
+    try {
+      final response = await http.post(
+        url,
+        headers: await getHeaders(),
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData, 'message': '发帖成功'};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'message': '登录已过期，请重新登录'};
+      } else {
+        final responseData = jsonDecode(response.body);
+        return {'success': false, 'message': responseData['detail'] ?? '发帖失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 点赞或取消点赞论坛帖子
+  static Future<Map<String, dynamic>> toggleForumPostLike(String postId) async {
+    final url = Uri.parse('$baseUrl/forum/posts/$postId/like/');
+
+    try {
+      final response = await http.post(url, headers: await getHeaders());
+
+      if (response.statusCode == 401) {
+        return {'success': false, 'message': '登录已过期，请重新登录'};
+      }
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        final responseData = jsonDecode(response.body);
+        return {'success': false, 'message': responseData['detail'] ?? '操作失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
+  /// 发表评论
+  static Future<Map<String, dynamic>> createForumComment({
+    required String postId,
+    required String content,
+  }) async {
+    final url = Uri.parse('$baseUrl/forum/posts/$postId/comments/');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: await getHeaders(),
+        body: jsonEncode({'content': content}),
+      );
+
+      if (response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        return {'success': true, 'data': responseData, 'message': '评论成功'};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'message': '登录已过期，请重新登录'};
+      } else {
+        final responseData = jsonDecode(response.body);
+        return {'success': false, 'message': responseData['detail'] ?? '评论失败'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '网络连接错误: $e'};
+    }
+  }
+
   // ── 推荐系统接口 ───────────────────────────────────────────────────────────
 
   /// 获取个性化推荐（支持分页）

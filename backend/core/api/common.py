@@ -175,6 +175,81 @@ class CategoryIn(Schema):
     is_active: bool = True
 
 
+# ── 论坛相关 Schemas ──────────────────────────────────────────────────────────
+
+class ForumCategoryOut(Schema):
+    category_id: str
+    name: str
+    description: str
+    sort_order: int
+    is_active: bool
+    created_at: Any
+    updated_at: Any
+
+
+class ForumCategoryIn(Schema):
+    category_id: Optional[str] = None
+    name: str
+    description: str = ""
+    sort_order: int = 0
+    is_active: bool = True
+
+
+class ForumTagOut(Schema):
+    tag_id: str
+    tag_name: str
+    usage_count: int
+    create_time: Any
+
+
+class ForumCommentOut(Schema):
+    comment_id: str
+    post_id: str
+    author_id: str
+    author_name: str
+    content: str
+    like_count: int
+    is_deleted: bool
+    created_at: Any
+    updated_at: Any
+
+
+class ForumPostSummaryOut(Schema):
+    post_id: str
+    title: str
+    content: str
+    cover_image_url: Optional[str] = None
+    author_id: str
+    author_name: str
+    category_id: Optional[str] = None
+    category_name: Optional[str] = None
+    tags: list[str] = []
+    view_count: int
+    like_count: int
+    comment_count: int
+    status: str
+    is_pinned: bool
+    published_at: Any
+    updated_at: Any
+    is_liked: bool = False
+
+
+class ForumPostOut(ForumPostSummaryOut):
+    comments: Optional[list[ForumCommentOut]] = None
+
+
+class ForumPostIn(Schema):
+    title: str
+    content: str
+    category_id: Optional[str] = None
+    tag_names: list[str] = []
+    cover_image_url: Optional[str] = None
+
+
+class ForumCommentIn(Schema):
+    content: str
+
+
 # ── 标签相关 Schemas ──────────────────────────────────────────────────────────
 
 class TagOut(Schema):

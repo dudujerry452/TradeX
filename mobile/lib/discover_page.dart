@@ -4,6 +4,7 @@ import 'api.dart';
 import 'product_detail_page.dart';
 import 'auth_manager.dart';
 import 'ai_chat_bottom_sheet.dart';
+import 'forum_page.dart';
 
 /// 发现页面 - 包含关注、推荐、最新、讨论四个Tab
 class DiscoverPage extends StatefulWidget {
@@ -26,14 +27,14 @@ class _DiscoverPageState extends State<DiscoverPage>
   List<Map<String, dynamic>> _categories = [];
 
   // 搜索相关状态
-  bool _isSearching = false;     // 是否正在搜索模式
-  String _searchQuery = '';      // 当前搜索关键词
+  bool _isSearching = false; // 是否正在搜索模式
+  String _searchQuery = ''; // 当前搜索关键词
 
   // 分页相关状态
-  int _currentOffset = 0;        // 当前偏移量
-  final int _pageSize = 10;      // 每页数量
-  bool _isLoadingMore = false;   // 是否正在加载更多
-  bool _hasMoreData = true;      // 是否还有更多数据
+  int _currentOffset = 0; // 当前偏移量
+  final int _pageSize = 10; // 每页数量
+  bool _isLoadingMore = false; // 是否正在加载更多
+  bool _hasMoreData = true; // 是否还有更多数据
 
   @override
   void initState() {
@@ -55,6 +56,17 @@ class _DiscoverPageState extends State<DiscoverPage>
 
   void _onTabChanged() {
     if (_tabController.indexIsChanging) {
+      if (_tabController.index == 3) {
+        setState(() {
+          _currentOffset = 0;
+          _hasMoreData = true;
+          _products = [];
+          _isLoading = false;
+          _isLoadingMore = false;
+        });
+        return;
+      }
+
       // 切换Tab时重置分页状态
       setState(() {
         _currentOffset = 0;
@@ -96,22 +108,6 @@ class _DiscoverPageState extends State<DiscoverPage>
     }
   }
 
-  /// 获取当前Tab的排序方式
-  String _getCurrentOrdering() {
-    switch (_tabController.index) {
-      case 0: // 关注
-        return '-publish_time'; // 暂时按时间排序
-      case 1: // 推荐
-        return '-publish_time'; // 按时间排序
-      case 2: // 最新
-        return '-publish_time'; // 按发布时间倒序
-      case 3: // 讨论
-        return '-publish_time'; // 暂时按时间排序
-      default:
-        return '-publish_time';
-    }
-  }
-
   Future<void> _loadCategories() async {
     final result = await ApiService.getCategories();
     if (result['success']) {
@@ -140,7 +136,7 @@ class _DiscoverPageState extends State<DiscoverPage>
     // 根据当前Tab决定加载策略
     switch (_tabController.index) {
       case 0: // 关注 - 占位符空页
-      case 3: // 讨论 - 占位符空页
+      case 3: // 讨论 - 直接显示论坛页
         setState(() {
           _products = [];
           _hasMoreData = false;
@@ -203,9 +199,9 @@ class _DiscoverPageState extends State<DiscoverPage>
     } else {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'])),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(result['message'])));
       }
     }
   }
@@ -264,9 +260,9 @@ class _DiscoverPageState extends State<DiscoverPage>
         _isLoadingMore = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'])),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(result['message'])));
       }
     }
   }
@@ -327,9 +323,9 @@ class _DiscoverPageState extends State<DiscoverPage>
     } else {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'])),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(result['message'])));
       }
     }
   }
@@ -394,28 +390,29 @@ class _DiscoverPageState extends State<DiscoverPage>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () => _loadProducts(refresh: true),
-          color: const Color(0xFFCE965B),
-          child: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                // 顶部Tab栏
-                SliverToBoxAdapter(
-                  child: _buildTopTabBar(),
-                ),
-                // 搜索框和AI按钮
-                SliverToBoxAdapter(
-                  child: _buildSearchBar(),
-                ),
-                // 分类横向滚动列表
-                SliverToBoxAdapter(
-                  child: _buildCategoryList(),
-                ),
-              ];
-            },
-            body: _buildProductGrid(),
-          ),
+        child: Column(
+          children: [
+            _buildTopTabBar(),
+            Expanded(
+              child: _tabController.index == 3
+                  ? const ForumPage(embedded: true)
+                  : RefreshIndicator(
+                      onRefresh: () => _loadProducts(refresh: true),
+                      color: const Color(0xFFCE965B),
+                      child: NestedScrollView(
+                        headerSliverBuilder: (context, innerBoxIsScrolled) {
+                          return [
+                            // 搜索框和AI按钮
+                            SliverToBoxAdapter(child: _buildSearchBar()),
+                            // 分类横向滚动列表
+                            SliverToBoxAdapter(child: _buildCategoryList()),
+                          ];
+                        },
+                        body: _buildProductGrid(),
+                      ),
+                    ),
+            ),
+          ],
         ),
       ),
     );
@@ -461,7 +458,9 @@ class _DiscoverPageState extends State<DiscoverPage>
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCE965B)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFFCE965B),
+                      ),
                     ),
                   )
                 : const Icon(Icons.refresh, color: Color(0xFFCE965B)),
@@ -513,7 +512,9 @@ class _DiscoverPageState extends State<DiscoverPage>
                           fontSize: 14,
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                        ),
                       ),
                     ),
                   ),
@@ -561,10 +562,7 @@ class _DiscoverPageState extends State<DiscoverPage>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  HeroIcons.bolt(
-                    size: 18,
-                    color: Colors.white,
-                  ),
+                  HeroIcons.bolt(size: 18, color: Colors.white),
                   const SizedBox(width: 4),
                   const Text(
                     'AI',
@@ -633,7 +631,9 @@ class _DiscoverPageState extends State<DiscoverPage>
                   category['name'],
                   style: TextStyle(
                     color: isSelected ? Colors.white : Colors.grey.shade700,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                     fontSize: 13,
                   ),
                 ),
@@ -648,7 +648,8 @@ class _DiscoverPageState extends State<DiscoverPage>
   /// 商品网格展示
   Widget _buildProductGrid() {
     // 关注和讨论Tab显示占位符（非搜索模式）
-    if ((_tabController.index == 0 || _tabController.index == 3) && !_isSearching) {
+    if ((_tabController.index == 0 || _tabController.index == 3) &&
+        !_isSearching) {
       return _buildPlaceholderPage();
     }
 
@@ -665,17 +666,11 @@ class _DiscoverPageState extends State<DiscoverPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            HeroIcons.shoppingBag(
-              size: 60,
-              color: Colors.grey.shade300,
-            ),
+            HeroIcons.shoppingBag(size: 60, color: Colors.grey.shade300),
             const SizedBox(height: 16),
             Text(
               _isSearching ? '未找到相关商品' : '暂无商品',
-              style: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
             ),
             if (_isSearching) ...[
               const SizedBox(height: 8),
@@ -705,10 +700,7 @@ class _DiscoverPageState extends State<DiscoverPage>
                 Expanded(
                   child: Text(
                     '"$_searchQuery" 的搜索结果',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -721,10 +713,7 @@ class _DiscoverPageState extends State<DiscoverPage>
                   ),
                   child: const Text(
                     '清除',
-                    style: TextStyle(
-                      color: Color(0xFFCE965B),
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Color(0xFFCE965B), fontSize: 13),
                   ),
                 ),
               ],
@@ -751,7 +740,9 @@ class _DiscoverPageState extends State<DiscoverPage>
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCE965B)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFFCE965B),
+                      ),
                     ),
                   ),
                 );
@@ -768,6 +759,7 @@ class _DiscoverPageState extends State<DiscoverPage>
   /// 占位符空页（关注和讨论）
   Widget _buildPlaceholderPage() {
     final isFollowing = _tabController.index == 0;
+    final isForum = _tabController.index == 3;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -779,7 +771,7 @@ class _DiscoverPageState extends State<DiscoverPage>
           ),
           const SizedBox(height: 20),
           Text(
-            isFollowing ? '关注功能开发中' : '讨论功能开发中',
+            isFollowing ? '关注功能开发中' : '论坛功能已开放',
             style: TextStyle(
               color: Colors.grey.shade500,
               fontSize: 18,
@@ -788,12 +780,30 @@ class _DiscoverPageState extends State<DiscoverPage>
           ),
           const SizedBox(height: 8),
           Text(
-            '敬请期待...',
-            style: TextStyle(
-              color: Colors.grey.shade400,
-              fontSize: 14,
-            ),
+            isForum ? '可以发帖、评论、点赞、筛选和搜索' : '敬请期待...',
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
           ),
+          if (isForum) ...[
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ForumPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFCE965B),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              icon: const Icon(Icons.forum),
+              label: const Text('进入论坛'),
+            ),
+          ],
         ],
       ),
     );
@@ -802,7 +812,9 @@ class _DiscoverPageState extends State<DiscoverPage>
   /// 商品卡片
   Widget _buildProductCard(dynamic product) {
     // DEBUG: 打印原始数据
-    print('DEBUG product: ${product['product_name']} keys=${product.keys.toList()}');
+    print(
+      'DEBUG product: ${product['product_name']} keys=${product.keys.toList()}',
+    );
 
     final productName = product['product_name'] ?? '未知商品';
     final price = product['price'] ?? 0.0;
@@ -818,7 +830,8 @@ class _DiscoverPageState extends State<DiscoverPage>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailPage(productId: product['product_id']),
+            builder: (context) =>
+                ProductDetailPage(productId: product['product_id']),
           ),
         );
       },
@@ -976,7 +989,10 @@ class _DiscoverPageState extends State<DiscoverPage>
                           ),
                         // DEBUG: 打印到控制台
                         if (trendingScore == null)
-                          Text('NO-H', style: TextStyle(fontSize: 8, color: Colors.grey)),
+                          Text(
+                            'NO-H',
+                            style: TextStyle(fontSize: 8, color: Colors.grey),
+                          ),
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(

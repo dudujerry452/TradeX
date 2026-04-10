@@ -9,6 +9,7 @@ from .products import router as products_router
 from .categories import router as categories_router
 from .tags import router as tags_router, product_tags_router
 from .favorites import router as favorites_router
+from .forum import router as forum_router
 from .recommendations import router as recommendations_router
 from .orders import router as orders_router
 from .notifications import router as notifications_router
@@ -41,6 +42,9 @@ router.add_router("/user-tag-preferences", user_tag_prefs_router, tags=["用户�
 
 # 收藏相关
 router.add_router("/product-favorites", favorites_router, tags=["商品收藏"])
+
+# 论坛相关
+router.add_router("/forum", forum_router, tags=["论坛"])
 
 # 推荐系统
 router.add_router("/recommendations", recommendations_router, tags=["推荐系统"])

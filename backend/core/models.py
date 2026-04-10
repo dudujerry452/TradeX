@@ -429,6 +429,172 @@ class ProductFavorite(models.Model):
         return f"{self.user.username} - {self.product.product_name}"
 
 
+class ForumCategory(models.Model):
+    """论坛分类实体"""
+    category_id = models.CharField(max_length=50, primary_key=True, verbose_name="分类ID")
+    name = models.CharField(max_length=100, unique=True, verbose_name="分类名称")
+    description = models.TextField(blank=True, verbose_name="分类描述")
+    sort_order = models.IntegerField(default=0, verbose_name="排序顺序")
+    is_active = models.BooleanField(default=True, verbose_name="是否启用")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        db_table = 'forum_category'
+        verbose_name = "论坛分类"
+        verbose_name_plural = verbose_name
+        ordering = ['sort_order', 'name']
+
+    def __str__(self):
+        return self.name
+
+
+class ForumTag(models.Model):
+    """论坛标签实体"""
+    tag_id = models.CharField(max_length=50, primary_key=True, verbose_name="标签ID")
+    tag_name = models.CharField(max_length=100, unique=True, verbose_name="标签名称")
+    usage_count = models.IntegerField(default=0, verbose_name="使用次数")
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        db_table = 'forum_tag'
+        verbose_name = "论坛标签"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.tag_name
+
+
+class ForumPost(models.Model):
+    """论坛帖子实体"""
+    class StatusChoices(models.TextChoices):
+        PUBLISHED = 'PUBLISHED', '已发布'
+        HIDDEN = 'HIDDEN', '已隐藏'
+
+    post_id = models.CharField(max_length=50, primary_key=True, verbose_name="帖子ID")
+    title = models.CharField(max_length=200, verbose_name="帖子标题")
+    content = models.TextField(verbose_name="帖子内容")
+    cover_image_url = models.URLField(max_length=500, blank=True, verbose_name="封面图片")
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='forum_posts',
+        verbose_name="发帖用户"
+    )
+    category = models.ForeignKey(
+        ForumCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='posts',
+        verbose_name="所属分类"
+    )
+    view_count = models.IntegerField(default=0, verbose_name="浏览量")
+    like_count = models.IntegerField(default=0, verbose_name="点赞数")
+    comment_count = models.IntegerField(default=0, verbose_name="评论数")
+    status = models.CharField(
+        max_length=20,
+        choices=StatusChoices.choices,
+        default=StatusChoices.PUBLISHED,
+        verbose_name="帖子状态"
+    )
+    is_pinned = models.BooleanField(default=False, verbose_name="是否置顶")
+    published_at = models.DateTimeField(auto_now_add=True, verbose_name="发布时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        db_table = 'forum_post'
+        verbose_name = "论坛帖子"
+        verbose_name_plural = verbose_name
+        ordering = ['-is_pinned', '-published_at']
+
+    def __str__(self):
+        return self.title
+
+
+class ForumPostTag(models.Model):
+    """论坛帖子标签关联"""
+    post = models.ForeignKey(
+        ForumPost,
+        on_delete=models.CASCADE,
+        related_name='tag_links',
+        verbose_name="帖子"
+    )
+    tag = models.ForeignKey(
+        ForumTag,
+        on_delete=models.CASCADE,
+        related_name='post_links',
+        verbose_name="标签"
+    )
+    tagged_time = models.DateTimeField(auto_now_add=True, verbose_name="打标时间")
+
+    class Meta:
+        db_table = 'forum_post_tag'
+        verbose_name = "论坛帖子标签关联"
+        verbose_name_plural = verbose_name
+        unique_together = ['post', 'tag']
+
+    def __str__(self):
+        return f"{self.post.title} - {self.tag.tag_name}"
+
+
+class ForumPostLike(models.Model):
+    """论坛帖子点赞"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='forum_post_likes',
+        verbose_name="用户"
+    )
+    post = models.ForeignKey(
+        ForumPost,
+        on_delete=models.CASCADE,
+        related_name='likes',
+        verbose_name="帖子"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="点赞时间")
+
+    class Meta:
+        db_table = 'forum_post_like'
+        verbose_name = "论坛帖子点赞"
+        verbose_name_plural = verbose_name
+        unique_together = ['user', 'post']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.post.title}"
+
+
+class ForumComment(models.Model):
+    """论坛评论实体"""
+    comment_id = models.CharField(max_length=50, primary_key=True, verbose_name="评论ID")
+    post = models.ForeignKey(
+        ForumPost,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name="所属帖子"
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='forum_comments',
+        verbose_name="评论用户"
+    )
+    content = models.TextField(verbose_name="评论内容")
+    like_count = models.IntegerField(default=0, verbose_name="点赞数")
+    is_deleted = models.BooleanField(default=False, verbose_name="是否删除")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        db_table = 'forum_comment'
+        verbose_name = "论坛评论"
+        verbose_name_plural = verbose_name
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"Comment {self.comment_id} on {self.post.title}"
+
+
 class OrderLog(models.Model):
     """订单操作日志"""
     class ActionChoices(models.TextChoices):
