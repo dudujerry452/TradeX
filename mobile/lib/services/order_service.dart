@@ -3,7 +3,10 @@ import 'package:http/http.dart' as http;
 import '../auth_manager.dart';
 
 class OrderService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://127.0.0.1:8000/api',
+  );
 
   static Future<Map<String, String>> _getHeaders() async {
     final token = await AuthManager.getToken();
