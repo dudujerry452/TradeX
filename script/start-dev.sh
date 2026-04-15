@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
-# backend/scripts/start_dev.sh — 启动开发环境（双端口模式）
+# script/start-dev.sh — 启动开发环境（双端口模式）
 #
 # 端口说明：
 # - 8000: Django HTTP (REST API)
 # - 8001: Daphne WebSocket
 #
 # 使用方法：
-#   ./scripts/start_dev.sh
+#   ./script/start-dev.sh
 #
 # 停止服务：
 #   Ctrl+C
 
 set -e
 
-cd "$(dirname "$0")/.."
+dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+cd ${dir}/../backend
 
 # 颜色输出
 RED='\033[0;31m'
