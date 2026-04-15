@@ -15,6 +15,7 @@ from .notifications import router as notifications_router
 from .uploads import router as uploads_router
 from .rag import router as rag_router
 from .system import router as system_router
+from .chat import router as chat_router
 
 router = Router()
 
@@ -59,3 +60,6 @@ router.add_router("/rag", rag_router, tags=["RAG"])
 
 # 系统
 router.add_router("/health", system_router, tags=["System"])
+
+# 聊天系统
+router.add_router("/chat", chat_router, tags=["聊天"])

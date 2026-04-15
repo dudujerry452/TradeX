@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'services/notification_service.dart';
+import 'services/chat_service.dart';
 import 'pages/order/order_detail_page.dart';
+import 'pages/chat/conversation_list_page.dart';
+import 'models/chat_message.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({super.key});
@@ -11,7 +14,144 @@ class MessagePage extends StatefulWidget {
   State<MessagePage> createState() => _MessagePageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
+class _MessagePageState extends State<MessagePage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  int _unreadChatCount = 0;
+  int _unreadNotificationCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _loadUnreadCounts();
+
+    // 监听 WebSocket 连接状态变化刷新未读数
+    ChatService().statusStream.listen((status) {
+      if (status == ChatConnectionStatus.connected) {
+        _loadUnreadCounts();
+      }
+    });
+  }
+
+  Future<void> _loadUnreadCounts() async {
+    // 获取未读通知数
+    final count = await NotificationService.getUnreadCount();
+    if (mounted) {
+      setState(() {
+        _unreadNotificationCount = count;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '消息',
+          style: TextStyle(
+            color: Color(0xFF1A1A2C),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: const Color(0xFFCE965B),
+          unselectedLabelColor: Colors.grey.shade500,
+          indicatorColor: const Color(0xFFCE965B),
+          indicatorWeight: 3,
+          tabs: [
+            Tab(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('聊天'),
+                  if (_unreadChatCount > 0)
+                    Container(
+                      margin: const EdgeInsets.only(left: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        _unreadChatCount > 99 ? '99+' : _unreadChatCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Tab(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('通知'),
+                  if (_unreadNotificationCount > 0)
+                    Container(
+                      margin: const EdgeInsets.only(left: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        _unreadNotificationCount > 99 ? '99+' : _unreadNotificationCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          const ConversationListPage(),
+          _NotificationTab(
+            onUnreadCountChanged: (count) {
+              setState(() {
+                _unreadNotificationCount = count;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 通知列表 Tab
+class _NotificationTab extends StatefulWidget {
+  final Function(int) onUnreadCountChanged;
+
+  const _NotificationTab({required this.onUnreadCountChanged});
+
+  @override
+  State<_NotificationTab> createState() => _NotificationTabState();
+}
+
+class _NotificationTabState extends State<_NotificationTab> {
   List<dynamic> _notifications = [];
   bool _isLoading = true;
   bool _hasMore = true;
@@ -56,6 +196,10 @@ class _MessagePageState extends State<MessagePage> {
         _hasMore = notifications.length >= _limit;
         _isLoading = false;
       });
+
+      // 更新未读数
+      final count = await NotificationService.getUnreadCount();
+      widget.onUnreadCountChanged(count);
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -79,6 +223,9 @@ class _MessagePageState extends State<MessagePage> {
           _notifications[index]['is_read'] = true;
         }
       });
+      // 刷新未读数
+      final count = await NotificationService.getUnreadCount();
+      widget.onUnreadCountChanged(count);
     } catch (e) {
       // 静默处理
     }
@@ -92,6 +239,7 @@ class _MessagePageState extends State<MessagePage> {
           notification['is_read'] = true;
         }
       });
+      widget.onUnreadCountChanged(0);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('已全部标记为已读')),
@@ -124,12 +272,10 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   void _onNotificationTap(Map<String, dynamic> notification) {
-    // 标记为已读
     if (!notification['is_read']) {
       _markAsRead(notification['notification_id']);
     }
 
-    // 如果有关联订单，跳转到订单详情
     final orderId = notification['related_order_id'];
     if (orderId != null) {
       Navigator.push(
@@ -171,36 +317,18 @@ class _MessagePageState extends State<MessagePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          '消息通知',
-          style: TextStyle(
-            color: Color(0xFF1A1A2C),
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          if (_notifications.isNotEmpty)
-            TextButton(
-              onPressed: _markAllAsRead,
-              child: const Text(
-                '全部已读',
-                style: TextStyle(
-                  color: Color(0xFFCE965B),
-                  fontSize: 14,
-                ),
-              ),
-            ),
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: () => _loadNotifications(refresh: true),
         color: const Color(0xFFCE965B),
         child: _buildBody(),
       ),
+      floatingActionButton: _notifications.isNotEmpty
+          ? FloatingActionButton.small(
+              onPressed: _markAllAsRead,
+              backgroundColor: const Color(0xFFCE965B),
+              child: const Icon(Icons.done_all, color: Colors.white),
+            )
+          : null,
     );
   }
 

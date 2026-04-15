@@ -104,10 +104,18 @@ class ProductOut(Schema):
     stock: int
     product_status: str
     publisher_id: str
+    publisher_name: str = ""  # 发布者名称
     view_count: int
     sales_count: int
     favorite_count: int
     avg_rating: float
+
+    @staticmethod
+    def resolve_publisher_name(obj):
+        """从 publisher 外键获取用户名"""
+        if hasattr(obj, 'publisher') and obj.publisher:
+            return obj.publisher.username
+        return ""
 
 
 class ProductIn(Schema):

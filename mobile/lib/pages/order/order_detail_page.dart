@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../icons.dart';
 import '../../services/order_service.dart';
+import '../../auth_manager.dart';
+import '../chat/chat_room_page.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final String orderId;
@@ -816,13 +818,64 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     );
   }
 
+  Future<void> _contactOtherParty() async {
+    final currentUserId = await AuthManager.getUserId();
+    if (currentUserId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请先登录'), backgroundColor: Colors.red),
+        );
+      }
+      return;
+    }
+
+    final isBuyer = _order!['buyer_id'] == currentUserId;
+    final otherUserId = isBuyer ? _order!['seller_id'] : _order!['buyer_id'];
+    final otherUserName = isBuyer ? '卖家' : '买家';
+
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatRoomPage(
+            userId: otherUserId,
+            username: otherUserName,
+            orderId: widget.orderId,
+          ),
+        ),
+      );
+    }
+  }
+
   Widget _buildBottomBar() {
     final status = _order!['order_status'];
 
     List<Widget> buttons = [];
 
+    // 联系对方按钮（所有状态都显示）
+    buttons.add(
+      GestureDetector(
+        onTap: _contactOtherParty,
+        child: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: const Color(0xFFCE965B).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.chat_bubble_outline,
+              color: Color(0xFFCE965B),
+            ),
+          ),
+        ),
+      ),
+    );
+    buttons.add(const SizedBox(width: 12));
+
     if (status == 'PENDING_PAY') {
-      buttons = [
+      buttons.addAll([
         Expanded(
           child: OutlinedButton(
             onPressed: _cancelOrder,
@@ -846,9 +899,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             child: const Text('立即支付'),
           ),
         ),
-      ];
+      ]);
     } else if (status == 'PENDING_SHIP') {
-      buttons = [
+      buttons.add(
         const Expanded(
           child: Center(
             child: Text(
@@ -859,9 +912,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             ),
           ),
         ),
-      ];
+      );
     } else if (status == 'SHIPPED') {
-      buttons = [
+      buttons.add(
         Expanded(
           child: ElevatedButton(
             onPressed: _receiveOrder,
@@ -873,10 +926,17 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             child: const Text('确认收货'),
           ),
         ),
-      ];
+      );
+    } else {
+      buttons.add(const Expanded(
+        child: Center(
+          child: Text(
+            '订单已结束',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      ));
     }
-
-    if (buttons.isEmpty) return const SizedBox.shrink();
 
     return Container(
       padding: const EdgeInsets.all(16),

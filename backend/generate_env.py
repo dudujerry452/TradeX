@@ -23,6 +23,12 @@ def parse_port(url: str) -> str:
     return match.group(1) if match else '8000'
 
 
+def parse_ws_port(url: str) -> str:
+    """从 WebSocket URL 提取端口"""
+    match = re.match(r'wss?://[^:/]+:(\d+)', url)
+    return match.group(1) if match else '8001'
+
+
 def generate_secret_key() -> str:
     """生成随机 SECRET_KEY"""
     import secrets
@@ -119,7 +125,11 @@ def main():
         deploy_config = json.load(f)
 
     api_url = deploy_config.get("api_base_url", "http://127.0.0.1:8000/api")
+    ws_url = deploy_config.get("ws_url", "ws://127.0.0.1:8001")
     environment = deploy_config.get("environment", "local")
+
+    # 解析 WebSocket URL
+    ws_port = parse_port(ws_url.replace("ws://", "http://"))
 
     # 获取环境配置
     try:
@@ -138,11 +148,15 @@ def main():
         print(f"如需覆盖，请使用: python {Path(__file__).name} -f")
         return 0
 
+    # 解析 WebSocket 端口
+    ws_port = parse_ws_port(ws_url)
+
     # 生成 .env 内容
     env_content = f"""# 由 deploy-config.json 自动生成
 # 环境级别: {environment}
 # 说明: {cfg['description']}
 # API地址: {api_url}
+# WebSocket地址: {ws_url}
 # 生成时间: {datetime.now().isoformat()}
 
 SECRET_KEY={generate_secret_key()}
@@ -150,6 +164,10 @@ DEBUG={cfg['debug']}
 ALLOWED_HOSTS={cfg['allowed_hosts']}
 
 DATABASE_URL=sqlite:///db.sqlite3
+
+# WebSocket 配置
+WS_URL={ws_url}
+WS_PORT={ws_port}
 
 OPENROUTER_API_KEY=
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
@@ -184,16 +202,17 @@ LANGUAGE_CODE=zh-hans
     print(f"    级别: {environment}")
     print(f"    说明: {cfg['description']}")
     print(f"    API: {api_url}")
+    print(f"    WebSocket: {ws_url}")
     print(f"    DEBUG: {cfg['debug']}")
     print(f"    CORS: {'允许所有' if cfg['cors_allow_all'] == 'True' else '受限'}")
     print(f"    ALLOWED_HOSTS: {cfg['allowed_hosts']}")
 
     # 提示
     if environment == "local":
-        print(f"\n运行: python manage.py runserver")
+        print(f"\n运行: ./script/run-backend.sh")
     elif environment == "development":
-        print(f"\n运行: DJANGO_ENV=development python manage.py runserver 0.0.0.0:{cfg['port']}")
-        print(f"    Flutter: flutter run -d chrome --dart-define=API_BASE_URL={api_url}")
+        print(f"\n运行: ./script/run-backend.sh 8000 8001")
+        print(f"    Flutter: ./script/run-web.sh")
     elif environment == "production":
         print(f"\n生产环境请使用 gunicorn:")
         print(f"    DJANGO_ENV=production gunicorn -b 0.0.0.0:{cfg['port']} tradeX.wsgi:application")
