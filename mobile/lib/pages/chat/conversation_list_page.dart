@@ -22,6 +22,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
   bool _isLoading = true;
   String? _currentUserId;
   StreamSubscription? _messageSubscription;
+  Timer? _refreshDebounce; // 防抖定时器
 
   @override
   void initState() {
@@ -32,25 +33,54 @@ class _ConversationListPageState extends State<ConversationListPage> {
   Future<void> _init() async {
     _currentUserId = await AuthManager.getUserId();
 
+    // 先加载本地缓存（避免空白）
+    await _loadLocalConversations();
+
     // 连接 WebSocket
     await _chatService.connect();
 
     // 订阅新消息
     _messageSubscription = _chatService.messageStream.listen(_onNewMessage);
 
-    // 加载对话列表
+    // 从服务器加载对话列表
     await _loadConversations();
 
     // 获取未读数
     await _loadUnreadCount();
   }
 
+  /// 从本地缓存加载对话
+  Future<void> _loadLocalConversations() async {
+    try {
+      final cached = await ChatLocalStorage.getCachedConversations();
+      if (cached.isNotEmpty && mounted) {
+        setState(() {
+          _conversations = cached;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('加载本地对话失败: $e');
+    }
+  }
+
   void _onNewMessage(ChatMessage message) {
     // 收到新消息时刷新列表（无论是接收还是发送的消息）
     // 只要消息涉及当前用户，就刷新对话列表
+    if (!mounted) return;
     if (message.receiverId == _currentUserId || message.senderId == _currentUserId) {
-      _loadConversations();
-      _loadUnreadCount();
+      debugPrint('ConversationList: 收到新消息，准备刷新列表');
+
+      // 取消之前的定时器
+      _refreshDebounce?.cancel();
+
+      // 设置新的防抖定时器（500ms 后刷新）
+      _refreshDebounce = Timer(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          _loadConversations();
+          _loadUnreadCount();
+        }
+      });
     }
   }
 
@@ -153,6 +183,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
   @override
   void dispose() {
     _messageSubscription?.cancel();
+    _refreshDebounce?.cancel(); // 取消防抖定时器
+    // 注意：不要在这里 disconnect()，因为 ChatService 是全局单例
+    // 其他页面可能还在使用连接
     super.dispose();
   }
 

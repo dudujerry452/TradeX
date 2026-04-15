@@ -38,6 +38,7 @@ class ChatService extends ChangeNotifier {
 
   ChatConnectionStatus _status = ChatConnectionStatus.disconnected;
   String? _errorMessage;
+  String? _currentUserId; // 当前用户ID
 
   // 消息流控制器
   final _messageController = StreamController<ChatMessage>.broadcast();
@@ -69,6 +70,9 @@ class ChatService extends ChangeNotifier {
         _handleError('未登录，无法连接聊天服务器');
         return;
       }
+
+      // 获取当前用户ID
+      _currentUserId = await AuthManager.getUserId();
 
       final wsUrl = '$_wsBaseUrl$_wsPath?token=$token';
 
@@ -213,7 +217,20 @@ class ChatService extends ChangeNotifier {
   /// 处理聊天消息
   void _handleChatMessage(Map<String, dynamic> json) {
     try {
-      final message = ChatMessage.fromJson(json);
+      // 后端消息格式: {type: 'chat_message', message_id, from, content, created_at, product_id, order_id}
+      // 转换为 ChatMessage 期望的格式
+      final message = ChatMessage(
+        messageId: json['message_id'] ?? '',
+        senderId: json['from'] ?? '',
+        receiverId: _currentUserId ?? '',
+        content: json['content'] ?? '',
+        isRead: false,
+        createdAt: json['created_at'] != null
+            ? DateTime.parse(json['created_at'])
+            : DateTime.now(),
+        productId: json['product_id'],
+        orderId: json['order_id'],
+      );
       _messageController.add(message);
     } catch (e) {
       debugPrint('ChatService: 处理聊天消息失败: $e');

@@ -128,7 +128,7 @@ def get_conversations(request):
             conversations.append({
                 "user_id": other_user.user_id,
                 "username": other_user.username,
-                "avatar_url": other_user.image_url or "",
+                "avatar_url": getattr(other_user, 'image_url', None) or "",
                 "last_message": last_msg.content[:100],  # 截断显示
                 "last_message_time": last_msg.created_at,
                 "unread_count": unread_count,
