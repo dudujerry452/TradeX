@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from core.models import (
+    Category,
     Message,
     Order,
     OrderDetail,
@@ -2263,6 +2264,48 @@ class Command(BaseCommand):
                 )
         return created_count
 
+    def _upsert_products(self):
+        """插入商品并关联正确的分类"""
+        category_map = {
+            "手机数码": "digital",
+            "音频设备": "digital",
+            "电脑外设": "digital",
+            "智能穿戴": "digital",
+            "生活家电": "misc",
+        }
+        created_count = 0
+        for data in PRODUCTS:
+            category_id = category_map.get(data["category"], "other")
+            category = Category.objects.get(category_id=category_id)
+
+            defaults = {k: v for k, v in data.items() if k != "product_id"}
+            defaults["category"] = category.name
+            defaults["category_ref"] = category
+
+            obj, created = Product.objects.get_or_create(
+                product_id=data["product_id"], defaults=defaults
+            )
+            if created:
+                created_count += 1
+                self.stdout.write(f"  + Product: {data['product_id']}")
+            else:
+                # 修复已有数据：补充分类关联
+                updated = False
+                if obj.category_ref_id is None or obj.category != category.name:
+                    obj.category = category.name
+                    obj.category_ref = category
+                    obj.save(update_fields=["category", "category_ref"])
+                    updated = True
+                if updated:
+                    self.stdout.write(
+                        self.style.NOTICE(f"  ~ Product: {data['product_id']} (已更新分类)")
+                    )
+                else:
+                    self.stdout.write(
+                        self.style.WARNING(f"  ~ Product: {data['product_id']} (已存在, 跳过)")
+                    )
+        return created_count
+
     def handle(self, *args, **options):
         total = 0
 
@@ -2270,7 +2313,7 @@ class Command(BaseCommand):
         total += self._upsert(User, "user_id", USERS)
 
         self.stdout.write(self.style.MIGRATE_HEADING("── 商品 ──"))
-        total += self._upsert(Product, "product_id", PRODUCTS)
+        total += self._upsert_products()
 
         self.stdout.write(self.style.MIGRATE_HEADING("── 注册审核 ──"))
         total += self._upsert(RegisterReview, "review_id", REGISTER_REVIEWS)
