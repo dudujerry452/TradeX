@@ -458,3 +458,167 @@
 3. **接口更新**
    - POST /api/products/ 支持同时传入 `tag_ids` 关联标签
    - 商品响应包含推荐系统字段（view_count, sales_count 等）
+
+---
+
+## 订单接口
+
+### GET /api/orders
+获取当前用户的订单列表
+
+### POST /api/orders
+创建新订单
+
+**请求体：**
+```json
+{
+    "product_id": "string",
+    "quantity": 1,
+    "total_price": 9999.00,
+    "address": "string"
+}
+```
+
+### GET /api/orders/{order_id}
+查询订单详情
+
+### PATCH /api/orders/{order_id}/status
+更新订单状态（支付/发货/收货/取消）
+
+**请求体：**
+```json
+{
+    "status": "PAID"
+}
+```
+
+---
+
+## 聊天接口
+
+### GET /api/chat/conversations
+获取当前用户的对话列表
+
+**响应：**
+```json
+[
+    {
+        "user_id": "string",
+        "username": "string",
+        "avatar_url": "string",
+        "last_message": "string",
+        "last_message_time": "2024-01-01T00:00:00Z",
+        "unread_count": 0,
+        "product_id": "string",
+        "product_name": "string",
+        "order_id": "string"
+    }
+]
+```
+
+### GET /api/chat/messages/{user_id}
+获取与指定用户的历史消息
+
+### POST /api/chat/messages/{user_id}/read
+标记与某用户的对话已读
+
+### GET /api/chat/unread-count
+获取未读消息总数
+
+### WebSocket /ws/chat/
+建立实时聊天连接，支持发送/接收即时消息。
+
+---
+
+## 论坛接口
+
+### GET /api/forum/categories
+获取论坛分类列表
+
+### GET /api/forum/tags
+获取论坛标签列表
+
+### GET /api/forum/posts
+获取帖子列表（支持分页、分类筛选）
+
+### POST /api/forum/posts
+发布新帖子（需登录）
+
+**请求体：**
+```json
+{
+    "title": "string",
+    "content": "string",
+    "cover_image_url": "string",
+    "category_id": "string",
+    "tag_ids": ["tag001"]
+}
+```
+
+### GET /api/forum/posts/{post_id}
+获取帖子详情
+
+### POST /api/forum/posts/{post_id}/like
+点赞或取消点赞帖子（需登录）
+
+### GET /api/forum/posts/{post_id}/comments
+获取帖子评论列表
+
+### POST /api/forum/posts/{post_id}/comments
+发表评论（需登录）
+
+**请求体：**
+```json
+{
+    "content": "string"
+}
+```
+
+---
+
+## 卖家中心接口
+
+### GET /api/products/my
+获取当前卖家发布的商品列表
+
+### PUT /api/products/{product_id}
+更新商品信息（仅卖家本人）
+
+### GET /api/products/seller/stats
+获取卖家统计数据
+
+**响应：**
+```json
+{
+    "total_products": 10,
+    "published_products": 8,
+    "pending_products": 1,
+    "rejected_products": 1,
+    "total_sales": 100,
+    "total_revenue": 999900.00
+}
+```
+
+---
+
+## 变更记录
+
+### 2026-04
+
+1. **新增系统**
+   - 实时聊天系统（WebSocket + REST API）
+   - 论坛系统（帖子、评论、点赞、分类、标签）
+   - 卖家中心（我的商品、商品编辑、销售统计）
+   - 订单全流程管理
+
+2. **新增接口**
+   - 聊天：`/api/chat/*` + WebSocket `/ws/chat/`
+   - 论坛：`/api/forum/*`
+   - 卖家中心：`/api/products/my`、`/api/products/seller/stats`
+   - 订单：`/api/orders/*`
+   - RAG AI：`/api/rag/*`
+
+3. **环境更新**
+   - Django 支持多环境 `.env` 配置（local/development/production）
+   - 引入 `deploy-config.json` 统一管理 API 地址与 WebSocket 地址
+   - 开发环境采用双端口：HTTP (7001) + WebSocket (7002)

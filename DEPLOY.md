@@ -6,52 +6,95 @@
 
 ```json
 {
-  "environment": "production",
-  "api_base_url": "https://api.yourdomain.com/api",
-  "flutter_version": "3.22.0"
+  "_comment": "TradeX 统一配置文件, 请使用./script/switch-config.sh切换",
+  "_environment_help": "local=本地开发, development=远程开发(CORS宽松), production=生产",
+  "environment": "local",
+  "api_base_url": "http://localhost:8000/api",
+  "ws_url": "ws://localhost:8001",
+  "flutter_version": "3.41.2"
 }
 ```
 
+## 环境说明
+
+- `local`：本地开发（前后端都在本地，CORS 最宽松）
+- `development`：远程开发（前端 localhost → 远程后端，CORS 宽松）
+- `production`：生产环境（严格配置）
+
 ## 使用方法
 
-### 1. 修改配置
+### 1. 切换配置
 
-编辑 `deploy-config.json`，填入你的域名：
-
-```json
-"api_base_url": "https://api.example.com/api"
-```
-
-### 2. 本地打包 APK
+使用脚本快速切换环境：
 
 ```bash
-./build-apk.sh
+./script/switch-config.sh local
+./script/switch-config.sh development
+./script/switch-config.sh production
 ```
 
-APK 将输出到 `tradex-production.apk`
+### 2. 启动后端服务
 
-### 3. 后端部署
+开发环境（双端口：HTTP + WebSocket）：
 
-手动部署，配置从 `.env` 读取：
+```bash
+./script/start-dev.sh
+```
+
+或手动指定端口：
+
+```bash
+./script/run-backend.sh 8000 8001
+```
+
+### 3. 本地打包 APK
+
+```bash
+./script/deploy.sh
+```
+
+APK 将输出到 `tradex-<environment>.apk`
+
+### 4. 后端手动部署
+
+配置从 `.env.${DJANGO_ENV}` 读取，默认回退到 `.env.local`：
 
 ```bash
 cd backend
-cp .env.example .env
-# 编辑 .env 填入配置
-python manage.py runserver
+export DJANGO_ENV=production
+# 编辑 .env.production 填入配置
+python manage.py migrate
+python manage.py collectstatic --noinput
 ```
 
-## 多环境配置
-
-支持的环境变量值：`development`, `staging`, `production`
-
-本地开发示例：
+生产环境建议用 Gunicorn + Daphne 分别启动 HTTP 与 WebSocket：
 
 ```bash
-# Android 模拟器
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000/api
+# WebSocket
+daphne -b 0.0.0.0 -p 8001 tradeX.asgi:application &
 
-# iOS 模拟器
+# HTTP
+gunicorn tradeX.wsgi:application -b 0.0.0.0:8000
+```
+
+## 多环境配置示例
+
+本地开发：
+
+```bash
+./script/switch-config.sh local
+./script/start-dev.sh
+```
+
+Android 模拟器：
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000/api
+```
+
+iOS 模拟器：
+
+```bash
 flutter run --dart-define=API_BASE_URL=http://127.0.0.1:8000/api
 ```
 
