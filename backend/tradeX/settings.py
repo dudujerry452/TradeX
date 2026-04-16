@@ -142,6 +142,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # 应用定义
 INSTALLED_APPS = [
+    "daphne",  # 必须在第一位，ASGI 支持
+    "channels",  # WebSocket 支持
     "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -182,6 +184,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "tradeX.wsgi.application"
+ASGI_APPLICATION = "tradeX.asgi.application"
+
+# Channel Layers 配置（WebSocket）
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # 开发环境使用内存
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",  # 生产环境使用 Redis
+        # "CONFIG": {
+        #     "hosts": [("127.0.0.1", 6379)],
+        # },
+    }
+}
 
 # 密码验证
 AUTH_PASSWORD_VALIDATORS = [

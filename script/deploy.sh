@@ -7,27 +7,27 @@ now=$(date +"%Y%m%d%H%M%S")
 
 cd ${dir}/../
 
-tar zcvf backend_${now}.tar.gz ./backend
+tar zcf backend_${now}.tar.gz ./backend
 
 scp backend_${now}.tar.gz cloud:~/
 rm backend_${now}.tar.gz 
 scp deploy-config.json* cloud:~/
 scp -r script cloud:~/
 
-ssh cloud << EOF
-rm backend
-tar xzvf backend_${now}.tar.gz
-mv backend backend_${now}
-ln -s backend_${now} backend
+ssh -T cloud << EOF
+  rm -f backend
+  tar xzf backend_${now}.tar.gz
+  mv backend backend_${now}
+  ln -s backend_${now} backend
 
-source .venv/bin/activate
+  source .venv/bin/activate
 
-bash script/switch-config.sh development
+  bash script/switch-config.sh development > /tmp/deploy-switch.log 2>&1
 
-rm backend/db.sqlite3
-rm -rf backend/vector_db/*
+  rm -f backend/db.sqlite3
+  rm -rf backend/vector_db/*
 
-python3 backend/manage.py migrate
-python3 backend/manage.py seed
-python3 backend/manage.py sync_vector_products
+  python3 backend/manage.py migrate > /tmp/deploy-migrate.log 2>&1
+  python3 backend/manage.py seed > /tmp/deploy-seed.log 2>&1
+  python3 backend/manage.py sync_vector_products > /tmp/deploy-sync.log 2>&1
 EOF

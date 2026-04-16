@@ -4,6 +4,7 @@ import 'api.dart';
 import 'auth_manager.dart';
 import 'services/order_service.dart';
 import 'pages/order/order_detail_page.dart';
+import 'pages/chat/chat_room_page.dart';
 
 /// 商品详情页面
 class ProductDetailPage extends StatefulWidget {
@@ -497,6 +498,49 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
+  Future<void> _contactSeller() async {
+    if (_currentUserId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请先登录'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final product = _product;
+    if (product == null) return;
+
+    final sellerId = product['publisher_id'];
+    final sellerName = product['publisher_name'] ?? '卖家';
+
+    if (sellerId == _currentUserId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('不能联系自己'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatRoomPage(
+          userId: sellerId,
+          username: sellerName,
+          productId: widget.productId,
+          productName: product['product_name'],
+        ),
+      ),
+    ).then((_) {
+      // 返回后刷新页面（可选）
+      if (mounted) setState(() {});
+    });
+  }
+
   Future<void> _buyNow() async {
     if (_currentUserId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -646,6 +690,25 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           _isFavorited ? Icons.favorite : Icons.favorite_border,
                           color: _isFavorited ? Colors.red : Colors.grey.shade600,
                         ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // 联系卖家按钮
+            GestureDetector(
+              onTap: _contactSeller,
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCE965B).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.chat_bubble_outline,
+                    color: Color(0xFFCE965B),
+                  ),
                 ),
               ),
             ),

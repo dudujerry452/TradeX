@@ -3,5 +3,6 @@
   "_environment_help": "local=本地开发, development=远程开发(CORS宽松), production=生产",
   "environment": "development",
   "api_base_url": "http://47.104.69.18:7001/api",
+  "ws_url": "ws://47.104.69.18:7002",
   "flutter_version": "3.41.2"
 }

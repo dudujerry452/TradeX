@@ -672,3 +672,62 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification {self.notification_id} for {self.user.username}"
+
+
+class ChatMessage(models.Model):
+    """聊天消息实体"""
+    message_id = models.CharField(max_length=50, primary_key=True, verbose_name="消息ID")
+
+    # 发送者
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='sent_chat_messages',
+        verbose_name="发送者"
+    )
+
+    # 接收者
+    receiver = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='received_chat_messages',
+        verbose_name="接收者"
+    )
+
+    # 关联商品（可选）
+    related_product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='chat_messages',
+        verbose_name="关联商品"
+    )
+
+    # 关联订单（可选）
+    related_order = models.ForeignKey(
+        Order,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='chat_messages',
+        verbose_name="关联订单"
+    )
+
+    content = models.TextField(verbose_name="消息内容")
+    is_read = models.BooleanField(default=False, verbose_name="是否已读")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        db_table = 'chat_message'
+        verbose_name = "聊天消息"
+        verbose_name_plural = "聊天消息"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['sender', 'receiver']),
+            models.Index(fields=['receiver', 'is_read']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"Chat {self.message_id}: {self.sender.username} -> {self.receiver.username}"
