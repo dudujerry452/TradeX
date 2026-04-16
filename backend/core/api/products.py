@@ -93,6 +93,7 @@ def search_products(
     limit: int = 10,
     offset: int = 0,
     token: Optional[str] = None,  # 可选用户token，用于个性化
+    sort: str = "trending",  # 排序方式：trending(热度) / time(时间)
 ):
     """模糊搜索商品（支持分类筛选）
 
@@ -100,11 +101,13 @@ def search_products(
     - 支持精确分类筛选（category参数）
     - 可选token用于后续个性化排序（预留）
     - 支持分页
+    - 支持排序方式切换：sort=trending（默认，按热度分降序）或 sort=time（按发布时间降序）
 
     使用场景：
     - q为空 + category有值：返回该分类下所有商品
     - q有值 + category有值：在该分类内搜索
     - q有值 + category为空：全站搜索
+    - 最新页面：q为空 + sort=time
     """
     from core.models import ProductFavorite
     from .common import JWT_SECRET
@@ -130,13 +133,17 @@ def search_products(
             Q(description__icontains=q),
         ).distinct()
 
-    # 添加热度分计算并排序
-    products = products.annotate(
-        trending_score=F('view_count') * 0.2 +
-                      F('sales_count') * 0.3 +
-                      F('favorite_count') * 0.3 +
-                      F('avg_rating') * 20 * 0.2
-    ).order_by('-trending_score')
+    # 根据 sort 参数决定排序方式
+    if sort == "time":
+        products = products.order_by('-publish_time')
+    else:
+        # 默认按热度分排序
+        products = products.annotate(
+            trending_score=F('view_count') * 0.2 +
+                          F('sales_count') * 0.3 +
+                          F('favorite_count') * 0.3 +
+                          F('avg_rating') * 20 * 0.2
+        ).order_by('-trending_score')
 
     # 分页
     paginated = products[offset:offset + limit]

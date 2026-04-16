@@ -1493,3 +1493,137 @@ class NotificationAPITests(TestCase):
 
         # 验证通知已删除
         self.assertFalse(Notification.objects.filter(notification_id="n001").exists())
+
+
+class ProductSearchSortTests(TestCase):
+    """搜索接口排序功能测试"""
+
+    def setUp(self):
+        self.publisher = make_user()
+
+    def test_search_default_sort_by_trending(self):
+        """验证默认不传 sort 时，返回结果按热度分从高到低排"""
+        from django.utils import timezone
+        now = timezone.now()
+
+        # 创建三个 APPROVED 商品，热度分从高到低
+        make_product(
+            self.publisher,
+            product_id="p_high",
+            product_name="高热度商品",
+            product_status=Product.StatusChoices.APPROVED,
+            view_count=1000,
+            sales_count=500,
+            favorite_count=300,
+            avg_rating=4.8,
+            publish_time=now,
+        )
+        make_product(
+            self.publisher,
+            product_id="p_mid",
+            product_name="中热度商品",
+            product_status=Product.StatusChoices.APPROVED,
+            view_count=500,
+            sales_count=200,
+            favorite_count=100,
+            avg_rating=4.5,
+            publish_time=now,
+        )
+        make_product(
+            self.publisher,
+            product_id="p_low",
+            product_name="低热度商品",
+            product_status=Product.StatusChoices.APPROVED,
+            view_count=100,
+            sales_count=50,
+            favorite_count=20,
+            avg_rating=4.0,
+            publish_time=now,
+        )
+
+        response = self.client.get("/api/products/search/?limit=10")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        product_ids = [p["product_id"] for p in data]
+        self.assertEqual(product_ids, ["p_high", "p_mid", "p_low"])
+
+    def test_search_sort_by_time(self):
+        """验证 sort=time 时，返回结果按 publish_time 从新到旧排"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        now = timezone.now()
+
+        # 创建三个 APPROVED 商品，发布时间从旧到新
+        make_product(
+            self.publisher,
+            product_id="p_old",
+            product_name="旧商品",
+            product_status=Product.StatusChoices.APPROVED,
+            publish_time=now - timedelta(hours=3),
+        )
+        make_product(
+            self.publisher,
+            product_id="p_mid",
+            product_name="中商品",
+            product_status=Product.StatusChoices.APPROVED,
+            publish_time=now - timedelta(hours=1),
+        )
+        make_product(
+            self.publisher,
+            product_id="p_new",
+            product_name="新商品",
+            product_status=Product.StatusChoices.APPROVED,
+            publish_time=now,
+        )
+
+        response = self.client.get("/api/products/search/?limit=10&sort=time")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        product_ids = [p["product_id"] for p in data]
+        self.assertEqual(product_ids, ["p_new", "p_mid", "p_old"])
+
+    def test_search_sort_by_time_with_category(self):
+        """验证带分类筛选 + sort=time 仍能正确排序"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        now = timezone.now()
+        cat = Category.objects.create(category_id="c001", name="电子产品")
+
+        # 属于目标分类的商品
+        make_product(
+            self.publisher,
+            product_id="p_cat_old",
+            product_name="分类旧商品",
+            product_status=Product.StatusChoices.APPROVED,
+            category="电子产品",
+            category_ref=cat,
+            publish_time=now - timedelta(hours=2),
+        )
+        make_product(
+            self.publisher,
+            product_id="p_cat_new",
+            product_name="分类新商品",
+            product_status=Product.StatusChoices.APPROVED,
+            category="电子产品",
+            category_ref=cat,
+            publish_time=now,
+        )
+
+        # 不属于目标分类的商品
+        make_product(
+            self.publisher,
+            product_id="p_other",
+            product_name="其他分类商品",
+            product_status=Product.StatusChoices.APPROVED,
+            category="服装",
+            publish_time=now - timedelta(minutes=30),
+        )
+
+        response = self.client.get("/api/products/search/?category=c001&limit=10&sort=time")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        product_ids = [p["product_id"] for p in data]
+        self.assertEqual(product_ids, ["p_cat_new", "p_cat_old"])
+        self.assertNotIn("p_other", product_ids)
