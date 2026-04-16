@@ -14,7 +14,20 @@
 set -e
 
 dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-cd ${dir}/../backend
+cd ${dir}/..
+
+# 读取配置
+ENVIR=$(cat deploy-config.json | jq -r '.environment')
+API_URL=$(cat deploy-config.json | jq -r '.api_base_url')
+WS_URL=$(cat deploy-config.json | jq -r '.ws_url')
+
+# 解析端口
+HTTP_PORT=$(echo $API_URL | grep -oP ':\K\d+' | head -1)
+WS_PORT=$(echo $WS_URL | grep -oP ':\K\d+' | head -1)
+HTTP_PORT=${HTTP_PORT:-8000}
+WS_PORT=${WS_PORT:-8001}
+
+cd backend
 
 # 颜色输出
 RED='\033[0;31m'
@@ -42,23 +55,33 @@ fi
 
 # 数据库迁移
 echo -e "${YELLOW}检查数据库迁移...${NC}"
-python manage.py migrate --run-syncdb
+DJANGO_ENV=$ENVIR python manage.py migrate --run-syncdb
+
+echo $ENVIR
+echo $API_URL
+echo $WS_URL
+
+# 解析端口
+echo $HTTP_PORT
+echo $WS_PORT
+echo $HTTP_PORT
+echo $WS_PORT
 
 echo ""
 echo -e "${GREEN}启动服务...${NC}"
 echo ""
 
-# 启动 Django HTTP (端口 8000)
-echo -e "${GREEN}[1/2] 启动 Django HTTP 服务器 (端口 8000)${NC}"
-python manage.py runserver 0.0.0.0:8000 &
+# 启动 Django HTTP
+echo -e "${GREEN}[1/2] 启动 Django HTTP 服务器 (端口 $HTTP_PORT)${NC}"
+DJANGO_ENV=$ENVIR python manage.py runserver 0.0.0.0:$HTTP_PORT &
 DJANGO_PID=$!
 
 # 等待 Django 启动
 sleep 2
 
-# 启动 Daphne WebSocket (端口 8001)
-echo -e "${GREEN}[2/2] 启动 Daphne WebSocket 服务器 (端口 8001)${NC}"
-daphne -b 0.0.0.0 -p 8001 tradeX.asgi:application &
+# 启动 Daphne WebSocket
+echo -e "${GREEN}[2/2] 启动 Daphne WebSocket 服务器 (端口 $WS_PORT)${NC}"
+DJANGO_ENV=$ENVIR daphne -b 0.0.0.0 -p $WS_PORT tradeX.asgi:application &
 DAPHNE_PID=$!
 
 echo ""
@@ -66,9 +89,10 @@ echo -e "${GREEN}=======================================${NC}"
 echo -e "${GREEN}  服务已启动!                          ${NC}"
 echo -e "${GREEN}=======================================${NC}"
 echo ""
-echo -e "  ${YELLOW}Django HTTP:${NC}   http://localhost:8000"
-echo -e "  ${YELLOW}WebSocket:${NC}     ws://localhost:8001/ws/chat/"
-echo -e "  ${YELLOW}API 文档:${NC}       http://localhost:8000/api/docs"
+echo -e "  ${YELLOW}环境:${NC}          $ENVIR"
+echo -e "  ${YELLOW}Django HTTP:${NC}   $API_URL"
+echo -e "  ${YELLOW}WebSocket:${NC}     $WS_URL/ws/chat/"
+echo -e "  ${YELLOW}API 文档:${NC}      $API_URL/docs"
 echo ""
 echo -e "  ${YELLOW}进程 PID:${NC}      Django=$DJANGO_PID, Daphne=$DAPHNE_PID"
 echo ""
