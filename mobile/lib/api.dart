@@ -586,12 +586,14 @@ class ApiService {
   /// [limit] 返回数量限制
   /// [offset] 分页偏移量
   /// [token] 可选用户token
+  /// [sort] 排序方式：trending(热度) / time(时间)
   static Future<Map<String, dynamic>> searchProducts({
     String query = '',
     String? category,
     int limit = 10,
     int offset = 0,
     String? token,
+    String? sort,
   }) async {
     final queryParams = <String, String>{
       'q': query,
@@ -603,6 +605,9 @@ class ApiService {
     }
     if (token != null && token.isNotEmpty) {
       queryParams['token'] = token;
+    }
+    if (sort != null && sort.isNotEmpty) {
+      queryParams['sort'] = sort;
     }
 
     final url = Uri.parse('$baseUrl/products/search/')

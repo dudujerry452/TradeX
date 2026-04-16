@@ -167,6 +167,7 @@ class _DiscoverPageState extends State<DiscoverPage>
       category: _selectedCategory == 'all' ? null : _selectedCategory,
       limit: _pageSize,
       offset: offset,
+      sort: 'time',
     );
 
     if (result['success']) {
@@ -175,13 +176,6 @@ class _DiscoverPageState extends State<DiscoverPage>
       if (rawData is List) {
         items = rawData;
       }
-
-      // 按发布时间排序（最新优先）
-      items.sort((a, b) {
-        final timeA = a['publish_time'] ?? '';
-        final timeB = b['publish_time'] ?? '';
-        return timeB.toString().compareTo(timeA.toString());
-      });
 
       setState(() {
         if (offset == 0) {
