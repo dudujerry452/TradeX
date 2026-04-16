@@ -14,7 +14,7 @@ rm backend_${now}.tar.gz
 scp deploy-config.json* cloud:~/
 scp -r script cloud:~/
 
-ssh -T cloud << EOF
+ssh -T cloud << EOF > /dev/null 2>&1
   rm -f backend
   tar xzf backend_${now}.tar.gz
   mv backend backend_${now}
