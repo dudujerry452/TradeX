@@ -1,6 +1,7 @@
 ---
 config:
   theme: neo
+  layout: dagre
 ---
 flowchart TB
     A1["1:项目初始化<br>2026-03-13 | 1d"] --> A2["2:Django后端初始化<br>2026-03-13 | 1d"]
@@ -20,7 +21,7 @@ flowchart TB
     F4 --> F5["6.5:移动端卖家中心开发<br>2026-04-08 | 1d"]
     G_HEAD --> G1["7.1:基础AI导购实现<br>2026-03-25 | 1d"]
     G1 --> G2["7.2:RAG泛化推荐开发<br>2026-04-07 | 1d"]
-    G2 --> G3["7.3:修复推荐乱推荐<br>无标签问题<br>2026-04-03~04-04 | 2d"]
+    G2 --> G3["7.3:修复推荐乱推荐<br>无标签问题<br>2026-04-04 | 2d"]
     G3 --> G4["7.4:AI导购界面与返回值优化<br>2026-04-08 | 1d"]
     H_HEAD --> H1["8.1:后端接口/路径修复<br>2026-04-04 | 1d"]
     H1 --> H2["8.2:移动端网络/字体<br>订单API修复<br>2026-03-30~04-10 | 2d"]
@@ -35,14 +36,12 @@ flowchart TB
     G4 --> J
     H4 --> J
     I4 --> J
-    J --> K["11:功能测试与显著问题修复<br>2026-4-10 ｜7d"]
-    K --> T_HEAD["主要功能实现及调试"] & U_HEAD["分支功能实现及调试"]
-    T_HEAD --> T0["12.1:图床开发<br>本周 | 1d | 已完成"]
-    T0 --> T1["12.2:测试订单流<br>本周 | 2d | 进行中"]
-    T1 --> T2["12.3:测试消息机制<br>购买/付款/发货提示<br>本周 | 2d | 进行中"]
-    T2 --> T3["12.4:实现实时消息<br>本周 | 2d | 进行中"]
-    T3 --> T4["12.5:讨论机制<br>本周 | 2d | 进行中"]
-    U_HEAD --> n1@{ label: "13.1:RAG搜索测试优化<br style=\"--tw-scale-x:\">本周 | 7d | 进行中" } & n2@{ label: "13.2:推荐系统测试优化<br style=\"--tw-scale-x:\">本周 | 3d | 进行中" }
+    J --> K["11:功能实现、测试与显著问题修复<br>2026-4-10 ｜7d"]
+    K --> T_HEAD["功能实现"] & U_HEAD["功能测试"]
+    T_HEAD --> T0["12.1:图床开发<br>2026-4-10 | 1d"]
+    T0 --> T3["12.2:实现实时消息<br>2026-4-15 | 3d"]
+    U_HEAD --> T2["13.1:测试消息机制<br>购买/付款/发货提示<br>7d | 进行中"] & T1["13.2:测试订单流<br>2026-4-12 | 2d"] & n1@{ label: "13.3:RAG搜索测试优化<br style=\"--tw-scale-x:\">3d" } & n2@{ label: "13.4:推荐系统测试优化<br style=\"--tw-scale-x:\">3d" }
+    T3 --> T4["12.3:讨论机制<br>"] & T2
 
     n1@{ shape: rect}
     n2@{ shape: rect}
@@ -66,7 +65,5 @@ flowchart TB
     style T_HEAD fill:#FFEBEE,stroke:#D32F2F
     style U_HEAD fill:#E3F2FD,stroke:#1976D2
     style T0 fill:#FFEBEE,stroke:#D32F2F
-    style T1 fill:#FFEBEE,stroke:#D32F2F
-    style T2 fill:#FFEBEE,stroke:#D32F2F
     style T3 fill:#FFEBEE,stroke:#D32F2F
-    style T4 fill:#FFEBEE,stroke:#D32F2F
+    style T2 fill:#FFEBEE,stroke:#D32F2F
