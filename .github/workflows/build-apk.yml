@@ -43,6 +43,7 @@ jobs:
           # 读取配置（带错误检查）
           ENVIRONMENT=$(jq -r '.environment // empty' deploy-config.json.development)
           API_URL=$(jq -r '.api_base_url // empty' deploy-config.json.development)
+          WS_URL=$(jq -r '.ws_url // empty' deploy-config.json.development)
           FLUTTER_VERSION=$(jq -r '.flutter_version // "3.22.0"' deploy-config.json.development)
 
           # 检查是否读取成功
@@ -51,13 +52,20 @@ jobs:
             exit 1
           fi
 
+          if [ -z "$WS_URL" ]; then
+            echo "❌ 错误: 无法读取 ws_url"
+            exit 1
+          fi
+
           echo "environment=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
           echo "api_url=${API_URL}" >> "$GITHUB_OUTPUT"
+          echo "ws_url=${WS_URL}" >> "$GITHUB_OUTPUT"
           echo "flutter_version=${FLUTTER_VERSION}" >> "$GITHUB_OUTPUT"
 
           echo "=== 读取到的配置 ==="
           echo "环境: ${ENVIRONMENT}"
           echo "API地址: ${API_URL}"
+          echo "WebSocket地址: ${WS_URL}"
           echo "Flutter版本: ${FLUTTER_VERSION}"
 
       - name: Setup Java
@@ -81,8 +89,12 @@ jobs:
         working-directory: ./mobile
         run: |
           API_URL="${{ steps.config.outputs.api_url }}"
+          WS_URL="${{ steps.config.outputs.ws_url }}"
           echo "Building with API: ${API_URL}"
-          flutter build apk --release --dart-define=API_BASE_URL="${API_URL}"
+          echo "Building with WS: ${WS_URL}"
+          flutter build apk --release \
+            --dart-define=API_BASE_URL="${API_URL}" \
+            --dart-define=WS_URL="${WS_URL}"
 
       - name: Show build artifacts
         working-directory: ./mobile
@@ -109,6 +121,7 @@ jobs:
 
             - 环境: ${{ steps.config.outputs.environment }}
             - API地址: ${{ steps.config.outputs.api_url }}
+            - WebSocket地址: ${{ steps.config.outputs.ws_url }}
             - Flutter版本: ${{ steps.config.outputs.flutter_version }}
           files: mobile/build/app/outputs/flutter-apk/*.apk
         env:
