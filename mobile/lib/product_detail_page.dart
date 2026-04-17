@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'api.dart';
 import 'auth_manager.dart';
+import 'services/cart_service.dart';
 import 'services/order_service.dart';
+import 'pages/cart/cart_page.dart';
 import 'pages/order/order_detail_page.dart';
 import 'pages/chat/chat_room_page.dart';
 
@@ -10,10 +12,7 @@ import 'pages/chat/chat_room_page.dart';
 class ProductDetailPage extends StatefulWidget {
   final String productId;
 
-  const ProductDetailPage({
-    super.key,
-    required this.productId,
-  });
+  const ProductDetailPage({super.key, required this.productId});
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -26,6 +25,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   bool _isLoading = true;
   bool _isFavorited = false;
   bool _isFavoriteLoading = false;
+  bool _isAddingToCart = false;
   String _currentUserId = '';
 
   @override
@@ -77,15 +77,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           _isFavorited = favoriteResult['isFavorited'] ?? false;
         }
         if (similarResult['success']) {
-          _similarProducts = similarResult['data'] is List ? similarResult['data'] : [];
+          _similarProducts = similarResult['data'] is List
+              ? similarResult['data']
+              : [];
         }
         _isLoading = false;
       });
 
       if (!productResult['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(productResult['message'])),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(productResult['message'])));
       }
     }
   }
@@ -95,10 +97,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
     if (_currentUserId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请先登录'),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(content: Text('请先登录'), backgroundColor: Colors.red),
       );
       return;
     }
@@ -120,7 +119,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result['message']),
-          backgroundColor: result['success'] ? const Color(0xFFCE965B) : Colors.red,
+          backgroundColor: result['success']
+              ? const Color(0xFFCE965B)
+              : Colors.red,
         ),
       );
     }
@@ -137,8 +138,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               ),
             )
           : _product == null
-              ? _buildErrorView()
-              : _buildContent(),
+          ? _buildErrorView()
+          : _buildContent(),
       bottomNavigationBar: _product != null ? _buildBottomBar() : null,
     );
   }
@@ -148,18 +149,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 60,
-            color: Colors.grey.shade400,
-          ),
+          Icon(Icons.error_outline, size: 60, color: Colors.grey.shade400),
           const SizedBox(height: 16),
           Text(
             '加载失败',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
           ),
           const SizedBox(height: 16),
           ElevatedButton(
@@ -183,9 +177,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           expandedHeight: 300,
           pinned: true,
           backgroundColor: const Color(0xFFCE965B),
-          flexibleSpace: FlexibleSpaceBar(
-            background: _buildImageGallery(),
-          ),
+          flexibleSpace: FlexibleSpaceBar(background: _buildImageGallery()),
           leading: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -215,27 +207,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ],
         ),
         // 商品信息
-        SliverToBoxAdapter(
-          child: _buildProductInfo(),
-        ),
+        SliverToBoxAdapter(child: _buildProductInfo()),
         // 标签区域
-        if (_tags.isNotEmpty)
-          SliverToBoxAdapter(
-            child: _buildTagsSection(),
-          ),
+        if (_tags.isNotEmpty) SliverToBoxAdapter(child: _buildTagsSection()),
         // 商品描述
-        SliverToBoxAdapter(
-          child: _buildDescriptionSection(),
-        ),
+        SliverToBoxAdapter(child: _buildDescriptionSection()),
         // 相似商品区域
         if (_similarProducts.isNotEmpty)
-          SliverToBoxAdapter(
-            child: _buildSimilarProductsSection(),
-          ),
+          SliverToBoxAdapter(child: _buildSimilarProductsSection()),
         // 底部留白
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 20),
-        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 20)),
       ],
     );
   }
@@ -252,10 +233,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               height: 300,
               errorBuilder: (context, error, stackTrace) {
                 return Center(
-                  child: HeroIcons.photo(
-                    size: 60,
-                    color: Colors.grey.shade400,
-                  ),
+                  child: HeroIcons.photo(size: 60, color: Colors.grey.shade400),
                 );
               },
             )
@@ -309,7 +287,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               const SizedBox(width: 12),
               if (stock > 0)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green.shade50,
                     borderRadius: BorderRadius.circular(8),
@@ -324,17 +305,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 )
               else
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.red.shade50,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '暂时缺货',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.red.shade700,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.red.shade700),
                   ),
                 ),
             ],
@@ -354,7 +335,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('评分', rating > 0 ? rating.toStringAsFixed(1) : '暂无', Icons.star),
+              _buildStatItem(
+                '评分',
+                rating > 0 ? rating.toStringAsFixed(1) : '暂无',
+                Icons.star,
+              ),
               _buildDivider(),
               _buildStatItem('销量', salesCount.toString(), Icons.shopping_cart),
               _buildDivider(),
@@ -389,21 +374,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
         ),
       ],
     );
   }
 
   Widget _buildDivider() {
-    return Container(
-      height: 30,
-      width: 1,
-      color: Colors.grey.shade200,
-    );
+    return Container(height: 30, width: 1, color: Colors.grey.shade200);
   }
 
   Widget _buildTagsSection() {
@@ -438,7 +416,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             runSpacing: 8,
             children: _tags.map((tag) {
               final tagName = tag['tag_name'] ?? '标签';
-              final category = tag['category'] ?? '';
               return Chip(
                 label: Text(tagName),
                 backgroundColor: const Color(0xFFCE965B).withOpacity(0.1),
@@ -501,10 +478,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Future<void> _contactSeller() async {
     if (_currentUserId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请先登录'),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(content: Text('请先登录'), backgroundColor: Colors.red),
       );
       return;
     }
@@ -517,10 +491,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
     if (sellerId == _currentUserId) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('不能联系自己'),
-          backgroundColor: Colors.orange,
-        ),
+        const SnackBar(content: Text('不能联系自己'), backgroundColor: Colors.orange),
       );
       return;
     }
@@ -541,13 +512,85 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     });
   }
 
+  Future<void> _addToCart() async {
+    if (_isAddingToCart) return;
+
+    if (_currentUserId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请先登录'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final product = _product;
+    if (product == null) return;
+
+    final sellerId = product['publisher_id']?.toString() ?? '';
+    if (sellerId.isNotEmpty && sellerId == _currentUserId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('不能把自己的商品加入购物车'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final stock = (product['stock'] as num?)?.toInt() ?? 0;
+    if (stock <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('商品库存不足'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    setState(() {
+      _isAddingToCart = true;
+    });
+
+    try {
+      await CartService.addProduct(product);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('已加入购物车'),
+          backgroundColor: const Color(0xFFCE965B),
+          action: SnackBarAction(
+            label: '去购物车',
+            textColor: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartPage()),
+              );
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAddingToCart = false;
+        });
+      }
+    }
+  }
+
   Future<void> _buyNow() async {
     if (_currentUserId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请先登录'),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(content: Text('请先登录'), backgroundColor: Colors.red),
       );
       return;
     }
@@ -619,9 +662,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OrderDetailPage(
-                orderId: result['order_id'],
-              ),
+              builder: (context) =>
+                  OrderDetailPage(orderId: result['order_id']),
             ),
           );
 
@@ -635,10 +677,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('创建订单失败: $e'),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text('创建订单失败: $e'), backgroundColor: Colors.red),
           );
         }
       }
@@ -683,12 +722,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFFCE965B)),
+                              Color(0xFFCE965B),
+                            ),
                           ),
                         )
                       : Icon(
                           _isFavorited ? Icons.favorite : Icons.favorite_border,
-                          color: _isFavorited ? Colors.red : Colors.grey.shade600,
+                          color: _isFavorited
+                              ? Colors.red
+                              : Colors.grey.shade600,
                         ),
                 ),
               ),
@@ -716,7 +758,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             // 加入购物车按钮
             Expanded(
               child: ElevatedButton(
-                onPressed: stock > 0 ? () {} : null,
+                onPressed: stock > 0 && !_isAddingToCart ? _addToCart : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFCE965B).withOpacity(0.1),
                   foregroundColor: const Color(0xFFCE965B),
@@ -726,13 +768,24 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  '加入购物车',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: _isAddingToCart
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFFCE965B),
+                          ),
+                        ),
+                      )
+                    : const Text(
+                        '加入购物车',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(width: 12),
@@ -751,10 +804,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 child: const Text(
                   '立即购买',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -802,10 +852,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 child: const Text(
                   '推荐',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Color(0xFFCE965B),
-                  ),
+                  style: TextStyle(fontSize: 10, color: Color(0xFFCE965B)),
                 ),
               ),
             ],
@@ -839,9 +886,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailPage(
-              productId: product['product_id'],
-            ),
+            builder: (context) =>
+                ProductDetailPage(productId: product['product_id']),
           ),
         );
       },

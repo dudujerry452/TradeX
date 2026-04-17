@@ -3,6 +3,7 @@ import 'icons.dart';
 import 'login_screen.dart';
 import 'api.dart';
 import 'favorites_page.dart';
+import 'pages/cart/cart_page.dart';
 import 'auth_manager.dart';
 import 'pages/order/order_list_page.dart';
 import 'pages/address/address_manage_page.dart';
@@ -27,12 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   };
 
   // 订单统计数据
-  final Map<String, int> _orderStats = {
-    '待付款': 2,
-    '待发货': 1,
-    '待收货': 3,
-    '待评价': 0,
-  };
+  final Map<String, int> _orderStats = {'待付款': 2, '待发货': 1, '待收货': 3, '待评价': 0};
 
   // 用户标签偏好数据
   List<dynamic> _tagPreferences = [];
@@ -80,29 +76,21 @@ class _ProfilePageState extends State<ProfilePage> {
   void _navigateToFavorites() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const FavoritesPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const FavoritesPage()),
     );
   }
 
-  void _navigateToOrderList({int initialTab = 0}) {
+  void _navigateToOrderList() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => OrderListPage(
-          role: 'buyer',
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => OrderListPage(role: 'buyer')),
     );
   }
 
   void _navigateToAddressManage() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddressManagePage(),
-      ),
+      MaterialPageRoute(builder: (context) => const AddressManagePage()),
     ).then((result) {
       // 返回后刷新用户信息
       if (result == true) {
@@ -111,18 +99,24 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  void _navigateToCart() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CartPage()),
+    );
+  }
+
   void _navigateToSellerCenter() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const SellerCenterPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const SellerCenterPage()),
     );
   }
 
   // 功能菜单列表
   final List<Map<String, dynamic>> _menuItems = [
     {'icon': 'heart', 'title': '我的收藏', 'color': Colors.red},
+    {'icon': 'shopping-cart', 'title': '购物车', 'color': Color(0xFFCE965B)},
     {'icon': 'clock', 'title': '浏览历史', 'color': Colors.blue},
     {'icon': 'map-pin', 'title': '收货地址', 'color': Colors.green},
     {'icon': 'shopping-bag', 'title': '卖家中心', 'color': Color(0xFFCE965B)},
@@ -141,25 +135,15 @@ class _ProfilePageState extends State<ProfilePage> {
         child: CustomScrollView(
           slivers: [
             // 顶部用户信息卡片
-            SliverToBoxAdapter(
-              child: _buildUserCard(),
-            ),
+            SliverToBoxAdapter(child: _buildUserCard()),
             // 订单统计区域
-            SliverToBoxAdapter(
-              child: _buildOrderStats(),
-            ),
+            SliverToBoxAdapter(child: _buildOrderStats()),
             // Debug 区域
-            SliverToBoxAdapter(
-              child: _buildDebugPanel(),
-            ),
+            SliverToBoxAdapter(child: _buildDebugPanel()),
             // 功能菜单列表
-            SliverToBoxAdapter(
-              child: _buildMenuGrid(),
-            ),
+            SliverToBoxAdapter(child: _buildMenuGrid()),
             // 退出登录按钮
-            SliverToBoxAdapter(
-              child: _buildLogoutButton(),
-            ),
+            SliverToBoxAdapter(child: _buildLogoutButton()),
           ],
         ),
       ),
@@ -206,10 +190,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           fit: BoxFit.cover,
                         ),
                       )
-                    : HeroIcons.user(
-                        size: 35,
-                        color: const Color(0xFFCE965B),
-                      ),
+                    : HeroIcons.user(size: 35, color: const Color(0xFFCE965B)),
               ),
               const SizedBox(width: 16),
               // 用户信息
@@ -277,10 +258,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: HeroIcons.pencil(
-                    color: Colors.white,
-                    size: 20,
-                  ),
+                  child: HeroIcons.pencil(color: Colors.white, size: 20),
                 ),
               ),
             ],
@@ -326,10 +304,7 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.8),
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.8)),
         ),
       ],
     );
@@ -417,7 +392,12 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Widget _buildOrderStatusItem(String iconName, String label, String? badge, {VoidCallback? onTap}) {
+  Widget _buildOrderStatusItem(
+    String iconName,
+    String label,
+    String? badge, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap ?? () => _navigateToOrderList(),
       child: Column(
@@ -470,10 +450,7 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 8),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade700,
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
           ),
         ],
       ),
@@ -550,7 +527,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.purple),
+                                Colors.purple,
+                              ),
                             ),
                           )
                         : const Icon(
@@ -572,11 +550,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Center(
                 child: Column(
                   children: [
-                    Icon(
-                      Icons.tag,
-                      size: 40,
-                      color: Colors.grey.shade300,
-                    ),
+                    Icon(Icons.tag, size: 40, color: Colors.grey.shade300),
                     const SizedBox(height: 8),
                     Text(
                       '暂无标签偏好数据',
@@ -646,7 +620,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 value: score / 10,
                                 backgroundColor: Colors.grey.shade200,
                                 valueColor: const AlwaysStoppedAnimation<Color>(
-                                    Colors.purple),
+                                  Colors.purple,
+                                ),
                                 minHeight: 6,
                                 borderRadius: BorderRadius.circular(3),
                               ),
@@ -740,14 +715,16 @@ class _ProfilePageState extends State<ProfilePage> {
       onTap: () {
         if (title == '我的收藏') {
           _navigateToFavorites();
+        } else if (title == '购物车') {
+          _navigateToCart();
         } else if (title == '收货地址') {
           _navigateToAddressManage();
         } else if (title == '卖家中心') {
           _navigateToSellerCenter();
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$title 功能开发中')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('$title 功能开发中')));
         }
       },
       child: Column(
@@ -761,20 +738,15 @@ class _ProfilePageState extends State<ProfilePage> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
-              child: HeroIcons.icon(
-                iconName,
-                size: 24,
-                color: color,
-              ),
+              child: iconName == 'shopping-cart'
+                  ? HeroIcons.shoppingCart(size: 24, color: color)
+                  : HeroIcons.icon(iconName, size: 24, color: color),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade700,
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -803,10 +775,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         child: const Text(
           '退出登录',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ),
     );
@@ -831,9 +800,7 @@ class _ProfilePageState extends State<ProfilePage> {
               // 跳转到登录页面
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
                 (route) => false,
               );
             },

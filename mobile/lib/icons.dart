@@ -7,11 +7,7 @@ class HeroIcons {
   static const String _path = 'assets/icons/';
 
   /// 加载 SVG 图标
-  static Widget icon(
-    String name, {
-    double size = 24,
-    Color? color,
-  }) {
+  static Widget icon(String name, {double size = 24, Color? color}) {
     return SvgPicture.asset(
       '$_path$name.svg',
       width: size,
@@ -25,6 +21,9 @@ class HeroIcons {
   // 预定义的常用图标
   static Widget shoppingBag({double size = 24, Color? color}) =>
       icon('shopping-bag', size: size, color: color);
+
+  static Widget shoppingCart({double size = 24, Color? color}) =>
+      Icon(Icons.shopping_cart_outlined, size: size, color: color);
 
   static Widget envelope({double size = 24, Color? color}) =>
       icon('envelope', size: size, color: color);
