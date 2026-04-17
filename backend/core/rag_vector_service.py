@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
@@ -14,9 +15,57 @@ except ImportError:
     chromadb = None
     embedding_functions = None
 
+try:
+    from huggingface_hub import snapshot_download
+except ImportError:
+    snapshot_download = None
+
 
 COLLECTION_NAME = "products"
 VECTOR_DB_DIRNAME = "vector_db"
+EMBEDDING_MODEL_REPO_ID = "BAAI/bge-base-zh-v1.5"
+EMBEDDING_MODEL_DIRNAME = "embedding_models"
+
+
+def _embedding_model_dir(base_dir: Path) -> Path:
+    return base_dir / EMBEDDING_MODEL_DIRNAME / EMBEDDING_MODEL_REPO_ID
+
+
+def _embedding_model_is_ready(model_dir: Path) -> bool:
+    weight_files = list(model_dir.glob("*.bin")) + list(model_dir.glob("*.safetensors"))
+    return (
+        model_dir.is_dir()
+        and (model_dir / "config.json").is_file()
+        and (model_dir / "modules.json").is_file()
+        and bool(weight_files)
+    )
+
+
+def _ensure_embedding_model_dir(base_dir: Path) -> Path:
+    model_dir = _embedding_model_dir(base_dir)
+    if _embedding_model_is_ready(model_dir):
+        return model_dir
+
+    if snapshot_download is None:
+        raise RuntimeError("缺少 huggingface_hub 依赖，请先安装 huggingface_hub")
+
+    model_dir.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        snapshot_download(
+            repo_id=EMBEDDING_MODEL_REPO_ID,
+            local_dir=str(model_dir),
+        )
+    except Exception as exc:
+        raise RuntimeError(
+            f"自动下载嵌入模型失败: {exc}\n"
+            f"模型会缓存到 {model_dir}，后续运行不会再次访问服务器。"
+        ) from exc
+
+    if not _embedding_model_is_ready(model_dir):
+        raise RuntimeError(f"嵌入模型下载完成，但目录仍不完整: {model_dir}")
+
+    return model_dir
 
 
 @dataclass
@@ -30,11 +79,16 @@ def get_rag_collection(base_dir: Path):
     if chromadb is None or embedding_functions is None:
         raise RuntimeError("缺少 chromadb 依赖，请先安装 chromadb")
 
+    model_dir = _ensure_embedding_model_dir(base_dir)
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
     client = chromadb.PersistentClient(path=str(base_dir / VECTOR_DB_DIRNAME))
-    embedding_func = embedding_functions.HuggingFaceEmbeddingFunction(
-    model_name="BAAI/bge-base-zh-v1.5",
-    model_kwargs={'device': 'cpu'}
-)
+    embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name=str(model_dir),
+        device="cpu",
+        local_files_only=True,
+    )
 
     return client.get_or_create_collection(
         name=COLLECTION_NAME,
