@@ -2,6 +2,76 @@ import 'package:flutter/material.dart';
 
 import 'api.dart';
 import 'auth_manager.dart';
+import 'pages/forum/forum_post_composer_page.dart';
+
+final RegExp _forumImageMarkdownRegex = RegExp(r'!\[[^\]]*\]\(([^)]+)\)');
+
+bool _forumIsImageMarkdownLine(String line) {
+  return _forumImageMarkdownRegex.hasMatch(line);
+}
+
+String? _forumExtractFirstImageUrl(String content) {
+  for (final rawLine in content.split(RegExp(r'\r?\n'))) {
+    final line = rawLine.trim();
+    final match = _forumImageMarkdownRegex.firstMatch(line);
+    if (match != null) {
+      final url = match.group(1)?.trim() ?? '';
+      if (url.isNotEmpty) {
+        return url;
+      }
+    }
+  }
+  return null;
+}
+
+List<String> _forumExtractImageUrls(String content, {String? coverImageUrl}) {
+  final imageUrls = <String>[];
+  final seenUrls = <String>{};
+
+  void addUrl(String? rawUrl) {
+    final url = rawUrl?.trim() ?? '';
+    if (url.isEmpty || seenUrls.contains(url)) {
+      return;
+    }
+
+    seenUrls.add(url);
+    imageUrls.add(url);
+  }
+
+  addUrl(coverImageUrl);
+  for (final match in _forumImageMarkdownRegex.allMatches(content)) {
+    addUrl(match.group(1));
+  }
+
+  return imageUrls;
+}
+
+String _forumExtractPreviewText(String content, {int maxLength = 120}) {
+  final lines = content.split(RegExp(r'\r?\n'));
+  final buffer = StringBuffer();
+
+  for (final rawLine in lines) {
+    final line = rawLine.trim();
+    if (line.isEmpty || _forumIsImageMarkdownLine(line)) {
+      continue;
+    }
+
+    if (buffer.isNotEmpty) {
+      buffer.write(' ');
+    }
+    buffer.write(line);
+
+    if (buffer.length >= maxLength) {
+      break;
+    }
+  }
+
+  final text = buffer.toString().replaceAll(RegExp(r'\s+'), ' ').trim();
+  if (text.isEmpty) {
+    return '暂无内容';
+  }
+  return text.length <= maxLength ? text : '${text.substring(0, maxLength)}...';
+}
 
 class ForumPage extends StatefulWidget {
   final bool embedded;
@@ -129,11 +199,11 @@ class _ForumPageState extends State<ForumPage> {
       return;
     }
 
-    final created = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _ForumComposerSheet(categories: _categories),
+    final created = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ForumPostComposerPage(categories: _categories),
+      ),
     );
 
     if (created == true) {
@@ -555,7 +625,12 @@ class _ForumPageState extends State<ForumPage> {
 
   Widget _buildPostCard(dynamic post) {
     final tags = (post['tags'] as List?)?.cast<dynamic>() ?? [];
-    final preview = (post['content'] ?? '').toString();
+    final content = (post['content'] ?? '').toString();
+    final preview = _forumExtractPreviewText(content);
+    final coverImageUrl =
+        (post['cover_image_url'] ?? '').toString().trim().isNotEmpty
+        ? (post['cover_image_url'] ?? '').toString().trim()
+        : (_forumExtractFirstImageUrl(content) ?? '');
     final postId = post['post_id']?.toString() ?? '';
 
     return GestureDetector(
@@ -596,6 +671,29 @@ class _ForumPageState extends State<ForumPage> {
               ),
             ),
             const SizedBox(height: 12),
+            if (coverImageUrl.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  height: 180,
+                  width: double.infinity,
+                  color: Colors.grey.shade100,
+                  child: Image.network(
+                    coverImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 42,
+                          color: Colors.grey.shade400,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            if (coverImageUrl.isNotEmpty) const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -765,10 +863,12 @@ class ForumPostDetailPage extends StatefulWidget {
 
 class _ForumPostDetailPageState extends State<ForumPostDetailPage> {
   final TextEditingController _commentController = TextEditingController();
+  final PageController _imagePageController = PageController();
 
   Map<String, dynamic>? _post;
   bool _isLoading = true;
   bool _isSubmitting = false;
+  int _currentImageIndex = 0;
 
   @override
   void initState() {
@@ -779,6 +879,7 @@ class _ForumPostDetailPageState extends State<ForumPostDetailPage> {
   @override
   void dispose() {
     _commentController.dispose();
+    _imagePageController.dispose();
     super.dispose();
   }
 
@@ -791,10 +892,21 @@ class _ForumPostDetailPageState extends State<ForumPostDetailPage> {
     if (!mounted) return;
 
     if (result['success'] == true) {
+      final shouldResetCarousel = _imagePageController.hasClients;
       setState(() {
         _post = Map<String, dynamic>.from(result['data']);
         _isLoading = false;
+        _currentImageIndex = 0;
       });
+
+      if (shouldResetCarousel) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || !_imagePageController.hasClients) {
+            return;
+          }
+          _imagePageController.jumpToPage(0);
+        });
+      }
     } else {
       setState(() {
         _isLoading = false;
@@ -907,8 +1019,188 @@ class _ForumPostDetailPageState extends State<ForumPostDetailPage> {
     );
   }
 
+  Widget _buildImageCarousel(List<String> imageUrls) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        height: 240,
+        width: double.infinity,
+        color: Colors.grey.shade100,
+        child: PageView.builder(
+          controller: _imagePageController,
+          itemCount: imageUrls.length,
+          onPageChanged: (index) {
+            if (!mounted) {
+              return;
+            }
+
+            setState(() {
+              _currentImageIndex = index;
+            });
+          },
+          itemBuilder: (context, index) {
+            final imageUrl = imageUrls[index];
+            return Padding(
+              padding: const EdgeInsets.all(12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: ColoredBox(
+                  color: Colors.white,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 44,
+                          color: Colors.grey.shade400,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageIndicator(int imageCount) {
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(imageCount, (index) {
+              final isActive = index == _currentImageIndex;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: isActive ? 18 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? const Color(0xFFCE965B)
+                      : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              );
+            }),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            '${_currentImageIndex + 1} / $imageCount',
+            style: TextStyle(
+              color: Colors.grey.shade700,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildContentBlocks(String content) {
+    final widgets = <Widget>[];
+    final textBuffer = <String>[];
+
+    void flushTextBuffer() {
+      if (textBuffer.isEmpty) {
+        return;
+      }
+
+      final text = textBuffer.join('\n').trim();
+      if (text.isNotEmpty) {
+        widgets.add(
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 15,
+              height: 1.6,
+              color: Color(0xFF2C2C38),
+            ),
+          ),
+        );
+      }
+      textBuffer.clear();
+    }
+
+    for (final rawLine in content.split(RegExp(r'\r?\n'))) {
+      final line = rawLine.trim();
+      if (line.isEmpty) {
+        flushTextBuffer();
+        if (widgets.isNotEmpty) {
+          widgets.add(const SizedBox(height: 8));
+        }
+        continue;
+      }
+
+      final match = _forumImageMarkdownRegex.firstMatch(line);
+      if (match != null) {
+        final cleanedLine = rawLine
+            .replaceAll(_forumImageMarkdownRegex, '')
+            .trim();
+        if (cleanedLine.isEmpty) {
+          flushTextBuffer();
+          continue;
+        }
+
+        textBuffer.add(cleanedLine);
+        continue;
+      }
+
+      textBuffer.add(rawLine);
+    }
+
+    flushTextBuffer();
+
+    if (widgets.isEmpty) {
+      if (content.trim().isEmpty) {
+        widgets.add(
+          Text(
+            '暂无内容',
+            style: const TextStyle(
+              fontSize: 15,
+              height: 1.6,
+              color: Color(0xFF2C2C38),
+            ),
+          ),
+        );
+      }
+    }
+
+    if (widgets.isNotEmpty && widgets.last is SizedBox) {
+      widgets.removeLast();
+    }
+
+    return widgets;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final coverImageUrl = (_post?['cover_image_url'] ?? '').toString().trim();
+    final content = _post?['content']?.toString() ?? '';
+    final imageUrls = _forumExtractImageUrls(
+      content,
+      coverImageUrl: coverImageUrl.isNotEmpty
+          ? coverImageUrl
+          : _forumExtractFirstImageUrl(content),
+    );
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
@@ -1002,14 +1294,12 @@ class _ForumPostDetailPageState extends State<ForumPostDetailPage> {
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              Text(
-                                _post!['content']?.toString() ?? '',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  height: 1.6,
-                                  color: Color(0xFF2C2C38),
-                                ),
-                              ),
+                              if (imageUrls.isNotEmpty) ...[
+                                _buildImageCarousel(imageUrls),
+                                _buildImageIndicator(imageUrls.length),
+                                const SizedBox(height: 12),
+                              ],
+                              ..._buildContentBlocks(content),
                               const SizedBox(height: 12),
                               Wrap(
                                 spacing: 8,

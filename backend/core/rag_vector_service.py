@@ -31,7 +31,11 @@ def get_rag_collection(base_dir: Path):
         raise RuntimeError("缺少 chromadb 依赖，请先安装 chromadb")
 
     client = chromadb.PersistentClient(path=str(base_dir / VECTOR_DB_DIRNAME))
-    embedding_func = embedding_functions.DefaultEmbeddingFunction()
+    embedding_func = embedding_functions.HuggingFaceEmbeddingFunction(
+    model_name="BAAI/bge-base-zh-v1.5",
+    model_kwargs={'device': 'cpu'}
+)
+
     return client.get_or_create_collection(
         name=COLLECTION_NAME,
         embedding_function=embedding_func,
