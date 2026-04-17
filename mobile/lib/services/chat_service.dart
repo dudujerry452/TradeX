@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/io.dart';
 import '../auth_manager.dart';
 import '../models/chat_message.dart';
 import 'chat_api_service.dart';
@@ -75,17 +73,10 @@ class ChatService extends ChangeNotifier {
       _currentUserId = await AuthManager.getUserId();
 
       final wsUrl = '$_wsBaseUrl$_wsPath?token=$token';
+      debugPrint('ChatService: 正在连接 WebSocket: $wsUrl');
 
-      if (kIsWeb) {
-        // Web 平台使用 HtmlWebSocketChannel
-        _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
-      } else {
-        // 移动端使用 IOWebSocketChannel
-        _channel = IOWebSocketChannel.connect(
-          Uri.parse(wsUrl),
-          pingInterval: const Duration(seconds: _heartbeatInterval),
-        );
-      }
+      // 所有平台都使用 WebSocketChannel.connect，它会自动选择正确的实现
+      _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
 
       // 监听消息
       _channel!.stream.listen(
@@ -99,8 +90,10 @@ class ChatService extends ChangeNotifier {
 
       _updateStatus(ChatConnectionStatus.connected);
       _currentReconnectDelay = 1; // 重置重连间隔
+      debugPrint('ChatService: WebSocket 连接成功');
 
     } catch (e) {
+      debugPrint('ChatService: 连接失败: $e');
       _handleError('连接失败: $e');
       _scheduleReconnect();
     }

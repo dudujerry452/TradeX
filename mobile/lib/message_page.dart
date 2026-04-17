@@ -18,6 +18,7 @@ class _MessagePageState extends State<MessagePage> with SingleTickerProviderStat
   late TabController _tabController;
   int _unreadChatCount = 0;
   int _unreadNotificationCount = 0;
+  StreamSubscription? _chatStatusSubscription;
 
   @override
   void initState() {
@@ -26,7 +27,7 @@ class _MessagePageState extends State<MessagePage> with SingleTickerProviderStat
     _loadUnreadCounts();
 
     // 监听 WebSocket 连接状态变化刷新未读数
-    ChatService().statusStream.listen((status) {
+    _chatStatusSubscription = ChatService().statusStream.listen((status) {
       if (status == ChatConnectionStatus.connected) {
         _loadUnreadCounts();
       }
@@ -46,6 +47,7 @@ class _MessagePageState extends State<MessagePage> with SingleTickerProviderStat
   @override
   void dispose() {
     _tabController.dispose();
+    _chatStatusSubscription?.cancel();
     super.dispose();
   }
 
@@ -197,9 +199,11 @@ class _NotificationTabState extends State<_NotificationTab> {
         _isLoading = false;
       });
 
-      // 更新未读数
-      final count = await NotificationService.getUnreadCount();
-      widget.onUnreadCountChanged(count);
+      // 只有在刷新时才更新未读数，避免重复请求
+      if (refresh) {
+        final count = await NotificationService.getUnreadCount();
+        widget.onUnreadCountChanged(count);
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -223,9 +227,8 @@ class _NotificationTabState extends State<_NotificationTab> {
           _notifications[index]['is_read'] = true;
         }
       });
-      // 刷新未读数
-      final count = await NotificationService.getUnreadCount();
-      widget.onUnreadCountChanged(count);
+      // 不立即刷新未读数，由父组件定时刷新或下次加载时刷新
+      // 减少请求频率
     } catch (e) {
       // 静默处理
     }
