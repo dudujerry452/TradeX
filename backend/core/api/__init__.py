@@ -4,6 +4,7 @@ core/api/__init__.py — 聚合所有模块的 Router
 from ninja import Router
 
 from .auth import router as auth_router
+from .admin import router as admin_router
 from .users import router as users_router, user_tag_prefs_router
 from .products import router as products_router
 from .categories import router as categories_router
@@ -22,6 +23,9 @@ router = Router()
 
 # 认证
 router.add_router("/login", auth_router, tags=["认证"])
+
+# 后台管理
+router.add_router("/admin", admin_router, tags=["后台管理"])
 
 # 用户相关
 router.add_router("/users", users_router, tags=["用户"])
