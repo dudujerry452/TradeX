@@ -85,9 +85,9 @@
             if [ ! -d "$PROJECT_ROOT/.venv" ]; then
               echo "Creating Python venv..."
               python3 -m venv "$PROJECT_ROOT/.venv"
+              pip install -q cos-python-sdk-v5 2>/dev/null || true
             fi
             source "$PROJECT_ROOT/.venv/bin/activate"
-            pip install -q cos-python-sdk-v5 2>/dev/null || true
 
             echo "TradeX nix shell ready (project root: $PROJECT_ROOT)"
           '';
