@@ -1,0 +1,974 @@
+<mxfile host="Electron" agent="TradeX" pages="7">
+  <diagram id="usecase" name="用户管理能力">
+    <mxGraphModel dx="1368" dy="886" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys-boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F0FE;strokeColor=#1A56DB;fontSize=16;fontStyle=1;verticalAlign=top;align=center;dashed=1;dashPattern=8 4;strokeWidth=2;arcSize=5;" value="TradeX 用户管理能力" vertex="1">
+          <mxGeometry height="720" width="720" x="320" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-user" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DBEAFE;strokeColor=#1E40AF;fontSize=14;fontStyle=1;" value="新用户" vertex="1">
+          <mxGeometry height="100" width="50" x="80" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-admin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=14;fontStyle=1;" value="管理员" vertex="1">
+          <mxGeometry height="100" width="50" x="170" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-register" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#EA580C;fontSize=14;fontStyle=1;tabWidth=100;tabHeight=28;tabPosition=left;collapsible=0;spacingLeft=8;" value="注册子系统" vertex="1">
+          <mxGeometry height="200" width="560" x="400" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-fill" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontSize=12;fontStyle=1;" value="填写注册信息" vertex="1">
+          <mxGeometry height="60" width="160" x="500" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-email" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=11;" value="邮箱注册" vertex="1">
+          <mxGeometry height="45" width="100" x="400" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-phone" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=11;" value="手机号注册" vertex="1">
+          <mxGeometry height="45" width="110" x="510" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-pwd" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=11;" value="设置登录密码" vertex="1">
+          <mxGeometry height="45" width="120" x="790" y="257.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-submit" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontSize=12;fontStyle=1;" value="提交注册申请" vertex="1">
+          <mxGeometry height="50" width="140" x="620" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-validate" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;fontSize=14;fontStyle=1;tabWidth=100;tabHeight=28;tabPosition=left;" value="校验子系统" vertex="1">
+          <mxGeometry height="180" width="560" x="400" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-checkuser" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=11;" value="校验用户名唯一性" vertex="1">
+          <mxGeometry height="50" width="130" x="410" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-checkemail" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=11;" value="校验邮箱唯一性" vertex="1">
+          <mxGeometry height="50" width="120" x="560" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-checkphone" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=11;" value="校验手机号唯一性" vertex="1">
+          <mxGeometry height="50" width="130" x="700" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-checkpwd" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=11;" value="密码复杂度校验" vertex="1">
+          <mxGeometry height="50" width="120" x="840" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-review" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FDF2F8;strokeColor=#BE185D;fontSize=14;fontStyle=1;tabWidth=100;tabHeight=28;tabPosition=left;" value="审核子系统" vertex="1">
+          <mxGeometry height="190" width="560" x="400" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-list" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=12;fontStyle=1;" value="查看待审核列表" vertex="1">
+          <mxGeometry height="50" width="140" x="420" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-approve" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;" value="通过注册申请" vertex="1">
+          <mxGeometry height="50" width="120" x="790" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-reject" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;" value="驳回注册申请" vertex="1">
+          <mxGeometry height="50" width="120" x="430" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-notify" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="推送审核结果" vertex="1">
+          <mxGeometry height="45" width="120" x="790" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-fill" edge="1" parent="1" source="actor-user" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" target="uc-fill">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-fill-email" edge="1" parent="1" source="uc-fill" style="endArrow=open;html=1;strokeColor=#EA580C;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#EA580C;" target="uc-email" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-fill-phone" edge="1" parent="1" source="uc-fill" style="endArrow=open;html=1;strokeColor=#EA580C;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#EA580C;" target="uc-phone" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-fill-pwd" edge="1" parent="1" source="uc-fill" style="endArrow=open;html=1;strokeColor=#EA580C;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#EA580C;" target="uc-pwd" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-fill-submit" edge="1" parent="1" source="uc-fill" style="endArrow=open;html=1;strokeColor=#16A34A;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#16A34A;" target="uc-submit" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-submit-checkuser" edge="1" parent="1" source="uc-submit" style="endArrow=open;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#3B82F6;" target="uc-checkuser" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-submit-checkemail" edge="1" parent="1" source="uc-submit" style="endArrow=open;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#3B82F6;" target="uc-checkemail" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-submit-checkphone" edge="1" parent="1" source="uc-submit" style="endArrow=open;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#3B82F6;" target="uc-checkphone" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-submit-checkpwd" edge="1" parent="1" source="uc-submit" style="endArrow=open;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#3B82F6;" target="uc-checkpwd" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-list" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-list">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-list-approve" edge="1" parent="1" source="uc-list" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-approve" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-list-reject" edge="1" parent="1" source="uc-list" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-reject" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-approve-notify" edge="1" parent="1" source="uc-approve" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-notify" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-reject-notify" edge="1" parent="1" source="uc-reject" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-notify" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-notify-user" edge="1" parent="1" source="uc-notify" style="endArrow=open;html=1;strokeColor=#8B5CF6;strokeWidth=1.5;dashed=1;dashPattern=3 3;fontSize=10;fontColor=#8B5CF6;" target="actor-user" value="«通知»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="850" y="760" />
+              <mxPoint x="105" y="760" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#94A3B8;fontSize=11;verticalAlign=top;align=left;spacingLeft=8;" value="" vertex="1">
+          <mxGeometry height="150" width="200" x="40" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontStyle=1;" value="图例" vertex="1">
+          <mxGeometry height="25" width="80" x="100" y="445" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-extend" edge="1" parent="1" style="endArrow=open;html=1;strokeColor=#EA580C;strokeWidth=1.5;dashed=1;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="490" as="sourcePoint" />
+            <mxPoint x="110" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-extend-txt" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" value="«extend» 扩展" vertex="1">
+          <mxGeometry height="20" width="110" x="120" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-include" edge="1" parent="1" style="endArrow=open;html=1;strokeColor=#16A34A;strokeWidth=1.5;dashed=1;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="520" as="sourcePoint" />
+            <mxPoint x="110" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-include-txt" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" value="«include» 包含" vertex="1">
+          <mxGeometry height="20" width="110" x="120" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-assoc" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="550" as="sourcePoint" />
+            <mxPoint x="110" y="550" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-assoc-txt" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" value="── 关联" vertex="1">
+          <mxGeometry height="20" width="110" x="120" y="540" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="product" name="商品管理能力">
+    <mxGraphModel dx="1140" dy="738" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys-boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#EA580C;fontSize=16;fontStyle=1;verticalAlign=top;align=center;dashed=1;dashPattern=8 4;strokeWidth=2;arcSize=5;" value="TradeX 商品管理能力" vertex="1">
+          <mxGeometry height="780" width="730" x="320" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-seller" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=14;fontStyle=1;" value="卖家" vertex="1">
+          <mxGeometry height="100" width="50" x="80" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-buyer" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DBEAFE;strokeColor=#1E40AF;fontSize=14;fontStyle=1;" value="买家" vertex="1">
+          <mxGeometry height="100" width="50" x="80" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-guest" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=12;fontStyle=1;" value="未登录用户" vertex="1">
+          <mxGeometry height="100" width="50" x="1100" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-ai" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#D1FAE5;strokeColor=#059669;fontSize=12;fontStyle=1;" value="AI 模型" vertex="1">
+          <mxGeometry height="100" width="50" x="1100" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-publish" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="商品发布能力" vertex="1">
+          <mxGeometry height="220" width="300" x="370" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-create-product" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontSize=12;fontStyle=1;" value="发布新商品" vertex="1">
+          <mxGeometry height="50" width="130" x="380" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-fill-info" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=11;" value="填写商品信息" vertex="1">
+          <mxGeometry height="40" width="120" x="350" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-upload-img" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=11;" value="上传商品图片" vertex="1">
+          <mxGeometry height="40" width="120" x="540" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-pending-audit" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=11;" value="进入待审核" vertex="1">
+          <mxGeometry height="40" width="110" x="450" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-edit-withdraw" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=11;" value="编辑/撤回" vertex="1">
+          <mxGeometry height="40" width="105" x="555" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-shelf" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="上下架与编辑" vertex="1">
+          <mxGeometry height="220" width="340" x="690" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-auto-list" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;fontStyle=1;" value="&amp;nbsp;审核通过自动上架" vertex="1">
+          <mxGeometry height="45" width="150" x="720" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-modify" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="&amp;nbsp;修改库存/详情" vertex="1">
+          <mxGeometry height="40" width="130" x="700" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-off-shelf" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="&amp;nbsp;手动下架" vertex="1">
+          <mxGeometry height="40" width="110" x="920" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-stock-control" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;" value="库存事务控制" vertex="1">
+          <mxGeometry height="40" width="130" x="910" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-search" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="检索与展示" vertex="1">
+          <mxGeometry height="200" width="660" x="370" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-search" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontSize=12;fontStyle=1;" value="关键词模糊搜索" vertex="1">
+          <mxGeometry height="50" width="140" x="410" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-sort" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=10;" value="排序(价格/销量/时间)" vertex="1">
+          <mxGeometry height="45" width="150" x="705" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-filter" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=10;" value="分类/价格/库存筛选" vertex="1">
+          <mxGeometry height="45" width="150" x="555" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-detail" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;" value="商品详情页展示" vertex="1">
+          <mxGeometry height="45" width="140" x="410" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-guest-access" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=10;dashed=1;" value="未登录可访问" vertex="1">
+          <mxGeometry height="50" width="130" x="855" y="477.5" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-recommend" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#F5F3FF;strokeColor=#8B5CF6;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="商品推荐" vertex="1">
+          <mxGeometry height="220" width="660" x="370" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-hot" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=11;" value="热门商品展示" vertex="1">
+          <mxGeometry height="45" width="130" x="400" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-new" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=11;" value="最新商品展示" vertex="1">
+          <mxGeometry height="45" width="130" x="550" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-ai-chat" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontSize=12;fontStyle=1;" value="AI 对话交互" vertex="1">
+          <mxGeometry height="50" width="130" x="420" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-ai-recommend" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontSize=11;" value="AI 商品推荐" vertex="1">
+          <mxGeometry height="45" width="130" x="580" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-rag" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontSize=10;" value="RAG 向量检索" vertex="1">
+          <mxGeometry height="45" width="130" x="740" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-deepseek" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=10;" value="DeepSeek LLM" vertex="1">
+          <mxGeometry height="45" width="120" x="890" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-seller-create" edge="1" parent="1" source="actor-seller" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-create-product">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-create-fill" edge="1" parent="1" source="uc-create-product" style="endArrow=open;html=1;strokeColor=#EA580C;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#EA580C;" target="uc-fill-info" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-create-upload" edge="1" parent="1" source="uc-create-product" style="endArrow=open;html=1;strokeColor=#EA580C;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#EA580C;" target="uc-upload-img" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-create-pending" edge="1" parent="1" source="uc-create-product" style="endArrow=open;html=1;strokeColor=#F59E0B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#F59E0B;" target="uc-pending-audit" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-pending-edit" edge="1" parent="1" source="uc-pending-audit" style="endArrow=open;html=1;strokeColor=#EA580C;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#EA580C;" target="uc-edit-withdraw" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-seller-auto" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="142.22" />
+              <mxPoint x="300" y="142.22" />
+            </Array>
+            <mxPoint x="140" y="210" as="sourcePoint" />
+            <mxPoint x="770.0056105703206" y="139.9952087685492" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-auto-modify" edge="1" parent="1" source="uc-auto-list" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-modify" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-auto-off" edge="1" parent="1" source="uc-auto-list" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-off-shelf" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-off-stock" edge="1" parent="1" source="uc-off-shelf" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-stock-control" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-search" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" target="uc-search">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-search-sort" edge="1" parent="1" source="uc-search" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-sort" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-search-filter" edge="1" parent="1" source="uc-search" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-filter" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-search-detail" edge="1" parent="1" source="uc-search" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-detail" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-guest-search" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#4F46E5;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1030" y="395" />
+            </Array>
+            <mxPoint x="1080" y="485" as="sourcePoint" />
+            <mxPoint x="530" y="395" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-guest-detail" edge="1" parent="1" source="actor-guest" style="endArrow=none;html=1;strokeColor=#4F46E5;strokeWidth=1.5;" target="uc-guest-access">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-hot" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=1.5;" target="uc-hot">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="640" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-buyer-ai" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" target="uc-ai-chat">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="715" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-ai-recommend" edge="1" parent="1" source="uc-ai-chat" style="endArrow=open;html=1;strokeColor=#8B5CF6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#8B5CF6;" target="uc-ai-recommend" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-ai-rag" edge="1" parent="1" source="uc-ai-recommend" style="endArrow=open;html=1;strokeColor=#8B5CF6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#8B5CF6;" target="uc-rag" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-rag-deepseek" edge="1" parent="1" source="uc-rag" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-deepseek" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-ai-actor" edge="1" parent="1" source="actor-ai" style="endArrow=none;html=1;strokeColor=#059669;strokeWidth=2;" target="uc-deepseek">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="review" name="审查管理能力">
+    <mxGraphModel dx="1520" dy="984" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys-boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF2F8;strokeColor=#BE185D;fontSize=16;fontStyle=1;verticalAlign=top;align=center;dashed=1;dashPattern=8 4;strokeWidth=2;arcSize=5;" value="TradeX 审查管理能力&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="700" width="700" x="300" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-admin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=14;fontStyle=1;" value=" " vertex="1">
+          <mxGeometry height="100" width="50" x="60" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-seller" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=12;fontStyle=1;" value="卖家" vertex="1">
+          <mxGeometry height="90" width="45" x="1030" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-user" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DBEAFE;strokeColor=#1E40AF;fontSize=12;fontStyle=1;" value=" " vertex="1">
+          <mxGeometry height="90" width="45" x="1040" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-user-review" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="用户资质审查" vertex="1">
+          <mxGeometry height="300" width="300" x="340" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-view-users" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=12;fontStyle=1;" value="查看待审核用户列表" vertex="1">
+          <mxGeometry height="50" width="160" x="380" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-user-info" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=10;" value="展示注册信息/提交时间" vertex="1">
+          <mxGeometry height="45" width="170" x="390" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-approve-user" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;fontStyle=1;" value="通过注册申请" vertex="1">
+          <mxGeometry height="45" width="130" x="330" y="275" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-reject-user" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;fontStyle=1;" value="驳回注册申请" vertex="1">
+          <mxGeometry height="45" width="130" x="500" y="275" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-push-user" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="实时推送结果" vertex="1">
+          <mxGeometry height="40" width="130" x="410" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-product-review" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="商品合规审查" vertex="1">
+          <mxGeometry height="280" width="620" x="340" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-view-products" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=12;fontStyle=1;" value="查看待审核商品列表" vertex="1">
+          <mxGeometry height="50" width="170" x="460" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-product-detail" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=10;" value="展示商品详情/卖家信息" vertex="1">
+          <mxGeometry height="45" width="170" x="430" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-approve-product" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;fontStyle=1;" value="通过上架申请" vertex="1">
+          <mxGeometry height="45" width="130" x="340" y="582.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-force-off" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;fontStyle=1;dashed=1;" value="强制下架违规商品" vertex="1">
+          <mxGeometry height="45" width="150" x="760" y="537.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-push-seller" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="实时推送给卖家" vertex="1">
+          <mxGeometry height="40" width="140" x="520" y="645" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-viewuser" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-view-users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-viewprod" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-view-products">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="495" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-viewuser-info" edge="1" parent="1" source="uc-view-users" style="endArrow=open;html=1;strokeColor=#DB2777;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DB2777;" target="uc-user-info" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-viewuser-approve" edge="1" parent="1" source="uc-view-users" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-approve-user" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-viewuser-reject" edge="1" parent="1" source="uc-view-users" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-reject-user" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-approveu-push" edge="1" parent="1" source="uc-approve-user" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-push-user" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-rejectu-push" edge="1" parent="1" source="uc-reject-user" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-push-user" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-pushuser-user" edge="1" parent="1" source="uc-push-user" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;dashPattern=3 3;fontSize=9;fontColor=#4F46E5;" target="actor-user" value="«»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-viewprod-detail" edge="1" parent="1" source="uc-view-products" style="endArrow=open;html=1;strokeColor=#DB2777;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DB2777;" target="uc-product-detail" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-viewprod-approve" edge="1" parent="1" source="uc-view-products" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-approve-product" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-viewprod-reject" edge="1" parent="1" source="uc-view-products" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-reject-product" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-viewprod-force" edge="1" parent="1" source="uc-view-products" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-force-off" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-approvep-push" edge="1" parent="1" source="uc-approve-product" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-push-seller" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-rejectp-push" edge="1" parent="1" source="uc-reject-product" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-push-seller" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-force-push" edge="1" parent="1" source="uc-reject-product" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-push-seller" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-pushseller-seller" edge="1" parent="1" source="uc-push-seller" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;dashPattern=3 3;fontSize=9;fontColor=#4F46E5;" target="actor-seller" value="«»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="07WFP8fXFvhD20oNCQgo-1" edge="1" parent="1" source="uc-force-off" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-reject-product" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="789" y="578" as="sourcePoint" />
+            <mxPoint x="552" y="669" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uc-reject-product" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;fontStyle=1;" value="驳回上架申请" vertex="1">
+          <mxGeometry height="45" width="130" x="560" y="582.5" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="trade" name="购物交易能力">
+    <mxGraphModel dx="1440" dy="933" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys-boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;fontSize=16;fontStyle=1;verticalAlign=top;align=center;dashed=1;dashPattern=8 4;strokeWidth=2;arcSize=5;" value="TradeX 购物交易&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;能力&lt;/span&gt;&lt;div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="700" width="720" x="300" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-buyer" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DBEAFE;strokeColor=#1E40AF;fontSize=14;fontStyle=1;" value="买家" vertex="1">
+          <mxGeometry height="100" width="50" x="60" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-cart" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="购物车管理" vertex="1">
+          <mxGeometry height="280" width="640" x="340" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-add-cart" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontSize=12;fontStyle=1;" value="加入购物车" vertex="1">
+          <mxGeometry height="50" width="130" x="410" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-modify-qty" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;" value="修改商品数量" vertex="1">
+          <mxGeometry height="40" width="120" x="350" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-delete-cart" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;" value="删除商品" vertex="1">
+          <mxGeometry height="40" width="110" x="760" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-select-checkout" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;" value="选择/取消结算商品" vertex="1">
+          <mxGeometry height="40" width="150" x="400" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-sync-cart" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=10;dashed=1;" value="多终端数据同步" vertex="1">
+          <mxGeometry height="40" width="130" x="760" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-cart-warn" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=10;" value="下架/缺货提示" vertex="1">
+          <mxGeometry height="35" width="130" x="590" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-order" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="订单生成与下单" vertex="1">
+          <mxGeometry height="320" width="640" x="340" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-batch-checkout" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=12;fontStyle=1;" value="购物车批量结算" vertex="1">
+          <mxGeometry height="50" width="150" x="380" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-direct-buy" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="详情页直接下单" vertex="1">
+          <mxGeometry height="50" width="140" x="560" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-validate-order" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=12;fontStyle=1;" value="校验库存/状态/价格" vertex="1">
+          <mxGeometry height="45" width="170" x="410" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-stock-deduct" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;fontStyle=1;" value="事务扣减库存" vertex="1">
+          <mxGeometry height="45" width="130" x="760" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-gen-order" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="生成唯一订单编号" vertex="1">
+          <mxGeometry height="45" width="150" x="750" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-order-info" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=10;" value="订单含商品/价格/地址/状态" vertex="1">
+          <mxGeometry height="45" width="170" x="740" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-exception" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;fontStyle=1;dashed=1;" value="异常终止+错误提示" vertex="1">
+          <mxGeometry height="45" width="170" x="410" y="625" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-add" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" target="uc-add-cart">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-add-qty" edge="1" parent="1" source="uc-add-cart" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-modify-qty" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-add-delete" edge="1" parent="1" source="uc-add-cart" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-delete-cart" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-add-select" edge="1" parent="1" source="uc-add-cart" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-select-checkout" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-select-checkout" edge="1" parent="1" source="uc-select-checkout" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-batch-checkout" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-add-direct" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=1.5;" target="uc-direct-buy">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-batch-validate" edge="1" parent="1" source="uc-batch-checkout" style="endArrow=open;html=1;strokeColor=#F59E0B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#F59E0B;" target="uc-validate-order" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-direct-validate" edge="1" parent="1" source="uc-direct-buy" style="endArrow=open;html=1;strokeColor=#F59E0B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#F59E0B;" target="uc-validate-order" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-validate-stock" edge="1" parent="1" source="uc-validate-order" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-stock-deduct" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-stock-gen" edge="1" parent="1" source="uc-stock-deduct" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-gen-order" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-gen-info" edge="1" parent="1" source="uc-gen-order" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-order-info" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-validate-exception" edge="1" parent="1" source="uc-validate-order" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=9;fontColor=#DC2626;" target="uc-exception" value="«extend»()">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-add-warn" edge="1" parent="1" source="uc-add-cart" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=9;fontColor=#DC2626;" target="uc-cart-warn" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="order-mgmt" name="订单与配送管理">
+    <mxGraphModel dx="1140" dy="738" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1250" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys-boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;fontSize=16;fontStyle=1;verticalAlign=top;align=center;dashed=1;dashPattern=8 4;strokeWidth=2;arcSize=5;" value="TradeX 订单与配送管理能力" vertex="1">
+          <mxGeometry height="880" width="880" x="260" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-buyer" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DBEAFE;strokeColor=#1E40AF;fontSize=14;fontStyle=1;" value="买家" vertex="1">
+          <mxGeometry height="100" width="50" x="50" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-seller" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=14;fontStyle=1;" value="卖家" vertex="1">
+          <mxGeometry height="100" width="50" x="1150" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-status" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="订单状态管理" vertex="1">
+          <mxGeometry height="400" width="420" x="290" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-lifecycle" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=12;fontStyle=1;" value="全生命周期状态管理" vertex="1">
+          <mxGeometry height="55" width="170" x="380" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-pay" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;" value="买家付款" vertex="1">
+          <mxGeometry height="50" width="110" x="310" y="205" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-ship" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=11;" value="卖家发货(填写物流)" vertex="1">
+          <mxGeometry height="50" width="155" x="555" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-receive" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;" value="买家确认收货" vertex="1">
+          <mxGeometry height="50" width="130" x="420" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-cancel" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;" value="取消订单" vertex="1">
+          <mxGeometry height="50" width="110" x="570" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-auto-cancel" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=10;dashed=1;" value="24h未支付自动取消" vertex="1">
+          <mxGeometry height="45" width="160" x="280" y="375" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-auto-complete" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=10;dashed=1;" value="15天超时自动完成" vertex="1">
+          <mxGeometry height="45" width="160" x="402.5" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-rate" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=11;fontStyle=1;" value="买家评价已完成订单" vertex="1">
+          <mxGeometry height="50" width="170" x="540" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-delivery" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="配送信息管理" vertex="1">
+          <mxGeometry height="400" width="390" x="730" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-logistics" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontSize=12;fontStyle=1;" value="查看物流信息" vertex="1">
+          <mxGeometry height="55" width="150" x="810" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-track" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=11;" value="物流轨迹追踪" vertex="1">
+          <mxGeometry height="45" width="130" x="750" y="207.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-order-log" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;fontStyle=1;" value="订单流转记录(不可篡改)" vertex="1">
+          <mxGeometry height="45" width="190" x="920" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-after" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FDF2F8;strokeColor=#BE185D;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="售后管理" vertex="1">
+          <mxGeometry height="370" width="830" x="290" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-after-sale" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=12;fontStyle=1;" value="申请售后" vertex="1">
+          <mxGeometry height="55" width="130" x="370" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-return" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=11;" value="退货" vertex="1">
+          <mxGeometry height="45" width="90" x="340" y="665" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-exchange" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=11;" value="换货" vertex="1">
+          <mxGeometry height="45" width="90" x="450" y="665" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-fill-reason" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=10;" value="填写售后原因" vertex="1">
+          <mxGeometry height="35" width="120" x="360" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-new-order" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontSize=11;fontStyle=1;dashed=1;" value="换货生成新订单编号" vertex="1">
+          <mxGeometry height="45" width="180" x="510" y="775" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-cancel-after" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;" value="取消售后" vertex="1">
+          <mxGeometry height="40" width="100" x="575" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-seller-rate-after" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=11;" value="卖家评价售后处理" vertex="1">
+          <mxGeometry height="45" width="160" x="820" y="795" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-after-status" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=10;dashed=1;" value="订单状态自动变更为售后中" vertex="1">
+          <mxGeometry height="45" width="200" x="805" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-cancel-status" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=10;dashed=1;" value="售后状态自动变更为售后取消" vertex="1">
+          <mxGeometry height="45" width="210" x="795" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-life" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" target="uc-lifecycle">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-seller-life" edge="1" parent="1" source="actor-seller" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-ship">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="930" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-life-pay" edge="1" parent="1" source="uc-lifecycle" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-pay" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-life-ship" edge="1" parent="1" source="uc-lifecycle" style="endArrow=open;html=1;strokeColor=#EA580C;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#EA580C;" target="uc-ship" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-life-receive" edge="1" parent="1" source="uc-lifecycle" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-receive" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-life-cancel" edge="1" parent="1" source="uc-lifecycle" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-cancel" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-life-rate" edge="1" parent="1" source="uc-lifecycle" style="endArrow=open;html=1;strokeColor=#F59E0B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#F59E0B;" target="uc-rate" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-pay-cancel" edge="1" parent="1" source="uc-pay" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=9;fontColor=#DC2626;" target="uc-auto-cancel" value="&lt;&lt;extend&gt;&gt;(超时)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-receive-auto" edge="1" parent="1" source="uc-receive" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=9;fontColor=#DC2626;" target="uc-auto-complete" value="&lt;&lt;extend&gt;&gt;(超时)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-logistics" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" target="uc-logistics">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-seller-logistics" edge="1" parent="1" source="actor-seller" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-logistics">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1070" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-logistics-track" edge="1" parent="1" source="uc-logistics" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-track" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-logistics-log" edge="1" parent="1" source="uc-logistics" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-order-log" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-ship-log" edge="1" parent="1" source="uc-ship" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-order-log" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-after" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" target="uc-after-sale">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="570" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-after-return" edge="1" parent="1" source="uc-after-sale" style="endArrow=open;html=1;strokeColor=#DB2777;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DB2777;" target="uc-return" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-after-exchange" edge="1" parent="1" source="uc-after-sale" style="endArrow=open;html=1;strokeColor=#DB2777;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DB2777;" target="uc-exchange" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-return-reason" edge="1" parent="1" source="uc-return" style="endArrow=open;html=1;strokeColor=#DB2777;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DB2777;" target="uc-fill-reason" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-exchange-reason" edge="1" parent="1" source="uc-exchange" style="endArrow=open;html=1;strokeColor=#DB2777;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DB2777;" target="uc-fill-reason" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-exchange-new" edge="1" parent="1" source="uc-exchange" style="endArrow=open;html=1;strokeColor=#8B5CF6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#8B5CF6;" target="uc-new-order" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-after-cancel" edge="1" parent="1" source="uc-after-sale" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-cancel-after" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-after-status" edge="1" parent="1" source="uc-after-sale" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-after-status" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-cancel-status" edge="1" parent="1" source="uc-cancel-after" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-cancel-status" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-seller-rate-after" edge="1" parent="1" source="actor-seller" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-seller-rate-after">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1070" y="815" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="system" name="系统管理能力">
+    <mxGraphModel dx="1140" dy="738" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="750" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys-boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#475569;fontSize=16;fontStyle=1;verticalAlign=top;align=center;dashed=1;dashPattern=8 4;strokeWidth=2;arcSize=5;" value="TradeX 系统管理能力" vertex="1">
+          <mxGeometry height="660" width="740" x="280" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-admin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=14;fontStyle=1;" value="管理员" vertex="1">
+          <mxGeometry height="100" width="50" x="50" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-perm" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="用户权限管理" vertex="1">
+          <mxGeometry height="190" width="320" x="310" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-manage-role" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=12;fontStyle=1;" value="角色管理" vertex="1">
+          <mxGeometry height="50" width="140" x="385" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-set-role" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=11;" value="设置用户角色" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-disable-user" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;" value="禁用/启用用户" vertex="1">
+          <mxGeometry height="40" width="120" x="510" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-stats" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="核心数据统计" vertex="1">
+          <mxGeometry height="190" width="340" x="660" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-view-stats" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=12;fontStyle=1;" value="查看系统核心统计" vertex="1">
+          <mxGeometry height="50" width="160" x="750" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-user-stats" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=10;" value="用户注册量统计" vertex="1">
+          <mxGeometry height="40" width="115" x="665" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-product-stats" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=10;" value="商品发布量统计" vertex="1">
+          <mxGeometry height="40" width="115" x="885" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-order-stats" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=10;" value="订单交易量统计" vertex="1">
+          <mxGeometry height="35" width="115" x="665" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-audit-stats" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=10;" value="审核通过率统计" vertex="1">
+          <mxGeometry height="35" width="115" x="885" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-export" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=14;fontStyle=1;tabWidth=100;tabHeight=28;tabPosition=left;" value="数据导出" vertex="1">
+          <mxGeometry height="135" width="320" x="320" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-export-data" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontSize=12;fontStyle=1;" value="导出统计数据" vertex="1">
+          <mxGeometry height="50" width="140" x="320" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-export-csv" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=10;" value="CSV/Excel导出" vertex="1">
+          <mxGeometry height="40" width="115" x="525" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-config" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="系统参数配置" vertex="1">
+          <mxGeometry height="220" width="340" x="660" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-config" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontSize=12;fontStyle=1;" value="配置系统基础参数" vertex="1">
+          <mxGeometry height="50" width="160" x="750" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-pwd-rule" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=10;" value="密码复杂度规则" vertex="1">
+          <mxGeometry height="40" width="120" x="660" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-audit-rule" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=10;" value="商品审核规则" vertex="1">
+          <mxGeometry height="40" width="110" x="890" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-real-time" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=10;fontStyle=1;dashed=1;" value="配置实时生效无需重启" vertex="1">
+          <mxGeometry height="40" width="180" x="740" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-role" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-manage-role">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-stats" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-view-stats">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="145" />
+              <mxPoint x="310" y="60" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-admin-export" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-export-data">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="365" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-admin-config" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-config">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="365" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-role-set" edge="1" parent="1" source="uc-manage-role" style="endArrow=open;html=1;strokeColor=#DB2777;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DB2777;" target="uc-set-role" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-role-disable" edge="1" parent="1" source="uc-manage-role" style="endArrow=open;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;" target="uc-disable-user" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-stats-user" edge="1" parent="1" source="uc-view-stats" style="endArrow=open;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;fontSize=9;fontColor=#3B82F6;" target="uc-user-stats" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-stats-product" edge="1" parent="1" source="uc-view-stats" style="endArrow=open;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;fontSize=9;fontColor=#3B82F6;" target="uc-product-stats" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-stats-order" edge="1" parent="1" source="uc-view-stats" style="endArrow=open;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;fontSize=9;fontColor=#3B82F6;" target="uc-order-stats" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-stats-audit" edge="1" parent="1" source="uc-view-stats" style="endArrow=open;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;fontSize=9;fontColor=#3B82F6;" target="uc-audit-stats" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-export-csv" edge="1" parent="1" source="uc-export-data" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-export-csv" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-config-pwd" edge="1" parent="1" source="uc-config" style="endArrow=open;html=1;strokeColor=#F59E0B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#F59E0B;" target="uc-pwd-rule" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-config-audit" edge="1" parent="1" source="uc-config" style="endArrow=open;html=1;strokeColor=#F59E0B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#F59E0B;" target="uc-audit-rule" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-config-real" edge="1" parent="1" source="uc-config" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-real-time" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="social" name="用户交流评论">
+    <mxGraphModel dx="1368" dy="886" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="750" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys-boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F3FF;strokeColor=#8B5CF6;fontSize=16;fontStyle=1;verticalAlign=top;align=center;dashed=1;dashPattern=8 4;strokeWidth=2;arcSize=5;" value="TradeX 用户交流评论能力" vertex="1">
+          <mxGeometry height="660" width="740" x="280" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-buyer" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DBEAFE;strokeColor=#1E40AF;fontSize=14;fontStyle=1;" value="买家" vertex="1">
+          <mxGeometry height="100" width="50" x="50" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-seller" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=14;fontStyle=1;" value="卖家" vertex="1">
+          <mxGeometry height="100" width="50" x="1150" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-rate" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=14;fontStyle=1;tabWidth=100;tabHeight=28;tabPosition=left;" value="商品评价" vertex="1">
+          <mxGeometry height="260" width="330" x="310" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-write-review" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontSize=12;fontStyle=1;" value="对已完成订单评价" vertex="1">
+          <mxGeometry height="50" width="170" x="392.5" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-review-audit" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=11;" value="评价审核后发布" vertex="1">
+          <mxGeometry height="40" width="140" x="325" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-like-review" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;fontSize=11;" value="对评价点赞" vertex="1">
+          <mxGeometry height="40" width="110" x="520" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-refresh-review" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=10;dashed=1;" value="评价实时刷新" vertex="1">
+          <mxGeometry height="40" width="115" x="420" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-chat" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontSize=14;fontStyle=1;tabWidth=110;tabHeight=28;tabPosition=left;" value="买家-卖家聊天" vertex="1">
+          <mxGeometry height="260" width="330" x="670" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-start-chat" parent="1" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontSize=12;fontStyle=1;" value="发起聊天" vertex="1">
+          <mxGeometry height="50" width="120" x="775" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-send-msg" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontSize=11;" value="发送消息" vertex="1">
+          <mxGeometry height="40" width="95" x="680" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-receive-msg" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontSize=11;" value="接收消息" vertex="1">
+          <mxGeometry height="40" width="95" x="895" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-ws-real-time" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontSize=10;fontStyle=1;dashed=1;" value="WebSocket实时刷新" vertex="1">
+          <mxGeometry height="40" width="160" x="850" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg-forum" parent="1" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=14;fontStyle=1;tabWidth=100;tabHeight=28;tabPosition=left;" value="论坛交流" vertex="1">
+          <mxGeometry height="290" width="690" x="310" y="372.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-post" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="发布论坛帖子" vertex="1">
+          <mxGeometry height="45" width="120" x="350" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-comment" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="评论帖子" vertex="1">
+          <mxGeometry height="45" width="100" x="360" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-like-post" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="点赞帖子" vertex="1">
+          <mxGeometry height="45" width="100" x="510" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-browse-forum" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=11;" value="浏览论坛内容" vertex="1">
+          <mxGeometry height="45" width="120" x="775" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-forum-category" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=10;" value="论坛分类浏览" vertex="1">
+          <mxGeometry height="35" width="115" x="385" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-forum-tag" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=10;" value="标签筛选" vertex="1">
+          <mxGeometry height="35" width="90" x="530" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-forum-pin" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;fontSize=10;dashed=1;" value="置顶管理" vertex="1">
+          <mxGeometry height="35" width="90" x="650" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-review" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;" target="uc-write-review">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-chat" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-start-chat">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="110" />
+            </Array>
+            <mxPoint x="100" y="210" as="sourcePoint" />
+            <mxPoint x="775" y="82" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-seller-chat" edge="1" parent="1" source="actor-seller" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=2;" target="uc-start-chat">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1080" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-review-audit" edge="1" parent="1" source="uc-write-review" style="endArrow=open;html=1;strokeColor=#F59E0B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#F59E0B;" target="uc-review-audit" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-review-like" edge="1" parent="1" source="uc-write-review" style="endArrow=open;html=1;strokeColor=#F59E0B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#F59E0B;" target="uc-like-review" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-chat-send" edge="1" parent="1" source="uc-start-chat" style="endArrow=open;html=1;strokeColor=#8B5CF6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#8B5CF6;" target="uc-send-msg" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-chat-receive" edge="1" parent="1" source="uc-start-chat" style="endArrow=open;html=1;strokeColor=#8B5CF6;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#8B5CF6;" target="uc-receive-msg" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-chat-ws" edge="1" parent="1" source="uc-receive-msg" style="endArrow=open;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#059669;" target="uc-ws-real-time" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-buyer-post" edge="1" parent="1" source="actor-buyer" style="endArrow=none;html=1;strokeColor=#1E40AF;strokeWidth=1.5;" target="uc-post">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="435" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-seller-post" edge="1" parent="1" source="actor-seller" style="endArrow=none;html=1;strokeColor=#DC2626;strokeWidth=1.5;" target="uc-post">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1080" y="435" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-post-comment" edge="1" parent="1" source="uc-post" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-comment" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-post-like" edge="1" parent="1" source="uc-post" style="endArrow=open;html=1;strokeColor=#4F46E5;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#4F46E5;" target="uc-like-post" value="&lt;&lt;extend&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
