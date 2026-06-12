@@ -1,0 +1,175 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="view05" name="View-05 接口架构视图">
+    <mxGraphModel dx="1284" dy="853" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="V0" />
+        <mxCell id="V1" parent="V0" />
+        <mxCell id="title05" parent="V1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=18;fontStyle=1;fontColor=#1A237E;" value="View-05：接口架构视图&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="900" x="160" y="13" as="geometry" />
+        </mxCell>
+        <mxCell id="containerI1" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#FFF3E0;strokeColor=#E65100;fontStyle=1;fontSize=13;fontColor=#BF360C;swimlaneLine=1;" value="Model-I1：接口标识与拓扑模型&#xa;tradeX/api.py -&gt; core/api/__init__.py -&gt; 15 个模块 Router" vertex="1">
+          <mxGeometry height="350" width="1180" x="20" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_root" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;fontSize=10;fontColor=#FFF;fontStyle=1;align=center;" value="&lt;b&gt;NinjaAPI&lt;/b&gt;&#xa;title: TradeX API&#xa;version: 0.1.0&#xa;docs_url: /docs&#xa;prefix: /api/" vertex="1">
+          <mxGeometry height="65" width="140" x="270" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_auth" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/login [认证]&lt;/b&gt;&#xa;POST: 用户登录&#xa;JWT Token 签发&#xa;auth=None (无需鉴权)" vertex="1">
+          <mxGeometry height="65" width="160" x="442.5" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_users" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/users [用户]&lt;/b&gt;&#xa;POST: 注册用户&#xa;GET: 用户信息&#xa;PUT: 更新信息" vertex="1">
+          <mxGeometry height="65" width="160" x="630" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_products" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/products [商品]&lt;/b&gt;&#xa;GET: 列表/搜索/详情&#xa;POST: 发布新商品&#xa;PUT: 更新商品状态" vertex="1">
+          <mxGeometry height="65" width="185" x="825" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_categories" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/categories [分类]&lt;/b&gt;&#xa;GET: 分类列表&#xa;POST: 创建分类" vertex="1">
+          <mxGeometry height="65" width="160" x="20" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_tags" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/tags [标签]&lt;/b&gt;&#xa;GET: 标签列表&#xa;POST: 创建标签" vertex="1">
+          <mxGeometry height="65" width="160" x="200" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_prodtags" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/product-tags [商品标签]&lt;/b&gt;&#xa;GET: 商品标签列表&#xa;POST: 关联标签" vertex="1">
+          <mxGeometry height="65" width="160" x="380" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_utpref" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/user-tag-preferences&lt;/b&gt;&#xa;[用户标签偏好]&#xa;GET: 偏好列表 | POST: 设置偏好" vertex="1">
+          <mxGeometry height="65" width="160" x="560" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_favorites" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/product-favorites [商品收藏]&lt;/b&gt;&#xa;GET: 收藏列表&#xa;POST: 收藏/取消收藏" vertex="1">
+          <mxGeometry height="65" width="160" x="740" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_forum" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/forum [论坛]&lt;/b&gt;&#xa;GET: categories/tags/posts/comments&#xa;POST: 发帖/评论" vertex="1">
+          <mxGeometry height="65" width="165" x="920" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_recommendations" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/recommendations [推荐系统]&lt;/b&gt;&#xa;GET: 热门推荐 | 个性化推荐&#xa;含 trending_score 算法" vertex="1">
+          <mxGeometry height="65" width="185" x="20" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_orders" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/orders [订单]&lt;/b&gt;&#xa;POST: 创建订单 | GET: 列表/详情&#xa;POST: 支付/发货/取消/收货&#xa;含买家/卖家双角色" vertex="1">
+          <mxGeometry height="65" width="185" x="225" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_notifications" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/notifications [通知]&lt;/b&gt;&#xa;GET: 通知列表/未读数&#xa;POST: 标记已读" vertex="1">
+          <mxGeometry height="65" width="185" x="430" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_uploads" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/uploads [文件]&lt;/b&gt;&#xa;POST: 图片上传 COS&#xa;multipart/form-data&#xa;限制: 10MB, jpeg/png/webp/gif" vertex="1">
+          <mxGeometry height="65" width="185" x="635" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_rag" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/rag [RAG]&lt;/b&gt;&#xa;POST: add-product (向量入库)&#xa;POST: chat/stream (SSE 流式问答)&#xa;模型: deepseek/deepseek-chat" vertex="1">
+          <mxGeometry height="65" width="185" x="840" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_system" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/health [System]&lt;/b&gt;&#xa;GET: 健康检查" vertex="1">
+          <mxGeometry height="65" width="120" x="1045" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_chat" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;/chat [聊天]&lt;/b&gt;&#xa;GET: conversations (对话列表)&#xa;GET: messages (历史消息)&#xa;POST: mark-read (标记已读)" vertex="1">
+          <mxGeometry height="51" width="185" x="430" y="289" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_ws" parent="containerI1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontSize=9;fontStyle=1;align=center;" value="&lt;b&gt;WebSocket: ws/chat/&lt;/b&gt;&#xa;core/routing.py -&gt; ChatConsumer&#xa;消息类型: chat_message | ping/pong | read_receipt | typing | system" vertex="1">
+          <mxGeometry height="51" width="185" x="640" y="289" as="geometry" />
+        </mxCell>
+        <mxCell id="containerI2" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#F3E5F5;strokeColor=#7B1FA2;fontStyle=1;fontSize=13;fontColor=#4A148C;swimlaneLine=1;" value="Model-I2：数据元素契约模型&#xa;core/api/common.py — Ninja Schema 定义 (请求/响应字段约束)" vertex="1">
+          <mxGeometry height="340" width="1180" x="20" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_auth_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;认证 Schema&lt;/b&gt;&#xa;LoginIn: email/username, password&#xa;LoginOut: token, user_id, username, role&#xa;RegisterIn: email, username, encrypted_password, real_name, id_card, phone, address" vertex="1">
+          <mxGeometry height="90" width="220" x="12" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_user_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;用户 Schema&lt;/b&gt;&#xa;UserOut: user_id, username, email, real_name, role, register_status, phone, address&#xa;UserUpdateIn: address, phone_display, real_name" vertex="1">
+          <mxGeometry height="90" width="220" x="248" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_product_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;商品 Schema&lt;/b&gt;&#xa;ProductOut: 全字段 + publisher_name resolver&#xa;ProductIn: product_name, description, price, stock, tag_ids&#xa;ProductUpdateIn: 全部 Optional&#xa;ProductStatusUpdateIn/Out: product_status + message" vertex="1">
+          <mxGeometry height="90" width="220" x="484" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_cattag_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;分类/标签 Schema&lt;/b&gt;&#xa;CategoryOut/In: category_id, name, sort_order, is_active&#xa;TagOut/In: tag_id, tag_name, category, usage_count&#xa;ProductTagOut/In | UserTagPreferenceOut/In" vertex="1">
+          <mxGeometry height="90" width="220" x="720" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_fav_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;收藏/推荐 Schema&lt;/b&gt;&#xa;ProductFavoriteOut/In: user_id + product_id&#xa;RecommendationOut: 继承 ProductOut + relevance_score, trending_score, is_favorited" vertex="1">
+          <mxGeometry height="90" width="212" x="956" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_order_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;订单 Schema&lt;/b&gt;&#xa;OrderOut: order_id, buyer_id, seller_id, total_amount, order_status+display, logistics, products: List[OrderProductOut]&#xa;OrderCreateIn: product_id, quantity, address, phone&#xa;OrderShipIn | OrderCancelIn | OrderPayIn" vertex="1">
+          <mxGeometry height="105" width="240" x="12" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_forum_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;论坛 Schema&lt;/b&gt;&#xa;ForumCategoryOut/In, ForumTagOut&#xa;ForumPostOut: includes comments list&#xa;ForumPostSummaryOut, ForumPostIn&#xa;ForumCommentOut/In&#xa;is_liked: bool (根据当前用户动态计算)" vertex="1">
+          <mxGeometry height="105" width="240" x="268" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_notifrag_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;通知/RAG/聊天 Schema&lt;/b&gt;&#xa;NotificationOut: type, title, content, is_read&#xa;UnreadCountOut: count&#xa;RagChatIn: question, n_results&#xa;RagChatOut: answer, products: list[dict]&#xa;ConversationOut | ChatMessageOut | SendMessageIn" vertex="1">
+          <mxGeometry height="105" width="270" x="524" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_util_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;通用/工具 Schema&lt;/b&gt;&#xa;SuccessOut: success(bool)+message&#xa;ImageUploadOut: url, key, filename&#xa;SellerStatsOut: 卖家统计数据&#xa;OrderLogOut: 订单操作日志&#xa;JWT: HS256 算法, 30天过期" vertex="1">
+          <mxGeometry height="105" width="240" x="810" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_auth_class" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#6A1B9A;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;fontColor=#FFF;" value="&lt;b&gt;认证器: AuthBearer(HttpBearer)&lt;/b&gt;&#xa;authenticate(request, token) -&gt; 解析 JWT&#xa;payload[&quot;user_id&quot;] -&gt; User.objects.get()&#xa;异常: ExpiredSignatureError / InvalidTokenError -&gt; None" vertex="1">
+          <mxGeometry height="55" width="390" x="12" y="248" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_gen_token" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#6A1B9A;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;fontColor=#FFF;" value="&lt;b&gt;generate_token(user) -&gt; str&lt;/b&gt;&#xa;payload = { user_id, username, exp: now()+30天 }&#xa;jwt.encode(payload, JWT_SECRET, algorithm=&quot;HS256&quot;)" vertex="1">
+          <mxGeometry height="55" width="350" x="418" y="248" as="geometry" />
+        </mxCell>
+        <mxCell id="containerI3" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#E8EAF6;strokeColor=#3949AB;fontStyle=1;fontSize=13;fontColor=#1A237E;swimlaneLine=1;" value="Model-I3：数据集合体契约模型&#xa;列表/分页/嵌套结构定义" vertex="1">
+          <mxGeometry height="260" width="580" x="20" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="i3_list" parent="containerI3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#5C6BC0;fontSize=9;align=left;spacingLeft=5;verticalAlign=top;" value="&lt;b&gt;列表响应模式&lt;/b&gt;&#xa;GET -&gt; response=list[Schema]&#xa;/products/ -&gt; list[ProductOut]&#xa;/categories/ -&gt; list[CategoryOut]&#xa;/tags/ -&gt; list[TagOut]&#xa;/recommendations/ -&gt; list[RecommendationOut]&#xa;/forum/posts/ -&gt; list[ForumPostSummaryOut]&#xa;/chat/conversations -&gt; list[ConversationOut]" vertex="1">
+          <mxGeometry height="100" width="270" x="12" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="i3_aggregate" parent="containerI3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#5C6BC0;fontSize=9;align=left;spacingLeft=5;verticalAlign=top;" value="&lt;b&gt;聚合响应模式&lt;/b&gt;&#xa;OrderListOut: {orders: List[OrderOut], total: int}&#xa;OrderOut.products: List[OrderProductOut] (嵌套)&#xa;ForumPostOut.comments: list[ForumCommentOut]&#xa;ChatMessageListOut: {messages: List, total, has_more}&#xa;RagChatOut.products: list[dict[str, Any]]" vertex="1">
+          <mxGeometry height="100" width="272" x="296" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="i3_pagination" parent="containerI3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#5C6BC0;fontSize=9;align=left;spacingLeft=5;verticalAlign=top;" value="&lt;b&gt;分页与查询模式&lt;/b&gt;&#xa;参数: limit (默认10-20), offset (默认0), before_id&#xa;排序: sort (trending/time), ordering (-published_at, hot)&#xa;筛选: status, role (buyer/seller), category_id, q (搜索)" vertex="1">
+          <mxGeometry height="72" width="270" x="12" y="152" as="geometry" />
+        </mxCell>
+        <mxCell id="i3_status" parent="containerI3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#5C6BC0;fontSize=9;align=left;spacingLeft=5;verticalAlign=top;" value="&lt;b&gt;响应状态码模式&lt;/b&gt;&#xa;201: 创建成功 (发布商品/创建订单)&#xa;200: 查询/更新成功&#xa;401: 认证失败 | 403: 权限不足&#xa;404: 资源不存在 | 400: 参数错误 | 500: 服务端错误" vertex="1">
+          <mxGeometry height="72" width="272" x="296" y="152" as="geometry" />
+        </mxCell>
+        <mxCell id="containerI4" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#E0F7FA;strokeColor=#00838F;fontStyle=1;fontSize=13;fontColor=#006064;swimlaneLine=1;" value="Model-I4：通信方法模型&#xa;REST API 方法与 WebSocket 通道" vertex="1">
+          <mxGeometry height="260" width="570" x="630" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="i4_get" parent="containerI4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2EBF2;strokeColor=#00ACC1;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;GET — 查询/检索&lt;/b&gt;&#xa;list_products | get_product&#xa;search_products (模糊搜索, auth=None)&#xa;list_categories | list_tags&#xa;list_orders (role=buyer/seller+status)&#xa;get_forum_post (+view_count++)&#xa;get_messages (分页before_id)&#xa;get_conversations | get_unread_count" vertex="1">
+          <mxGeometry height="105" width="270" x="12" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="i4_post" parent="containerI4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2EBF2;strokeColor=#00ACC1;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;POST — 创建/操作&lt;/b&gt;&#xa;create_product | create_order&#xa;login (auth=None) | register&#xa;pay_order (模拟支付)&#xa;create_forum_post | create_forum_comment&#xa;rag_add_product | rag_chat_stream (SSE)&#xa;upload_image (multipart/form-data)&#xa;mark_messages_read" vertex="1">
+          <mxGeometry height="105" width="262" x="296" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="i4_ws" parent="containerI4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2EBF2;strokeColor=#00ACC1;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;WebSocket — 实时双向通信&lt;/b&gt;&#xa;ws://host/ws/chat/?token=JWT&#xa;connect: JWT认证 -&gt; 加入user_{id}组 (最大3并发)&#xa;receive: chat_message | ping/pong | read_receipt | typing&#xa;disconnect: 离开用户组，减少连接计数&#xa;Channel Layer 事件: chat_message, read_receipt, typing_status" vertex="1">
+          <mxGeometry height="70" width="440" x="12" y="156" as="geometry" />
+        </mxCell>
+        <mxCell id="i4_put" parent="containerI4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2EBF2;strokeColor=#00ACC1;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;PUT — 更新&lt;/b&gt;&#xa;update_user (地址/手机/姓名)&#xa;update_product_status (审核/上下架)" vertex="1">
+          <mxGeometry height="70" width="96" x="464" y="156" as="geometry" />
+        </mxCell>
+        <mxCell id="containerI5" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#E8F5E9;strokeColor=#2E7D32;fontStyle=1;fontSize=13;fontColor=#1B5E20;swimlaneLine=1;" value="Model-I5：协议特性模型&#xa;认证、安全、传输协议特性" vertex="1">
+          <mxGeometry height="300" width="600" x="20" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="i5_jwt" parent="containerI5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;JWT Bearer 认证&lt;/b&gt;&#xa;Header: Authorization: Bearer &lt;token&gt;&#xa;算法: HS256 | 有效期: 30天&#xa;payload: {user_id, username, exp}&#xa;AuthBearer(HttpBearer) 自动解析&#xa;auth=None 标记公开接口" vertex="1">
+          <mxGeometry height="80" width="280" x="12" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="i5_cors" parent="containerI5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;CORS 跨域策略&lt;/b&gt;&#xa;corsheaders.CorsMiddleware&#xa;CORS_ALLOW_CREDENTIALS: True&#xa;CORS_ALLOWED_ORIGINS: 从env解析&#xa;开发: CORS_ALLOW_ALL_ORIGINS=True&#xa;生产: 白名单模式" vertex="1">
+          <mxGeometry height="80" width="282" x="306" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="i5_csrf" parent="containerI5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;CSRF / 安全 Cookie&lt;/b&gt;&#xa;CsrfViewMiddleware&#xa;CSRF_TRUSTED_ORIGINS: 环境变量配置&#xa;SESSION_COOKIE_SECURE: 生产环境启用&#xa;CSRF_COOKIE_SECURE: 生产环境启用&#xa;SESSION_COOKIE_SAMESITE: Lax" vertex="1">
+          <mxGeometry height="80" width="280" x="12" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="i5_content" parent="containerI5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;传输格式&lt;/b&gt;&#xa;Content-Type: application/json (默认)&#xa;multipart/form-data (图片上传)&#xa;SSE: text/event-stream (RAG流式问答)&#xa;WebSocket: JSON 文本帧&#xa;ASGI: Daphne + ProtocolTypeRouter" vertex="1">
+          <mxGeometry height="80" width="282" x="306" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="i5_error" parent="containerI5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;错误处理机制&lt;/b&gt;&#xa;HttpError(status, message) -&gt; JSON响应&#xa;WebSocket: close(code=4001-4005) 认证错误码&#xa;WebSocket error: {&quot;type&quot;:&quot;error&quot;,&quot;message&quot;:&quot;...&quot;}" vertex="1">
+          <mxGeometry height="65" width="440" x="80" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="containerI6" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#FBE9E7;strokeColor=#BF360C;fontStyle=1;fontSize=13;fontColor=#BF360C;swimlaneLine=1;" value="Model-I6：物理兼容性模型&#xa;运行环境与基础设施兼容性" vertex="1">
+          <mxGeometry height="300" width="550" x="650" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="i6_runtime" parent="containerI6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#D81B60;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;运行时环境&lt;/b&gt;&#xa;Python 3.x + Django 5.0&#xa;ASGI: Daphne (异步服务器)&#xa;WSGI: Gunicorn (生产备用)&#xa;Docker: Dockerfile 容器化部署" vertex="1">
+          <mxGeometry height="75" width="260" x="12" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="i6_db" parent="containerI6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#D81B60;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;数据库兼容性&lt;/b&gt;&#xa;SQLite3: 开发环境 (本地文件)&#xa;PostgreSQL: 生产环境 (DATABASE_URL)&#xa;自动切换: dj_database_url.parse()&#xa;迁移: Django Migrations (0001-0008)" vertex="1">
+          <mxGeometry height="75" width="252" x="286" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="i6_cache" parent="containerI6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#D81B60;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;缓存/通道兼容性&lt;/b&gt;&#xa;LocMemCache: 开发 (内存)&#xa;RedisCache: 生产 (django_redis)&#xa;InMemoryChannelLayer: 开发 (WebSocket)&#xa;RedisChannelLayer: 生产 (WebSocket)" vertex="1">
+          <mxGeometry height="75" width="260" x="12" y="128" as="geometry" />
+        </mxCell>
+        <mxCell id="i6_external" parent="containerI6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#D81B60;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;外部服务兼容性&lt;/b&gt;&#xa;ChromaDB: 向量存储 (RAG)&#xa;Tencent COS: 文件存储 (图片上传)&#xa;OpenRouter API: LLM 服务 (deepseek)&#xa;CORS: 前端跨域 (localhost:5173)" vertex="1">
+          <mxGeometry height="75" width="252" x="286" y="128" as="geometry" />
+        </mxCell>
+        <mxCell id="i6_deploy" parent="containerI6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#D81B60;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;部署与CI/CD&lt;/b&gt;&#xa;Docker Compose: 多服务编排&#xa;环境切换: DJANGO_ENV=local/development/production&#xa;.env 文件: 环境变量隔离&#xa;静态文件: STATIC_ROOT + WhiteNoise" vertex="1">
+          <mxGeometry height="72" width="260" x="12" y="218" as="geometry" />
+        </mxCell>
+        <mxCell id="i6_protocol" parent="containerI6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#D81B60;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;支持的协议&lt;/b&gt;&#xa;HTTP/1.1: REST API (Django Ninja)&#xa;WebSocket: 实时通信 (Django Channels)&#xa;SSE: 流式推送 (RAG chat/stream)&#xa;HTTPS: 生产环境 (SECURE Cookies)" vertex="1">
+          <mxGeometry height="72" width="252" x="286" y="218" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
