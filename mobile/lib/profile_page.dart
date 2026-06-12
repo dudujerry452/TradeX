@@ -8,6 +8,7 @@ import 'auth_manager.dart';
 import 'pages/order/order_list_page.dart';
 import 'pages/address/address_manage_page.dart';
 import 'pages/seller/seller_center_page.dart';
+import 'services/order_service.dart';
 
 /// 我的页面 - 展示用户账户信息
 class ProfilePage extends StatefulWidget {
@@ -28,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
   };
 
   // 订单统计数据
-  final Map<String, int> _orderStats = {'待付款': 2, '待发货': 1, '待收货': 3, '待评价': 0};
+  Map<String, int> _orderStats = {};
 
   // 用户标签偏好数据
   List<dynamic> _tagPreferences = [];
@@ -48,7 +49,42 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _userInfo = user;
       });
+      _loadOrderStats();
       _loadTagPreferences();
+    }
+  }
+
+  /// 加载订单统计数据
+  Future<void> _loadOrderStats() async {
+    try {
+      // 分别获取各个状态的订单数量
+      final statuses = ['PENDING_PAY', 'PENDING_SHIP', 'SHIPPED', 'COMPLETED'];
+      final labels = ['待付款', '待发货', '待收货', '待评价'];
+      final Map<String, int> stats = {};
+
+      for (int i = 0; i < statuses.length; i++) {
+        final result = await OrderService.getOrders(
+          status: statuses[i],
+          role: 'buyer',
+          limit: 1,
+          offset: 0,
+        );
+        // 从返回的 total 字段获取该状态的订单总数
+        stats[labels[i]] = result['total'] ?? 0;
+      }
+
+      if (mounted) {
+        setState(() {
+          _orderStats = stats;
+        });
+      }
+    } catch (e) {
+      // 加载失败时使用默认值
+      if (mounted) {
+        setState(() {
+          _orderStats = {'待付款': 0, '待发货': 0, '待收货': 0, '待评价': 0};
+        });
+      }
     }
   }
 
