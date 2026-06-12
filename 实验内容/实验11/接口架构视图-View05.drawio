@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram id="view05" name="View-05 接口架构视图">
-    <mxGraphModel dx="1284" dy="853" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1600" math="0" shadow="0">
+    <mxGraphModel dx="2443" dy="1643" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1600" math="0" shadow="0">
       <root>
         <mxCell id="V0" />
         <mxCell id="V1" parent="V0" />
@@ -65,7 +65,7 @@
           <mxGeometry height="51" width="185" x="640" y="289" as="geometry" />
         </mxCell>
         <mxCell id="containerI2" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#F3E5F5;strokeColor=#7B1FA2;fontStyle=1;fontSize=13;fontColor=#4A148C;swimlaneLine=1;" value="Model-I2：数据元素契约模型&#xa;core/api/common.py — Ninja Schema 定义 (请求/响应字段约束)" vertex="1">
-          <mxGeometry height="340" width="1180" x="20" y="420" as="geometry" />
+          <mxGeometry height="340" width="1180" x="20" y="450" as="geometry" />
         </mxCell>
         <mxCell id="i2_auth_s" parent="containerI2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;认证 Schema&lt;/b&gt;&#xa;LoginIn: email/username, password&#xa;LoginOut: token, user_id, username, role&#xa;RegisterIn: email, username, encrypted_password, real_name, id_card, phone, address" vertex="1">
           <mxGeometry height="90" width="220" x="12" y="40" as="geometry" />
@@ -101,7 +101,7 @@
           <mxGeometry height="55" width="350" x="418" y="248" as="geometry" />
         </mxCell>
         <mxCell id="containerI3" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#E8EAF6;strokeColor=#3949AB;fontStyle=1;fontSize=13;fontColor=#1A237E;swimlaneLine=1;" value="Model-I3：数据集合体契约模型&#xa;列表/分页/嵌套结构定义" vertex="1">
-          <mxGeometry height="260" width="580" x="20" y="780" as="geometry" />
+          <mxGeometry height="260" width="580" x="40" y="860" as="geometry" />
         </mxCell>
         <mxCell id="i3_list" parent="containerI3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#5C6BC0;fontSize=9;align=left;spacingLeft=5;verticalAlign=top;" value="&lt;b&gt;列表响应模式&lt;/b&gt;&#xa;GET -&gt; response=list[Schema]&#xa;/products/ -&gt; list[ProductOut]&#xa;/categories/ -&gt; list[CategoryOut]&#xa;/tags/ -&gt; list[TagOut]&#xa;/recommendations/ -&gt; list[RecommendationOut]&#xa;/forum/posts/ -&gt; list[ForumPostSummaryOut]&#xa;/chat/conversations -&gt; list[ConversationOut]" vertex="1">
           <mxGeometry height="100" width="270" x="12" y="38" as="geometry" />
@@ -116,7 +116,7 @@
           <mxGeometry height="72" width="272" x="296" y="152" as="geometry" />
         </mxCell>
         <mxCell id="containerI4" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#E0F7FA;strokeColor=#00838F;fontStyle=1;fontSize=13;fontColor=#006064;swimlaneLine=1;" value="Model-I4：通信方法模型&#xa;REST API 方法与 WebSocket 通道" vertex="1">
-          <mxGeometry height="260" width="570" x="630" y="780" as="geometry" />
+          <mxGeometry height="260" width="570" x="680" y="860" as="geometry" />
         </mxCell>
         <mxCell id="i4_get" parent="containerI4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2EBF2;strokeColor=#00ACC1;fontSize=9;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;GET — 查询/检索&lt;/b&gt;&#xa;list_products | get_product&#xa;search_products (模糊搜索, auth=None)&#xa;list_categories | list_tags&#xa;list_orders (role=buyer/seller+status)&#xa;get_forum_post (+view_count++)&#xa;get_messages (分页before_id)&#xa;get_conversations | get_unread_count" vertex="1">
           <mxGeometry height="105" width="270" x="12" y="38" as="geometry" />
@@ -131,7 +131,7 @@
           <mxGeometry height="70" width="96" x="464" y="156" as="geometry" />
         </mxCell>
         <mxCell id="containerI5" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#E8F5E9;strokeColor=#2E7D32;fontStyle=1;fontSize=13;fontColor=#1B5E20;swimlaneLine=1;" value="Model-I5：协议特性模型&#xa;认证、安全、传输协议特性" vertex="1">
-          <mxGeometry height="300" width="600" x="20" y="1060" as="geometry" />
+          <mxGeometry height="300" width="600" x="30" y="1180" as="geometry" />
         </mxCell>
         <mxCell id="i5_jwt" parent="containerI5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;JWT Bearer 认证&lt;/b&gt;&#xa;Header: Authorization: Bearer &lt;token&gt;&#xa;算法: HS256 | 有效期: 30天&#xa;payload: {user_id, username, exp}&#xa;AuthBearer(HttpBearer) 自动解析&#xa;auth=None 标记公开接口" vertex="1">
           <mxGeometry height="80" width="280" x="12" y="38" as="geometry" />
@@ -149,7 +149,7 @@
           <mxGeometry height="65" width="440" x="80" y="225" as="geometry" />
         </mxCell>
         <mxCell id="containerI6" parent="V1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#FBE9E7;strokeColor=#BF360C;fontStyle=1;fontSize=13;fontColor=#BF360C;swimlaneLine=1;" value="Model-I6：物理兼容性模型&#xa;运行环境与基础设施兼容性" vertex="1">
-          <mxGeometry height="300" width="550" x="650" y="1060" as="geometry" />
+          <mxGeometry height="300" width="550" x="680" y="1180" as="geometry" />
         </mxCell>
         <mxCell id="i6_runtime" parent="containerI6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#D81B60;fontSize=10;align=left;spacingLeft=4;verticalAlign=top;" value="&lt;b&gt;运行时环境&lt;/b&gt;&#xa;Python 3.x + Django 5.0&#xa;ASGI: Daphne (异步服务器)&#xa;WSGI: Gunicorn (生产备用)&#xa;Docker: Dockerfile 容器化部署" vertex="1">
           <mxGeometry height="75" width="260" x="12" y="38" as="geometry" />

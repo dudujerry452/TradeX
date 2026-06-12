@@ -1,0 +1,49 @@
+<mxfile host="app.diagrams.net" agent="Claude">
+  <diagram id="model-i3" name="Model-I3 数据集合体契约模型">
+    <mxGraphModel dx="1555" dy="1104" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1000" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#3949AB;" value="&lt;b style=&quot;font-size:18px&quot;&gt;Model-I3 数据集合体契约模型&lt;/b&gt;" vertex="1">
+          <mxGeometry height="50" width="500" x="250" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="card1_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;strokeWidth=2;arcSize=8;" value="" vertex="1">
+          <mxGeometry height="410" width="470" x="20" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="card1_header" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3949AB;fontColor=#FFFFFF;fontSize=15;fontStyle=1;strokeColor=#3949AB;arcSize=12;" value="分页模式" vertex="1">
+          <mxGeometry height="36" width="450" x="30" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="card1_body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=auto;fillColor=#C5CAE9;strokeColor=none;rounded=1;arcSize=8;" value="&lt;div style=&#39;text-align:left;font-size:12px;line-height:1.6;&#39;&gt;&#xa;&lt;b&gt;适用范围：&lt;/b&gt;所有列表查询接口&lt;br/&gt;&#xa;&lt;b&gt;请求参数：&lt;/b&gt;&lt;br/&gt;&#xa;　• &lt;code&gt;limit&lt;/code&gt;（默认 10）— 每页返回记录数&lt;br/&gt;&#xa;　• &lt;code&gt;offset&lt;/code&gt;（默认 0）— 起始偏移量&lt;br/&gt;&#xa;&lt;b&gt;响应结构：&lt;/b&gt;&lt;br/&gt;&#xa;　• &lt;code&gt;results&lt;/code&gt; — 当前页记录列表&lt;br/&gt;&#xa;　• &lt;code&gt;count&lt;/code&gt; — 符合条件的总记录数&lt;br/&gt;&#xa;&lt;b&gt;示例：&lt;/b&gt;&lt;code&gt;GET /api/xxx/?limit=10&amp;amp;offset=20&lt;/code&gt;&#xa;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="344" width="450" x="30" y="136" as="geometry" />
+        </mxCell>
+        <mxCell id="card2_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;strokeWidth=2;arcSize=8;" value="" vertex="1">
+          <mxGeometry height="410" width="470" x="510" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="card2_header" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3949AB;fontColor=#FFFFFF;fontSize=15;fontStyle=1;strokeColor=#3949AB;arcSize=12;" value="商品搜索" vertex="1">
+          <mxGeometry height="36" width="450" x="520" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="card2_body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=auto;fillColor=#C5CAE9;strokeColor=none;rounded=1;arcSize=8;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;br&gt;&lt;b&gt;接口：&lt;/b&gt;&lt;code&gt;GET /api/products/search/&lt;/code&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;参数：&lt;/b&gt;&lt;br&gt;&lt;br&gt;　• &lt;code&gt;q&lt;/code&gt; — 关键词，模糊匹配 name + description&lt;br&gt;&lt;br&gt;　• &lt;code&gt;category&lt;/code&gt; — 分类 ID，精确过滤&lt;br&gt;&lt;br&gt;　• &lt;code&gt;sort&lt;/code&gt; — 排序方式（如 &lt;code&gt;time&lt;/code&gt; 发布时间倒序）&lt;br&gt;&lt;br&gt;&lt;b&gt;组合逻辑：&lt;/b&gt;&lt;br&gt;&lt;br&gt;　• q 为空 + category 存在 → 该分类下所有商品&lt;br&gt;&lt;br&gt;　• q + category 同时存在 → 分类内关键词搜索&lt;br&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="334" width="450" x="520" y="136" as="geometry" />
+        </mxCell>
+        <mxCell id="card3_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;strokeWidth=2;arcSize=8;" value="" vertex="1">
+          <mxGeometry height="450" width="470" x="20" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="card3_header" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3949AB;fontColor=#FFFFFF;fontSize=15;fontStyle=1;strokeColor=#3949AB;arcSize=12;" value="推荐系统" vertex="1">
+          <mxGeometry height="36" width="450" x="30" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="card3_body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=auto;fillColor=#C5CAE9;strokeColor=none;rounded=1;arcSize=8;" value="&lt;div style=&#39;text-align:left;font-size:12px;line-height:1.6;&#39;&gt;&#xa;&lt;b&gt;已登录用户：&lt;/b&gt;&lt;br/&gt;&#xa;　&lt;code&gt;GET /api/recommendations/personalized/&lt;/code&gt;&lt;br/&gt;&#xa;　基于用户标签偏好的个性化推荐&lt;br/&gt;&#xa;&lt;br/&gt;&#xa;&lt;b&gt;未登录用户：&lt;/b&gt;&lt;br/&gt;&#xa;　&lt;code&gt;GET /api/recommendations/trending/&lt;/code&gt;&lt;br/&gt;&#xa;　基于热度排序的热门推荐&lt;br/&gt;&#xa;&lt;br/&gt;&#xa;&lt;b&gt;通用参数：&lt;/b&gt;两个接口均支持 &lt;code&gt;limit&lt;/code&gt; / &lt;code&gt;offset&lt;/code&gt; 分页&#xa;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="384" width="450" x="30" y="596" as="geometry" />
+        </mxCell>
+        <mxCell id="card4_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;strokeWidth=2;arcSize=8;" value="" vertex="1">
+          <mxGeometry height="450" width="470" x="510" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="card4_header" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3949AB;fontColor=#FFFFFF;fontSize=15;fontStyle=1;strokeColor=#3949AB;arcSize=12;" value="聊天会话" vertex="1">
+          <mxGeometry height="36" width="450" x="520" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="card4_body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=auto;fillColor=#C5CAE9;strokeColor=none;rounded=1;arcSize=8;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;br&gt;&lt;b&gt;会话列表排序：&lt;/b&gt;按最新消息时间倒序&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;每个会话包含：&lt;/b&gt;&lt;br&gt;&lt;br&gt;　• 对方用户信息（头像、昵称等）&lt;br&gt;&lt;br&gt;　• 最新一条消息内容&lt;br&gt;&lt;br&gt;　• 未读消息计数&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;历史消息排序：&lt;/b&gt;&lt;br&gt;&lt;br&gt;　两个用户之间的消息按时间正序排列&lt;br&gt;&lt;br&gt;　支持 &lt;code&gt;limit&lt;/code&gt; / &lt;code&gt;offset&lt;/code&gt; 分页加载更多&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="384" width="450" x="520" y="596" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,85 @@
+<mxfile host="app.diagrams.net" agent="Claude">
+  <diagram id="model-i6" name="Model-I6 物理兼容性模型">
+    <mxGraphModel dx="1425" dy="1012" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#D81B60;" value="&lt;b style=&quot;font-size:18px&quot;&gt;Model-I6 物理兼容性模型&lt;/b&gt;" vertex="1">
+          <mxGeometry height="50" width="600" x="300" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="web_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE9E7;strokeColor=#D81B60;strokeWidth=2;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="510" width="370" x="20" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="web_header" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D81B60;fontColor=#FFFFFF;fontSize=16;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="Web 端" vertex="1">
+          <mxGeometry height="40" width="350" x="30" y="85" as="geometry" />
+        </mxCell>
+        <mxCell id="web_platform_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="支持平台" vertex="1">
+          <mxGeometry height="26" width="350" x="30" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="web_platform" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;任意主流浏览器&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="350" x="30" y="166" as="geometry" />
+        </mxCell>
+        <mxCell id="web_api_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="网络通信 API" vertex="1">
+          <mxGeometry height="26" width="350" x="30" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="web_api" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;web原生Fetch API&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="19" width="350" x="30" y="284" as="geometry" />
+        </mxCell>
+        <mxCell id="web_conn_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="连接方式" vertex="1">
+          <mxGeometry height="26" width="350" x="30" y="323" as="geometry" />
+        </mxCell>
+        <mxCell id="web_conn" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;br&gt;&lt;b&gt;开发环境：&lt;/b&gt;&lt;br&gt;&lt;br&gt;　Vite proxy 将 /api/* 转发到后端&lt;br&gt;&lt;br&gt;&lt;b&gt;生产环境：&lt;/b&gt;&lt;br&gt;&lt;br&gt;　Nginx 同源代理&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="350" x="30" y="371" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE9E7;strokeColor=#D81B60;strokeWidth=2;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="510" width="370" x="410" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter_header" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D81B60;fontColor=#FFFFFF;fontSize=16;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="Flutter 移动端" vertex="1">
+          <mxGeometry height="40" width="350" x="420" y="85" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter_platform_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="支持平台" vertex="1">
+          <mxGeometry height="26" width="350" x="420" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter_platform" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;br&gt;　Android 10+&lt;br&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="52" width="350" x="420" y="166" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter_api_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="网络通信 API" vertex="1">
+          <mxGeometry height="26" width="350" x="420" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter_api" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Dart &lt;/span&gt;&lt;code style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;http&lt;/code&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt; package&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="52" width="350" x="420" y="259" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter_conn_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="连接方式" vertex="1">
+          <mxGeometry height="26" width="350" x="415" y="323" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter_conn" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&#39;text-align:left;font-size:12px;line-height:1.6;&#39;&gt;&#xa;　直接跨域请求后端&lt;br/&gt;&#xa;　后端 &lt;code&gt;django-cors-headers&lt;/code&gt; 中间件处理 CORS&lt;br/&gt;&#xa;　WebSocket 地址从 &lt;code&gt;deploy-config.json&lt;/code&gt; 读取&#xa;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="350" x="420" y="354" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE9E7;strokeColor=#D81B60;strokeWidth=2;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="510" width="370" x="800" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp_header" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D81B60;fontColor=#FFFFFF;fontSize=16;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="uni-app 小程序端" vertex="1">
+          <mxGeometry height="40" width="350" x="810" y="85" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp_platform_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="支持平台" vertex="1">
+          <mxGeometry height="26" width="350" x="810" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp_platform" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;Wechat App&lt;/div&gt;" vertex="1">
+          <mxGeometry height="34" width="350" x="810" y="166" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp_api_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="网络通信 API" vertex="1">
+          <mxGeometry height="26" width="350" x="808" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp_api" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;code&gt;&lt;br&gt;&lt;/code&gt;&lt;/div&gt;&lt;div style=&quot;text-align:left;font-size:12px;line-height:1.6;&quot;&gt;&lt;code&gt;wx.request&lt;/code&gt; 原生 API&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="52" width="350" x="808" y="259" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp_conn_label" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;fontColor=#880E4F;fontSize=13;fontStyle=1;strokeColor=#D81B60;arcSize=10;" value="连接方式" vertex="1">
+          <mxGeometry height="26" width="350" x="813" y="323" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp_conn" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=#FBE9E7;strokeColor=none;rounded=1;" value="&lt;div style=&#39;text-align:left;font-size:12px;line-height:1.6;&#39;&gt;&#xa;　直接跨域请求后端&lt;br/&gt;&#xa;　后端 &lt;code&gt;django-cors-headers&lt;/code&gt; 中间件处理 CORS&lt;br/&gt;&#xa;　WebSocket 地址从 &lt;code&gt;deploy-config.json&lt;/code&gt; 读取&#xa;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="45" width="350" x="810" y="361" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

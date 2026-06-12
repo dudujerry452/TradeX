@@ -1,0 +1,82 @@
+<mxfile host="app.diagrams.net" agent="Claude">
+  <diagram id="model-d2-globals" name="Model-D2：全局变量模型">
+    <mxGraphModel dx="1425" dy="1012" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1400" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" value="&lt;font style=&quot;font-size:20px;&quot;&gt;&lt;b&gt;Model-D2：全局变量模型&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="420" x="490" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" value="&lt;font style=&quot;font-size:13px;color:#616161;&quot;&gt;backend/tradeX/settings.py + deploy-config.json&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="420" x="490" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cat1_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#66BB6A;arcSize=8;shadow=1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="170" width="420" x="30" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="cat1_title" parent="1" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#2E7D32;" value="&lt;font style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;环境配置&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="45" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="var_env" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;&lt;code&gt;ENVIRONMENT&lt;/code&gt;&lt;/b&gt;&lt;br&gt;决定使用的配置集：&lt;code&gt;local&lt;/code&gt; / &lt;code&gt;development&lt;/code&gt; / &lt;code&gt;production&lt;/code&gt;&lt;br&gt;对应文件：&lt;code&gt;.env.local&lt;/code&gt; / &lt;code&gt;.env.development&lt;/code&gt; / &lt;code&gt;.env.production&lt;/code&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="390" x="45" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="var_debug" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;&lt;code&gt;DEBUG&lt;/code&gt;&lt;/b&gt; — 开发环境 True，生产环境 False&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="390" x="45" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="cat2_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#66BB6A;arcSize=8;shadow=1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="170" width="440" x="470" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="cat2_title" parent="1" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#2E7D32;" value="&lt;font style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;安全配置&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="485" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="var_secret" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;&lt;code&gt;SECRET_KEY&lt;/code&gt;&lt;/b&gt;&lt;br&gt;用于 JWT 签名与 Django 加密&lt;br&gt;各环境不同，生产环境必须使用高强度随机密钥&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="410" x="485" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="var_hosts" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;&lt;code&gt;ALLOWED_HOSTS&lt;/code&gt;&lt;/b&gt; — 允许接受请求的主机名列表&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="410" x="485" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="cat3_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#66BB6A;arcSize=8;shadow=1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="170" width="440" x="930" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="cat3_title" parent="1" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#2E7D32;" value="&lt;font style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;数据库配置&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="945" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="var_db" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;&lt;code&gt;DATABASE_URL&lt;/code&gt;&lt;/b&gt;&lt;br&gt;数据库连接字符串&lt;br&gt;默认：&lt;code&gt;sqlite:///db.sqlite3&lt;/code&gt;&lt;br&gt;同时支持 PostgreSQL&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="410" x="945" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="cat4_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#66BB6A;arcSize=8;shadow=1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="210" width="420" x="30" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="cat4_title" parent="1" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#2E7D32;" value="&lt;font style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;外部服务配置&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="120" x="45" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="var_openrouter" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;&lt;code&gt;OPENROUTER_API_KEY&lt;/code&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;code&gt;OPENROUTER_BASE_URL&lt;/code&gt;&lt;/b&gt;&lt;br&gt;第三方 AI 服务凭证，由 RAG 模块读取&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="390" x="45" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="var_cos" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;Tencent COS 变量&lt;/b&gt;&lt;br&gt;&lt;code&gt;COS_SECRET_ID&lt;/code&gt; / &lt;code&gt;COS_SECRET_KEY&lt;/code&gt; / &lt;code&gt;COS_BUCKET&lt;/code&gt; / &lt;code&gt;COS_REGION&lt;/code&gt;&lt;br&gt;对象存储密钥与配置，由上传模块读取&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="390" x="45" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="cat5_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#66BB6A;arcSize=8;shadow=1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="210" width="440" x="470" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="cat5_title" parent="1" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#2E7D32;" value="&lt;font style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;部署配置&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="485" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="var_deploy" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;&lt;code&gt;deploy-config.json&lt;/code&gt;&lt;/b&gt;&lt;br&gt;前端与部署脚本共享配置&lt;br&gt;&lt;br&gt;&lt;b&gt;HTTP 地址：&lt;/b&gt;&lt;code&gt;http://localhost:7001&lt;/code&gt;&lt;br&gt;&lt;b&gt;WebSocket：&lt;/b&gt;&lt;code&gt;ws://localhost:7002/ws/chat/&lt;/code&gt;&lt;br&gt;&lt;br&gt;&lt;i style=&quot;color:#2E7D32;font-size:11px;&quot;&gt;由 script/switch-config.sh 统一切换&lt;/i&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="410" x="485" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="cat6_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#66BB6A;arcSize=8;shadow=1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="210" width="440" x="930" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="cat6_title" parent="1" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#2E7D32;" value="&lt;font style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;运行时状态&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="110" x="945" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="var_ws" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;arcSize=10;verticalAlign=middle;shadow=0;" value="&lt;div style=&quot;text-align:left;padding:4px 10px;font-size:12px;line-height:1.7;&quot;&gt;&lt;b&gt;&lt;code&gt;ChatConsumer.user_connections&lt;/code&gt;&lt;/b&gt;&lt;br&gt;类级别字典：&lt;code&gt;user_id → 连接计数&lt;/code&gt;&lt;br&gt;&lt;br&gt;每用户最多 &lt;b&gt;3&lt;/b&gt; 个并发 WebSocket 连接&lt;br&gt;进程重启时自动重置&lt;br&gt;&lt;br&gt;&lt;i style=&quot;color:#2E7D32;font-size:11px;&quot;&gt;内存级变量，不持久化&lt;/i&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="410" x="945" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="note_bottom" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;verticalAlign=middle;align=center;fillColor=#E8F5E9;strokeColor=#66BB6A;shadow=1;rounded=1;arcSize=8;spacingLeft=8;spacingRight=8;" value="&lt;font style=&quot;font-size:12px;&quot;&gt;通过环境变量注入实现多环境适配&lt;/font&gt;" vertex="1">
+          <mxGeometry height="45" width="350" x="490" y="530" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,565 @@
+<mxfile host="app.diagrams.net" modified="2026-06-12T00:00:00.000Z" agent="Claude" version="24.0.0" type="device">
+  <diagram id="model-d3" name="Model-D3：数据结构模型">
+    <mxGraphModel dx="1800" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3600" pageHeight="2800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ============================================================ -->
+        <!-- Title & Subtitle                                             -->
+        <!-- ============================================================ -->
+        <mxCell id="title" value="&lt;b style=&quot;font-size:22px;&quot;&gt;Model-D3：数据结构模型&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:13px;color:#546E7A;&quot;&gt;core/models.py — 21 个 Django ORM 模型 · 6 个实体组&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="20" width="400" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- GROUP 1: 用户与权限 (User & Permissions)                      -->
+        <!-- ============================================================ -->
+        <mxCell id="g1" value="&lt;b&gt;用户与权限&lt;/b&gt;" style="swimlane;startSize=30;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#1E88E5;rounded=1;arcSize=8;fontSize=14;fontStyle=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="420" height="440" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user" value="&lt;b&gt;User&lt;/b&gt;&#xa;─────────────────────────────&#xa;PK  user_id : CharField(50)&#xa;    username : CharField  «unique»&#xa;    email : EmailField  «unique»&#xa;    phone : CharField  «unique»&#xa;    encrypted_password : CharField&#xa;        → PBKDF2 hash&#xa;    real_name : CharField&#xa;    id_card : CharField  «unique»&#xa;    contact_phone : CharField&#xa;    address : TextField&#xa;    role : RoleChoices&#xa;    register_status : RegisterStatusChoices&#xa;    register_time : DateTimeField&#xa;    last_login : DateTimeField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g1">
+          <mxGeometry x="20" y="45" width="380" height="370" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- GROUP 2: 商品与分类 (Product & Category)                      -->
+        <!-- ============================================================ -->
+        <mxCell id="g2" value="&lt;b&gt;商品与分类&lt;/b&gt;" style="swimlane;startSize=30;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#1E88E5;rounded=1;arcSize=8;fontSize=14;fontStyle=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="500" y="100" width="700" height="610" as="geometry" />
+        </mxCell>
+
+        <mxCell id="category" value="&lt;b&gt;Category&lt;/b&gt;&#xa;──────────────────────&#xa;PK  category_id : AutoField&#xa;    name : CharField&#xa;    description : TextField&#xa;    sort_order : IntegerField&#xa;    is_active : BooleanField&#xa;        → soft delete" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g2">
+          <mxGeometry x="20" y="45" width="280" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="product" value="&lt;b&gt;Product&lt;/b&gt;&#xa;──────────────────────────────&#xa;PK  product_id : AutoField&#xa;FK  publisher → User&#xa;FK  category_ref → Category (SET_NULL)&#xa;    product_name : CharField&#xa;    description : TextField&#xa;    image_url : URLField&#xa;    price : DecimalField(10,2)&#xa;    stock : IntegerField&#xa;    view_count : IntegerField&#xa;    sales_count : IntegerField&#xa;    favorite_count : IntegerField&#xa;    avg_rating : DecimalField&#xa;    product_status : StatusChoices&#xa;    published_at : DateTimeField&#xa;    reviewed_at : DateTimeField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g2">
+          <mxGeometry x="20" y="240" width="340" height="350" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tag" value="&lt;b&gt;Tag&lt;/b&gt;&#xa;──────────────────────&#xa;PK  tag_id : AutoField&#xa;    tag_name : CharField&#xa;    category : CharField&#xa;    usage_count : IntegerField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g2">
+          <mxGeometry x="400" y="45" width="270" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="producttag" value="&lt;b&gt;ProductTag&lt;/b&gt;  «junction»&#xa;──────────────────────────&#xa;FK  product → Product&#xa;FK  tag → Tag&#xa;    weight : FloatField&#xa;    tagged_time : DateTimeField&#xa;  unique_together(product, tag)" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g2">
+          <mxGeometry x="400" y="200" width="270" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- internal arrows in Group 2 -->
+        <mxCell id="e_cat_prod" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="g2" source="category" target="product">
+          <mxGeometry relative="1" as="geometry" />
+          <Array as="points" />
+        </mxCell>
+        <mxCell id="e_cat_prod_label" value="1 : N" style="edgeLabel;html=1;fontSize=10;fontColor=#1E88E5;fontStyle=1;" vertex="1" connectable="0" parent="e_cat_prod">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_prod_pt" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="g2" source="product" target="producttag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_prod_pt_label" value="M : N&#xa;（通过 ProductTag）" style="edgeLabel;html=1;fontSize=10;fontColor=#1E88E5;fontStyle=1;" vertex="1" connectable="0" parent="e_prod_pt">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_tag_pt" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="g2" source="tag" target="producttag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- GROUP 3: 审查 (Review)                                       -->
+        <!-- ============================================================ -->
+        <mxCell id="g3" value="&lt;b&gt;审查&lt;/b&gt;" style="swimlane;startSize=30;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#1E88E5;rounded=1;arcSize=8;fontSize=14;fontStyle=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="420" height="470" as="geometry" />
+        </mxCell>
+
+        <mxCell id="registerreview" value="&lt;b&gt;RegisterReview&lt;/b&gt;&#xa;──────────────────────────────&#xa;PK  review_id : AutoField&#xa;O2O pending_user → User&#xa;FK  admin → User&#xa;    result : ResultChoices&#xa;    opinion : TextField&#xa;    review_time : DateTimeField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g3">
+          <mxGeometry x="20" y="45" width="380" height="185" as="geometry" />
+        </mxCell>
+
+        <mxCell id="productreview" value="&lt;b&gt;ProductReview&lt;/b&gt;&#xa;──────────────────────────────&#xa;PK  review_id : AutoField&#xa;O2O pending_product → Product&#xa;FK  admin → User&#xa;    result : ResultChoices&#xa;    opinion : TextField&#xa;    review_time : DateTimeField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g3">
+          <mxGeometry x="20" y="260" width="380" height="185" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- GROUP 4: 订单与交易 (Order & Transaction)                     -->
+        <!-- ============================================================ -->
+        <mxCell id="g4" value="&lt;b&gt;订单与交易&lt;/b&gt;" style="swimlane;startSize=30;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#1E88E5;rounded=1;arcSize=8;fontSize=14;fontStyle=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="500" y="750" width="700" height="820" as="geometry" />
+        </mxCell>
+
+        <mxCell id="order" value="&lt;b&gt;Order&lt;/b&gt;&#xa;─────────────────────────────────&#xa;PK  order_id : AutoField&#xa;FK  buyer → User (PROTECT)&#xa;FK  seller → User (PROTECT)&#xa;    total_amount : DecimalField(12,2)&#xa;    address_snapshot : TextField&#xa;    phone_snapshot : CharField&#xa;        → snapshot strategy&#xa;    order_status : StatusChoices&#xa;    order_time : DateTimeField&#xa;    pay_time : DateTimeField&#xa;    ship_time : DateTimeField&#xa;    receive_time : DateTimeField&#xa;    auto_receive_time : DateTimeField&#xa;    logistics_company : CharField&#xa;    logistics_number : CharField&#xa;    logistics_info : JSONField&#xa;    cancel_reason : TextField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g4">
+          <mxGeometry x="20" y="45" width="370" height="410" as="geometry" />
+        </mxCell>
+
+        <mxCell id="orderdetail" value="&lt;b&gt;OrderDetail&lt;/b&gt;&#xa;──────────────────────────────&#xa;PK  detail_id : AutoField&#xa;FK  order → Order&#xa;FK  product → Product&#xa;    quantity : IntegerField&#xa;    price_snapshot : DecimalField&#xa;    subtotal : DecimalField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g4">
+          <mxGeometry x="420" y="45" width="260" height="190" as="geometry" />
+        </mxCell>
+
+        <mxCell id="orderlog" value="&lt;b&gt;OrderLog&lt;/b&gt;  «immutable audit»&#xa;──────────────────────────────&#xa;PK  log_id : AutoField&#xa;FK  order → Order&#xa;FK  operator → User&#xa;    action : ActionChoices&#xa;    from_status : CharField&#xa;    to_status : CharField&#xa;    remark : TextField&#xa;    created_at : DateTimeField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g4">
+          <mxGeometry x="420" y="270" width="260" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- Order internal edges -->
+        <mxCell id="e_order_detail" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="g4" source="order" target="orderdetail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_order_detail_label" value="1 : N" style="edgeLabel;html=1;fontSize=10;fontColor=#1E88E5;fontStyle=1;" vertex="1" connectable="0" parent="e_order_detail">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_order_log" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=1;exitY=0.6;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="g4" source="order" target="orderlog">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_order_log_label" value="1 : N&#xa;审计跟踪" style="edgeLabel;html=1;fontSize=10;fontColor=#1E88E5;fontStyle=1;" vertex="1" connectable="0" parent="e_order_log">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- GROUP 5: 社交与互动 (Social & Interaction)                    -->
+        <!-- ============================================================ -->
+        <mxCell id="g5" value="&lt;b&gt;社交与互动&lt;/b&gt;" style="swimlane;startSize=30;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#1E88E5;rounded=1;arcSize=8;fontSize=14;fontStyle=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="100" width="780" height="820" as="geometry" />
+        </mxCell>
+
+        <mxCell id="message" value="&lt;b&gt;Message&lt;/b&gt;&#xa;──────────────────────────────&#xa;FK  product → Product&#xa;FK  user → User&#xa;    content : TextField&#xa;    parent_message : FK (self)&#xa;    created_at : DateTimeField&#xa;→ Product messages &amp;&#xa;  merchant replies" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g5">
+          <mxGeometry x="20" y="45" width="340" height="195" as="geometry" />
+        </mxCell>
+
+        <mxCell id="productfavorite" value="&lt;b&gt;ProductFavorite&lt;/b&gt;&#xa;──────────────────────────────&#xa;FK  user → User&#xa;FK  product → Product&#xa;    created_at : DateTimeField&#xa;  unique_together(user, product)" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g5">
+          <mxGeometry x="420" y="45" width="330" height="145" as="geometry" />
+        </mxCell>
+
+        <mxCell id="usertagpref" value="&lt;b&gt;UserTagPreference&lt;/b&gt;&#xa;──────────────────────────────&#xa;FK  user → User&#xa;FK  tag → Tag&#xa;    score : FloatField&#xa;        → for recommendation&#xa;  unique_together(user, tag)" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g5">
+          <mxGeometry x="420" y="220" width="330" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="chatmessage" value="&lt;b&gt;ChatMessage&lt;/b&gt;&#xa;──────────────────────────────&#xa;FK  sender → User&#xa;FK  receiver → User&#xa;FK  product → Product (optional)&#xa;FK  order → Order (optional)&#xa;    content : TextField&#xa;    is_read : BooleanField&#xa;    created_at : DateTimeField&#xa;─── Indexes ───&#xa;  idx(sender, receiver)&#xa;  idx(receiver, is_read)&#xa;  idx(created_at)" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g5">
+          <mxGeometry x="20" y="280" width="340" height="265" as="geometry" />
+        </mxCell>
+
+        <mxCell id="notification" value="&lt;b&gt;Notification&lt;/b&gt;&#xa;──────────────────────────────&#xa;FK  user → User&#xa;FK  order → Order (optional)&#xa;    type : TypeChoices&#xa;    title : CharField&#xa;    content : TextField&#xa;    is_read : BooleanField&#xa;    created_at : DateTimeField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g5">
+          <mxGeometry x="20" y="580" width="340" height="210" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- GROUP 6: 论坛 (Forum)                                        -->
+        <!-- ============================================================ -->
+        <mxCell id="g6" value="&lt;b&gt;论坛&lt;/b&gt;" style="swimlane;startSize=30;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#1E88E5;rounded=1;arcSize=8;fontSize=14;fontStyle=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="2100" y="100" width="780" height="1100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="forumcategory" value="&lt;b&gt;ForumCategory&lt;/b&gt;&#xa;──────────────────────────────&#xa;PK  category_id : AutoField&#xa;    name : CharField&#xa;    description : TextField&#xa;    sort_order : IntegerField&#xa;    is_active : BooleanField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g6">
+          <mxGeometry x="20" y="45" width="320" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="forumtag" value="&lt;b&gt;ForumTag&lt;/b&gt;&#xa;──────────────────────────────&#xa;PK  tag_id : AutoField&#xa;    tag_name : CharField&#xa;    usage_count : IntegerField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g6">
+          <mxGeometry x="440" y="45" width="310" height="115" as="geometry" />
+        </mxCell>
+
+        <mxCell id="forumpost" value="&lt;b&gt;ForumPost&lt;/b&gt;&#xa;──────────────────────────────&#xa;PK  post_id : AutoField&#xa;FK  author → User&#xa;FK  category → ForumCategory&#xa;    title : CharField&#xa;    content : TextField&#xa;    cover_image_url : URLField&#xa;    view_count : IntegerField&#xa;    like_count : IntegerField&#xa;    comment_count : IntegerField&#xa;    status : PUBLISHED / HIDDEN&#xa;    is_pinned : BooleanField&#xa;    published_at : DateTimeField&#xa;    updated_at : DateTimeField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g6">
+          <mxGeometry x="20" y="250" width="340" height="330" as="geometry" />
+        </mxCell>
+
+        <mxCell id="forumposttag" value="&lt;b&gt;ForumPostTag&lt;/b&gt;  «junction»&#xa;──────────────────────────────&#xa;FK  post → ForumPost&#xa;FK  tag → ForumTag&#xa;→ many-to-many junction" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g6">
+          <mxGeometry x="440" y="250" width="310" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="forumpostlike" value="&lt;b&gt;ForumPostLike&lt;/b&gt;&#xa;──────────────────────────────&#xa;FK  user → User&#xa;FK  post → ForumPost&#xa;    created_at : DateTimeField&#xa;  unique_together(user, post)" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g6">
+          <mxGeometry x="440" y="410" width="310" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="forumcomment" value="&lt;b&gt;ForumComment&lt;/b&gt;&#xa;──────────────────────────────&#xa;FK  post → ForumPost&#xa;FK  author → User&#xa;    content : TextField&#xa;    is_deleted : BooleanField&#xa;        → soft delete&#xa;    created_at : DateTimeField" style="shape=mxgraph.basic.rect;dx=10;fillColor=#BBDEFB;strokeColor=#1E88E5;fontColor=#1A237E;rounded=1;arcSize=8;whiteSpace=wrap;html=0;align=left;spacingLeft=10;spacingTop=4;spacingBottom=4;fontSize=11;fontFamily=Consolas;" vertex="1" parent="g6">
+          <mxGeometry x="20" y="620" width="340" height="185" as="geometry" />
+        </mxCell>
+
+        <!-- Forum internal edges -->
+        <mxCell id="e_fcat_fpost" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="g6" source="forumcategory" target="forumpost">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_fcat_fpost_label" value="1 : N" style="edgeLabel;html=1;fontSize=10;fontColor=#1E88E5;fontStyle=1;" vertex="1" connectable="0" parent="e_fcat_fpost">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_fpost_fpt" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="g6" source="forumpost" target="forumposttag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_fpost_fpt_label" value="M : N&#xa;（通过 ForumPostTag）" style="edgeLabel;html=1;fontSize=10;fontColor=#1E88E5;fontStyle=1;" vertex="1" connectable="0" parent="e_fpost_fpt">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_ftag_fpt" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="g6" source="forumtag" target="forumposttag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_fpost_flike" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=1;exitY=0.6;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="g6" source="forumpost" target="forumpostlike">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_fpost_flike_label" value="1 : N" style="edgeLabel;html=1;fontSize=10;fontColor=#1E88E5;fontStyle=1;" vertex="1" connectable="0" parent="e_fpost_flike">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_fpost_fcomment" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E88E5;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="g6" source="forumpost" target="forumcomment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_fpost_fcomment_label" value="1 : N" style="edgeLabel;html=1;fontSize=10;fontColor=#1E88E5;fontStyle=1;" vertex="1" connectable="0" parent="e_fpost_fcomment">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- CROSS-GROUP RELATIONSHIP ARROWS                              -->
+        <!-- ============================================================ -->
+
+        <!-- User → Product  (publisher)  1:N -->
+        <mxCell id="r_user_product" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E65100;strokeWidth=2;dashed=0;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.15;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="product">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="480" y="256" />
+              <mxPoint x="480" y="393" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_product_l" value="&lt;b&gt;1:N&lt;/b&gt; publisher" style="edgeLabel;html=1;fontSize=10;fontColor=#E65100;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_product">
+          <mxGeometry x="-0.3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → Order (buyer)  1:N  PROTECT -->
+        <mxCell id="r_user_order_buyer" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#C62828;strokeWidth=2;dashed=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.15;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="order">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="250" y="570" />
+              <mxPoint x="250" y="740" />
+              <mxPoint x="470" y="740" />
+              <mxPoint x="470" y="857" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_order_buyer_l" value="&lt;b&gt;1:N&lt;/b&gt; buyer&#xa;PROTECT" style="edgeLabel;html=1;fontSize=10;fontColor=#C62828;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_order_buyer">
+          <mxGeometry x="-0.5" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → Order (seller)  1:N  PROTECT -->
+        <mxCell id="r_user_order_seller" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#AD1457;strokeWidth=2;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="order">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="270" y="560" />
+              <mxPoint x="270" y="730" />
+              <mxPoint x="490" y="730" />
+              <mxPoint x="490" y="939" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_order_seller_l" value="&lt;b&gt;1:N&lt;/b&gt; seller&#xa;PROTECT" style="edgeLabel;html=1;fontSize=10;fontColor=#AD1457;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_order_seller">
+          <mxGeometry x="-0.4" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User ↔ RegisterReview  (pending_user) 1:1 -->
+        <mxCell id="r_user_rreview" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1B5E20;strokeWidth=2;dashed=0;exitX=0.3;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="registerreview">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="174" y="555" />
+              <mxPoint x="174" y="605" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_rreview_l" value="&lt;b&gt;1:1&lt;/b&gt;&#xa;pending_user" style="edgeLabel;html=1;fontSize=10;fontColor=#1B5E20;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_rreview">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-50" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → RegisterReview (admin) 1:N -->
+        <mxCell id="r_user_rreview_admin" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1B5E20;strokeWidth=1.5;dashed=1;exitX=0.7;exitY=1;exitDx=0;exitDy=0;entryX=0.7;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="registerreview">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="326" y="555" />
+              <mxPoint x="326" y="605" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_rreview_admin_l" value="&lt;b&gt;1:N&lt;/b&gt; admin" style="edgeLabel;html=1;fontSize=10;fontColor=#1B5E20;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_rreview_admin">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Product ↔ ProductReview  (pending_product) 1:1 -->
+        <mxCell id="r_prod_preview" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#4A148C;strokeWidth=2;dashed=0;exitX=0;exitY=0.8;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="product" target="productreview">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="620" />
+              <mxPoint x="490" y="700" />
+              <mxPoint x="475" y="700" />
+              <mxPoint x="475" y="933" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_prod_preview_l" value="&lt;b&gt;1:1&lt;/b&gt; pending_product" style="edgeLabel;html=1;fontSize=10;fontColor=#4A148C;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_prod_preview">
+          <mxGeometry x="0.3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → Message  1:N -->
+        <mxCell id="r_user_msg" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E65100;strokeWidth=1.5;dashed=1;exitX=1;exitY=0.1;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="message">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="182" />
+              <mxPoint x="1240" y="182" />
+              <mxPoint x="1240" y="203" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_msg_l" value="&lt;b&gt;1:N&lt;/b&gt;" style="edgeLabel;html=1;fontSize=10;fontColor=#E65100;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_msg">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → ChatMessage (sender/receiver)  1:N -->
+        <mxCell id="r_user_chat" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E65100;strokeWidth=1.5;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="chatmessage">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="465" y="352" />
+              <mxPoint x="1230" y="352" />
+              <mxPoint x="1230" y="433" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_chat_l" value="&lt;b&gt;1:N&lt;/b&gt;&#xa;sender / receiver" style="edgeLabel;html=1;fontSize=10;fontColor=#E65100;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_chat">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → Notification 1:N -->
+        <mxCell id="r_user_notif" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E65100;strokeWidth=1.5;dashed=1;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="notification">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="465" y="404" />
+              <mxPoint x="1220" y="404" />
+              <mxPoint x="1220" y="785" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_notif_l" value="&lt;b&gt;1:N&lt;/b&gt;" style="edgeLabel;html=1;fontSize=10;fontColor=#E65100;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_notif">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → ProductFavorite 1:N -->
+        <mxCell id="r_user_fav" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E65100;strokeWidth=1.5;dashed=1;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="productfavorite">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="200" />
+              <mxPoint x="1250" y="200" />
+              <mxPoint x="1250" y="273" />
+              <mxPoint x="1680" y="273" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_fav_l" value="&lt;b&gt;1:N&lt;/b&gt;" style="edgeLabel;html=1;fontSize=10;fontColor=#E65100;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_fav">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User ↔ Tag via UserTagPreference  M:N -->
+        <mxCell id="r_user_tagpref" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#0D47A1;strokeWidth=2;dashed=0;exitX=1;exitY=0.6;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="usertagpref">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="465" y="367" />
+              <mxPoint x="1210" y="367" />
+              <mxPoint x="1210" y="400" />
+              <mxPoint x="1680" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_tagpref_l" value="&lt;b&gt;M:N&lt;/b&gt;&#xa;通过 UserTagPreference" style="edgeLabel;html=1;fontSize=10;fontColor=#0D47A1;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_tagpref">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → ForumPost (author) 1:N -->
+        <mxCell id="r_user_fpost" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E65100;strokeWidth=1.5;dashed=1;exitX=1;exitY=0.05;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="forumpost">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="465" y="163" />
+              <mxPoint x="2060" y="163" />
+              <mxPoint x="2060" y="449" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_fpost_l" value="&lt;b&gt;1:N&lt;/b&gt; author" style="edgeLabel;html=1;fontSize=10;fontColor=#E65100;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_fpost">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → ForumPostLike 1:N -->
+        <mxCell id="r_user_flike" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E65100;strokeWidth=1;dashed=1;exitX=1;exitY=0.08;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="forumpostlike">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="468" y="175" />
+              <mxPoint x="2060" y="175" />
+              <mxPoint x="2060" y="50" />
+              <mxPoint x="2920" y="50" />
+              <mxPoint x="2920" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_flike_l" value="&lt;b&gt;1:N&lt;/b&gt;" style="edgeLabel;html=1;fontSize=10;fontColor=#E65100;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_flike">
+          <mxGeometry x="0.7" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → ForumComment (author) 1:N -->
+        <mxCell id="r_user_fcomment" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E65100;strokeWidth=1;dashed=1;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="forumcomment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="136" y="540" />
+              <mxPoint x="30" y="540" />
+              <mxPoint x="30" y="1400" />
+              <mxPoint x="2070" y="1400" />
+              <mxPoint x="2070" y="813" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_fcomment_l" value="&lt;b&gt;1:N&lt;/b&gt; author" style="edgeLabel;html=1;fontSize=10;fontColor=#E65100;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_fcomment">
+          <mxGeometry x="0.7" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User → OrderLog (operator) 1:N -->
+        <mxCell id="r_user_orderlog" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#C62828;strokeWidth=1.5;dashed=1;exitX=0.8;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="orderlog">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="364" y="560" />
+              <mxPoint x="364" y="710" />
+              <mxPoint x="1050" y="710" />
+              <mxPoint x="1050" y="1020" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_user_orderlog_l" value="&lt;b&gt;1:N&lt;/b&gt; operator" style="edgeLabel;html=1;fontSize=10;fontColor=#C62828;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_user_orderlog">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Product → OrderDetail  FK -->
+        <mxCell id="r_prod_orderdetail" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#4A148C;strokeWidth=1.5;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="product" target="orderdetail">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="690" y="710" />
+              <mxPoint x="1050" y="710" />
+              <mxPoint x="1050" y="795" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_prod_orderdetail_l" value="&lt;b&gt;1:N&lt;/b&gt; FK" style="edgeLabel;html=1;fontSize=10;fontColor=#4A148C;fontStyle=0;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="r_prod_orderdetail">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- LEGEND                                                       -->
+        <!-- ============================================================ -->
+        <mxCell id="legend_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#90A4AE;strokeWidth=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="2100" y="1250" width="760" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_title" value="&lt;b&gt;图例&lt;/b&gt;" style="text;html=1;fontSize=13;fontColor=#37474F;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="2120" y="1260" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg1" value="" style="endArrow=classic;strokeColor=#E65100;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2130" y="1310" as="sourcePoint" />
+            <mxPoint x="2210" y="1310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg1t" value="1:N  FK (级联删除)" style="text;html=1;fontSize=11;fontColor=#E65100;align=left;" vertex="1" parent="1">
+          <mxGeometry x="2220" y="1298" width="200" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg2" value="" style="endArrow=classic;strokeColor=#C62828;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2130" y="1340" as="sourcePoint" />
+            <mxPoint x="2210" y="1340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg2t" value="1:N  FK (保护) — 核心交易" style="text;html=1;fontSize=11;fontColor=#C62828;align=left;" vertex="1" parent="1">
+          <mxGeometry x="2220" y="1328" width="320" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg3" value="" style="endArrow=classic;strokeColor=#1B5E20;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2130" y="1370" as="sourcePoint" />
+            <mxPoint x="2210" y="1370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg3t" value="1:1  一对一 / 1:N 管理员" style="text;html=1;fontSize=11;fontColor=#1B5E20;align=left;" vertex="1" parent="1">
+          <mxGeometry x="2220" y="1358" width="280" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg4" value="" style="endArrow=classic;strokeColor=#4A148C;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2130" y="1400" as="sourcePoint" />
+            <mxPoint x="2210" y="1400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg4t" value="1:1 / 1:N  商品 → 审查 / 订单明细" style="text;html=1;fontSize=11;fontColor=#4A148C;align=left;" vertex="1" parent="1">
+          <mxGeometry x="2220" y="1388" width="320" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg5" value="" style="endArrow=classic;strokeColor=#0D47A1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2130" y="1430" as="sourcePoint" />
+            <mxPoint x="2210" y="1430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg5t" value="M:N  通过关联表" style="text;html=1;fontSize=11;fontColor=#0D47A1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="2220" y="1418" width="250" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- FK Delete Policy summary box -->
+        <mxCell id="policy_box" value="&lt;b style=&quot;font-size:12px;color:#37474F;&quot;&gt;外键删除策略&lt;/b&gt;&lt;br/&gt;&lt;hr/&gt;&lt;span style=&quot;font-size:11px;&quot;&gt;&lt;b&gt;CASCADE&lt;/b&gt; — 强归属关系（订单→明细, 帖子→评论）&lt;br/&gt;&lt;b&gt;SET_NULL&lt;/b&gt; — 可选引用（商品.分类引用）&lt;br/&gt;&lt;b&gt;PROTECT&lt;/b&gt; — 核心交易（订单.买家, 订单.卖家）&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;arcSize=8;align=left;spacingLeft=10;spacingRight=10;spacingTop=6;spacingBottom=6;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="2100" y="1480" width="450" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Model count summary -->
+        <mxCell id="summary" value="&lt;span style=&quot;font-size:11px;color:#546E7A;&quot;&gt;&lt;b&gt;总计：21 个模型&lt;/b&gt;  |  G1: User(1)  |  G2: Category+Product+Tag+ProductTag(4)  |  G3: RegisterReview+ProductReview(2)  |  G4: Order+OrderDetail+OrderLog(3)  |  G5: Message+ProductFavorite+UserTagPreference+ChatMessage+Notification(5)  |  G6: ForumCategory+ForumTag+ForumPost+ForumPostTag+ForumPostLike+ForumComment(6)&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1630" width="1800" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

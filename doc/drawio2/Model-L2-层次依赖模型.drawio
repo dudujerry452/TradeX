@@ -1,0 +1,109 @@
+<mxfile host="app.diagrams.net" agent="Claude">
+  <diagram id="layer-dependency-model" name="Model-L2 层次依赖模型">
+    <mxGraphModel dx="1621" dy="867" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontColor=#333333;" value="&lt;b style=&quot;font-size:18px&quot;&gt;Model-L2 层次依赖模型&lt;/b&gt;" vertex="1">
+          <mxGeometry height="40" width="800" x="200" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="L1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;strokeColor=#4A90D9;strokeWidth=2;fillColor=#DAE8FC;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=15;fontColor=#1A3A5C;arcSize=6;shadow=1;" value="&lt;b style=&quot;font-size:15px;&quot;&gt;Layer 1 — 接入层&lt;/b&gt;" vertex="1">
+          <mxGeometry height="130" width="880" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="web" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B3D7FF;strokeColor=#4A90D9;strokeWidth=1.5;fontSize=12;fontColor=#1A3A5C;shadow=1;" value="&lt;b&gt;Web端&lt;/b&gt;&lt;br&gt;Vue 3 + Vite&lt;br&gt;admin-web" vertex="1">
+          <mxGeometry height="70" width="160" x="100" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="flutter" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B3D7FF;strokeColor=#4A90D9;strokeWidth=1.5;fontSize=12;fontColor=#1A3A5C;shadow=1;" value="&lt;b&gt;Flutter 移动端&lt;/b&gt;&lt;br&gt;Dart / Flutter&lt;br&gt;mobile" vertex="1">
+          <mxGeometry height="70" width="160" x="320" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="uniapp" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B3D7FF;strokeColor=#4A90D9;strokeWidth=1.5;fontSize=12;fontColor=#1A3A5C;shadow=1;" value="&lt;b&gt;uni-app 小程序端&lt;/b&gt;&lt;br&gt;Vue 3 / uni-app&lt;br&gt;mini-program" vertex="1">
+          <mxGeometry height="70" width="160" x="540" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="proto1" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#4A90D9;fontStyle=2;" value="&lt;i&gt;HTTP/HTTPS (RESTful API)&lt;br&gt;WebSocket (实时聊天)&lt;/i&gt;" vertex="1">
+          <mxGeometry height="55" width="160" x="740" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_L1_L2" edge="1" parent="1" source="L1" style="shape=flexArrow;endArrow=classic;startArrow=none;html=1;fillColor=#4A90D9;strokeColor=#4A90D9;width=6;endSize=5;startSize=5;fontSize=10;fontColor=#333333;labelBackgroundColor=#FFFFFF;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="L2" value="公开 API &amp;amp; WebSocket 端点">
+          <mxGeometry relative="1" x="-0.2" y="10" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;strokeColor=#5C6BC0;strokeWidth=2;fillColor=#E8EAF6;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=15;fontColor=#283593;arcSize=6;shadow=1;" value="&lt;b style=&quot;font-size:15px;&quot;&gt;Layer 2 — 业务层&lt;/b&gt;" vertex="1">
+          <mxGeometry height="210" width="880" x="40" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="rest" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#5C6BC0;strokeWidth=1.5;fontSize=12;fontColor=#1A237E;shadow=1;" value="&lt;b&gt;15 个 REST API 路由模块&lt;/b&gt;&lt;br&gt;(django-ninja)&lt;hr size=&quot;1&quot;&gt;&lt;span style=&quot;font-size:10px;&quot;&gt;user · goods · order · trade&lt;br&gt;chat · upload · logistics&lt;br&gt;address · review · favorite&lt;br&gt;admin · search · notify&lt;br&gt;stats · rag&lt;/span&gt;" vertex="1">
+          <mxGeometry height="150" width="220" x="60" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="ws" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#5C6BC0;strokeWidth=1.5;fontSize=12;fontColor=#1A237E;shadow=1;" value="&lt;b&gt;WebSocket 消费者&lt;/b&gt;&lt;br&gt;(Django Channels)&lt;hr size=&quot;1&quot;&gt;&lt;span style=&quot;font-size:10px;&quot;&gt;实时聊天&lt;br&gt;通知推送&lt;/span&gt;" vertex="1">
+          <mxGeometry height="100" width="180" x="310" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="core" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#5C6BC0;strokeWidth=1.5;fontSize=12;fontColor=#1A237E;shadow=1;" value="&lt;b&gt;核心处理&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;span style=&quot;font-size:10px;&quot;&gt;参数验证&lt;br&gt;JWT 认证&lt;br&gt;RBAC 授权&lt;br&gt;业务逻辑&lt;/span&gt;" vertex="1">
+          <mxGeometry height="100" width="170" x="520" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="ext" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1C4E9;strokeColor=#7E57C2;strokeWidth=1.5;fontSize=12;fontColor=#4A148C;shadow=1;" value="&lt;b&gt;外部服务&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;span style=&quot;font-size:10px;&quot;&gt;RAG module → OpenRouter API (LLM)&lt;br&gt;上传模块 → 腾讯 COS&lt;/span&gt;" vertex="1">
+          <mxGeometry height="100" width="185" x="720" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="note_biz" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#5C6BC0;fontStyle=2;" value="&lt;i style=&quot;font-size:10px;&quot;&gt;模块间通过 Django ORM 模型关系间接交互，&lt;br&gt;无直接跨模块函数调用&lt;/i&gt;" vertex="1">
+          <mxGeometry height="45" width="220" x="310" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_L2_L3" edge="1" parent="1" source="L2" style="shape=flexArrow;endArrow=classic;startArrow=none;html=1;fillColor=#5C6BC0;strokeColor=#5C6BC0;width=6;endSize=5;startSize=5;fontSize=10;fontColor=#333333;labelBackgroundColor=#FFFFFF;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="L3" value="ORM 接口 &amp;amp; 外部服务 SDK">
+          <mxGeometry relative="1" x="-0.2" y="10" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;strokeColor=#43A047;strokeWidth=2;fillColor=#E8F5E9;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=15;fontColor=#1B5E20;arcSize=6;shadow=1;" value="&lt;b style=&quot;font-size:15px;&quot;&gt;Layer 3 — 数据层&lt;/b&gt;" vertex="1">
+          <mxGeometry height="130" width="880" x="40" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="orm" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#43A047;strokeWidth=1.5;fontSize=12;fontColor=#1B5E20;shadow=1;" value="&lt;b&gt;Django ORM&lt;/b&gt;&lt;br&gt;对象 → SQL 转换&lt;br&gt;模型定义 &amp;amp; 迁移" vertex="1">
+          <mxGeometry height="70" width="200" x="100" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="sqlite" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#A5D6A7;strokeColor=#43A047;strokeWidth=1.5;fontSize=12;fontColor=#1B5E20;shadow=1;size=10;" value="&lt;b&gt;SQLite&lt;/b&gt;&lt;br&gt;单文件存储&lt;br&gt;backend/db.sqlite3&lt;br&gt;完整 ACID 支持" vertex="1">
+          <mxGeometry height="85" width="170" x="370" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="chromadb" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#A5D6A7;strokeColor=#43A047;strokeWidth=1.5;fontSize=12;fontColor=#1B5E20;shadow=1;size=10;" value="&lt;b&gt;ChromaDB&lt;/b&gt;&lt;br&gt;向量数据库&lt;br&gt;RAG 语义搜索" vertex="1">
+          <mxGeometry height="85" width="170" x="610" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_orm_sqlite" edge="1" parent="1" source="orm" style="endArrow=classic;html=1;strokeColor=#43A047;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="sqlite">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_L3_L4" edge="1" parent="1" source="L3" style="shape=flexArrow;endArrow=classic;startArrow=none;html=1;fillColor=#43A047;strokeColor=#43A047;width=6;endSize=5;startSize=5;fontSize=10;fontColor=#333333;labelBackgroundColor=#FFFFFF;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="L4" value="数据库引擎 &amp;amp; 文件系统接口">
+          <mxGeometry relative="1" x="-0.2" y="10" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;strokeColor=#EF6C00;strokeWidth=2;fillColor=#FFF3E0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=15;fontColor=#BF360C;arcSize=6;shadow=1;" value="&lt;b style=&quot;font-size:15px;&quot;&gt;Layer 4 — 基础设施层&lt;/b&gt;" vertex="1">
+          <mxGeometry height="130" width="880" x="40" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="os" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;strokeWidth=1.5;fontSize=12;fontColor=#BF360C;shadow=1;" value="&lt;b&gt;操作系统 &amp;amp; 运行时&lt;/b&gt;&lt;br&gt;Linux / macOS&lt;br&gt;Python 3.12" vertex="1">
+          <mxGeometry height="65" width="160" x="60" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="daphne" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;strokeWidth=1.5;fontSize=12;fontColor=#BF360C;shadow=1;" value="&lt;b&gt;Daphne ASGI Server&lt;/b&gt;&lt;br&gt;HTTP &amp;amp; WebSocket" vertex="1">
+          <mxGeometry height="65" width="170" x="260" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="nginx" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;strokeWidth=1.5;fontSize=12;fontColor=#BF360C;shadow=1;" value="&lt;b&gt;Nginx&lt;/b&gt;&lt;br&gt;反向代理&lt;br&gt;(生产环境)" vertex="1">
+          <mxGeometry height="65" width="160" x="470" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="cicd" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#EF6C00;strokeWidth=1.5;fontSize=12;fontColor=#BF360C;shadow=1;" value="&lt;b&gt;GitHub Actions&lt;/b&gt;&lt;br&gt;CI/CD 流水线" vertex="1">
+          <mxGeometry height="65" width="160" x="670" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="constraint" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=2;fontSize=12;fontColor=#333333;shadow=1;align=left;spacingLeft=10;spacingRight=10;spacingTop=4;arcSize=8;" value="&lt;b style=&quot;font-size:13px;&quot;&gt;架构约束&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;span style=&quot;font-size:10px;&quot;&gt;1. 接入层 → 业务层: 仅通过公开 API &amp;amp; WebSocket 端点&lt;br&gt;2. 业务层 → 数据层: 仅通过 ORM 接口 &amp;amp; 外部服务 SDK&lt;br&gt;3. 数据层 → 基础设施层: 仅通过数据库引擎 &amp;amp; 文件系统接口&lt;br&gt;&lt;br&gt;&lt;b&gt;禁止:&lt;/b&gt; 反向调用（下层 → 上层），&lt;br&gt;跨层访问（接入层 → 数据层直接访问）&lt;/span&gt;" vertex="1">
+          <mxGeometry height="190" width="230" x="950" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8E24AA;strokeWidth=1.5;fontSize=12;fontColor=#4A148C;shadow=1;align=left;spacingLeft=10;spacingRight=10;spacingTop=4;arcSize=8;" value="&lt;b style=&quot;font-size:12px;&quot;&gt;依赖方向&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;span style=&quot;font-size:10px;&quot;&gt;↓ 上层依赖下层&lt;br&gt;✕ 禁止反向调用&lt;br&gt;✕ 禁止跨层访问&lt;/span&gt;" vertex="1">
+          <mxGeometry height="100" width="230" x="950" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="color_legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#9E9E9E;strokeWidth=1.5;fontSize=12;fontColor=#333333;shadow=1;align=left;spacingLeft=10;spacingRight=10;spacingTop=4;arcSize=8;" value="&lt;b style=&quot;font-size:12px;&quot;&gt;颜色图例&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;span style=&quot;font-size:10px;&quot;&gt;🔵 蓝色 — 接入层&lt;br&gt;🟣 靛蓝 — 业务层&lt;br&gt;🟢 绿色 — 数据层&lt;br&gt;🟠 橙色 — 基础设施层&lt;br&gt;🟡 黄色 — 架构约束&lt;/span&gt;" vertex="1">
+          <mxGeometry height="130" width="230" x="950" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="no_direct" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#D32F2F;fontStyle=1;rotation=-90;" value="✕ 禁止直接访问" vertex="1">
+          <mxGeometry height="30" width="120" x="-60" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="forbidden_line" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#D32F2F;strokeWidth=2;dashed=1;dashPattern=5 5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="20" y="190" as="sourcePoint" />
+            <mxPoint x="20" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

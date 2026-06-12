@@ -1,0 +1,205 @@
+<mxfile host="app.diagrams.net" agent="Claude">
+  <diagram id="model-l1-component" name="Model-L1 组件划分模型">
+    <mxGraphModel dx="1900" dy="1278" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#1E293B;fontSize=14;" value="&lt;b style=&quot;font-size:18px&quot;&gt;Model-L1 组件划分模型&lt;/b&gt;" vertex="1">
+          <mxGeometry height="40" width="220" x="676" y="12" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-cluster" parent="1" style="swimlane;startSize=40;fillColor=#F8FAFC;strokeColor=#94A3B8;fontColor=#1E293B;fontSize=13;rounded=1;arcSize=8;shadow=1;html=1;collapsible=0;" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;后端服务集群&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="770" width="1560" x="26" y="72" as="geometry" />
+        </mxCell>
+        <mxCell id="api-layer" parent="backend-cluster" style="swimlane;startSize=35;fillColor=#FEF3C7;strokeColor=#D97706;fontColor=#92400E;fontSize=12;rounded=1;arcSize=6;html=1;collapsible=0;" value="&lt;b&gt;API 路由层&lt;/b&gt;&lt;br&gt;&amp;nbsp;core/api/*.py" vertex="1">
+          <mxGeometry height="305" width="1060" x="20" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-auth" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-AUTH&lt;/b&gt;&lt;br&gt;auth.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;用户登录 &amp; JWT令牌签发&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="20" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-user" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-USER&lt;/b&gt;&lt;br&gt;users.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;注册、资料、地址、标签偏好&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="225" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-product" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-PRODUCT&lt;/b&gt;&lt;br&gt;products.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;商品CRUD、搜索、状态变更&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="430" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-category" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-CATEGORY&lt;/b&gt;&lt;br&gt;categories.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;分类CRUD &amp; 启用/禁用&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="635" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-tag" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-TAG&lt;/b&gt;&lt;br&gt;tags.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;商品标签 &amp; 关联管理&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="840" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-favorite" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-FAVORITE&lt;/b&gt;&lt;br&gt;favorites.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;用户商品收藏&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="20" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-recommend" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-RECOMMEND&lt;/b&gt;&lt;br&gt;recommendations.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;热门/个性化/相似推荐&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="225" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-order" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-ORDER&lt;/b&gt;&lt;br&gt;orders.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;订单生命周期 &amp; 日志&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="430" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-notification" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-NOTIFICATION&lt;/b&gt;&lt;br&gt;notifications.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;订单/系统/消息通知&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="635" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-chat-rest" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-CHAT-REST&lt;/b&gt;&lt;br&gt;chat.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;会话、历史、未读计数&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="840" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-upload" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-UPLOAD&lt;/b&gt;&lt;br&gt;uploads.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;图片上传至腾讯COS&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="20" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-rag" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-RAG&lt;/b&gt;&lt;br&gt;rag.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;AI聊天 &amp; 向量推荐&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="225" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-forum" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-FORUM&lt;/b&gt;&lt;br&gt;forum.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;帖子、评论、点赞、分类标签&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="430" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-admin" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-ADMIN&lt;/b&gt;&lt;br&gt;admin.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;用户审核、商品审核、系统管理&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="635" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-system" parent="api-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;fontColor=#78350F;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-SYSTEM&lt;/b&gt;&lt;br&gt;system.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#78716C&#39;&gt;健康检查端点&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="840" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="ws-layer" parent="backend-cluster" style="swimlane;startSize=35;fillColor=#E0E7FF;strokeColor=#4F46E5;fontColor=#312E81;fontSize=12;rounded=1;arcSize=6;html=1;collapsible=0;" value="&lt;b&gt;WebSocket 实时通信层&lt;/b&gt;&lt;br&gt;Django Channels" vertex="1">
+          <mxGeometry height="205" width="440" x="1100" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="mod-chat-ws" parent="ws-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#4F46E5;fontColor=#312E81;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;MOD-CHAT-WS&lt;/b&gt;&lt;br&gt;consumers.py&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#6366F1&#39;&gt;AsyncWebsocketConsumer&lt;br&gt;实时聊天消息处理&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="400" x="20" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ws-routing" parent="ws-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#4F46E5;fontColor=#312E81;fontSize=11;arcSize=20;shadow=1;" value="&lt;b&gt;routing.py&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:10px;color:#6366F1&#39;&gt;/ws/chat/ → ChatConsumer&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="400" x="20" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ws-arrow" edge="1" parent="ws-layer" source="ws-routing" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F46E5;strokeWidth=1;dashed=1;" target="mod-chat-ws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="data-layer" parent="backend-cluster" style="swimlane;startSize=35;fillColor=#ECFDF5;strokeColor=#059669;fontColor=#064E3B;fontSize=12;rounded=1;arcSize=6;html=1;collapsible=0;" value="&lt;b&gt;数据模型层&lt;/b&gt;&lt;br&gt;models.py — 21 ORM Models" vertex="1">
+          <mxGeometry height="360" width="850" x="90" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="model-group-user" parent="data-layer" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#064E3B;fontSize=11;" value="&lt;b&gt;用户 &amp; 认证&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="20" y="42" as="geometry" />
+        </mxCell>
+        <mxCell id="m-user" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;User&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="20" y="72" as="geometry" />
+        </mxCell>
+        <mxCell id="m-registerreview" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;RegisterReview&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="120" x="140" y="72" as="geometry" />
+        </mxCell>
+        <mxCell id="m-usertagpref" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;UserTagPreference&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="140" x="270" y="72" as="geometry" />
+        </mxCell>
+        <mxCell id="model-group-product" parent="data-layer" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#064E3B;fontSize=11;" value="&lt;b&gt;商品 &amp; 分类&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="20" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="m-category" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;Category&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="20" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m-product" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;Product&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m-productreview" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ProductReview&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="120" x="260" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m-tag" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;Tag&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="90" x="390" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m-producttag" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ProductTag&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="490" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m-productfavorite" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ProductFavorite&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="130" x="610" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="model-group-order" parent="data-layer" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#064E3B;fontSize=11;" value="&lt;b&gt;订单 &amp; 交易&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="20" y="198" as="geometry" />
+        </mxCell>
+        <mxCell id="m-order" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;Order&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="20" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="m-orderdetail" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;OrderDetail&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="140" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="m-orderlog" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;OrderLog&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="260" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="model-group-comm" parent="data-layer" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#064E3B;fontSize=11;" value="&lt;b&gt;消息 &amp; 通知&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="450" y="198" as="geometry" />
+        </mxCell>
+        <mxCell id="m-message" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;Message&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="450" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="m-notification" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;Notification&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="570" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="m-chatmessage" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ChatMessage&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="120" x="690" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="model-group-forum" parent="data-layer" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#064E3B;fontSize=11;" value="&lt;b&gt;论坛社区&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="80" x="20" y="276" as="geometry" />
+        </mxCell>
+        <mxCell id="m-forumcategory" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ForumCategory&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="130" x="20" y="306" as="geometry" />
+        </mxCell>
+        <mxCell id="m-forumtag" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ForumTag&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="160" y="306" as="geometry" />
+        </mxCell>
+        <mxCell id="m-forumpost" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ForumPost&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="110" x="280" y="306" as="geometry" />
+        </mxCell>
+        <mxCell id="m-forumposttag" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ForumPostTag&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="130" x="400" y="306" as="geometry" />
+        </mxCell>
+        <mxCell id="m-forumpostlike" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ForumPostLike&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="130" x="540" y="306" as="geometry" />
+        </mxCell>
+        <mxCell id="m-forumcomment" parent="data-layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;fontColor=#064E3B;fontSize=10;arcSize=30;shadow=1;" value="&lt;b&gt;ForumComment&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="130" x="680" y="306" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-cluster" parent="1" style="swimlane;startSize=40;fillColor=#EFF6FF;strokeColor=#3B82F6;fontColor=#1E3A5F;fontSize=13;rounded=1;arcSize=8;shadow=1;html=1;collapsible=0;" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;前端应用集群&amp;nbsp;&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="330" width="1560" x="26" y="912" as="geometry" />
+        </mxCell>
+        <mxCell id="app-web" parent="frontend-cluster" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontColor=#1E3A5F;fontSize=11;arcSize=12;shadow=1;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;b style=&quot;&quot;&gt;APP-WEB&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Vue 3 + Vite&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;color: rgb(59, 130, 246);&quot;&gt;webview/&lt;br&gt;Web 端应用&lt;/font&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="180" width="400" x="110" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="app-mobile" parent="frontend-cluster" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontColor=#1E3A5F;fontSize=11;arcSize=12;shadow=1;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;b style=&quot;&quot;&gt;APP-MOBILE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Flutter&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;color: rgb(59, 130, 246);&quot;&gt;mobile/&lt;br&gt;iOS &amp;amp; Android 移动端&lt;/font&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="180" width="400" x="580" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="app-mini" parent="frontend-cluster" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;fontColor=#1E3A5F;fontSize=11;arcSize=12;shadow=1;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;b style=&quot;&quot;&gt;APP-MINI&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;uni-app 微信小程序&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;color: rgb(59, 130, 246);&quot;&gt;mini-program/&lt;br&gt;WeChat Mini-Program&lt;/font&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="180" width="400" x="1050" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-web-api" edge="1" parent="1" source="app-web" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6366F1;strokeWidth=2;fontColor=#6366F1;fontSize=10;dashed=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="backend-cluster" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="336" y="1013" />
+              <mxPoint x="416" y="1013" />
+            </Array>
+            <mxPoint x="338" y="892" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-mobile-api" edge="1" parent="1" source="app-mobile" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6366F1;strokeWidth=2;fontColor=#6366F1;fontSize=10;dashed=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.25;exitDx=0;exitDy=0;" target="data-layer" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="636" y="1122" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-mini-api" edge="1" parent="1" source="app-mini" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6366F1;strokeWidth=2;fontColor=#6366F1;fontSize=10;dashed=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="backend-cluster" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1276" y="1002" />
+              <mxPoint x="1196" y="1002" />
+            </Array>
+            <mxPoint x="1274" y="892" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ext-services" parent="1" style="swimlane;startSize=30;fillColor=#F5F3FF;strokeColor=#8B5CF6;fontColor=#5B21B6;fontSize=11;rounded=1;arcSize=6;html=1;collapsible=0;" value="&lt;b&gt;外部服务 (External Services)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="120" width="440" x="1066" y="582" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-cos" parent="ext-services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontColor=#5B21B6;fontSize=10;arcSize=20;shadow=1;" value="&lt;b&gt;腾讯云 COS&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#7C3AED&#39;&gt;对象存储 (图片)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="125" x="15" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-ai" parent="ext-services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontColor=#5B21B6;fontSize=10;arcSize=20;shadow=1;" value="&lt;b&gt;AI / LLM&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#7C3AED&#39;&gt;RAG 向量检索&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="125" x="155" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-db" parent="ext-services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;fontColor=#5B21B6;fontSize=10;arcSize=20;shadow=1;" value="&lt;b&gt;Database&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#7C3AED&#39;&gt;MySQL / PostgreSQL&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="130" x="295" y="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
